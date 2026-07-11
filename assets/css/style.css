@@ -183,4 +183,26 @@ section.block { padding: 56px 0; }
 .footer-grid li { margin-bottom: 6px; }
 .footer-bottom { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.85rem; }
 
+/* Site-wide verify-before-you-rely disclaimer (appears in every footer) */
+.site-footer .disclaimer {
+  border: 2px solid var(--accent-2);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 0 0 24px;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+}
+.site-footer .disclaimer .dh {
+  display: block;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent-2);
+  font-size: 1.02rem;
+  margin-bottom: 6px;
+}
+.site-footer .disclaimer strong { font-weight: 700; }
+
 hr.rule { border: 0; border-top: 1px solid var(--border); margin: 40px 0; }

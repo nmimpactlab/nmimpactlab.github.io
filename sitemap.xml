@@ -2,6 +2,12 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://nmimpactlab.org/</loc></url>
   <url><loc>https://nmimpactlab.org/investigations/</loc></url>
+  <url><loc>https://nmimpactlab.org/articles/</loc></url>
+  <url><loc>https://nmimpactlab.org/articles/introducing-new-mexico-impact-lab.html</loc></url>
+  <url><loc>https://nmimpactlab.org/articles/how-to-navigate-the-data.html</loc></url>
+  <url><loc>https://nmimpactlab.org/articles/where-new-mexico-bills-go-to-die.html</loc></url>
+  <url><loc>https://nmimpactlab.org/articles/who-works-the-new-mexico-legislature.html</loc></url>
+  <url><loc>https://nmimpactlab.org/articles/thirty-years-of-dead-bills.html</loc></url>
   <url><loc>https://nmimpactlab.org/investigations/legislation.html</loc></url>
   <url><loc>https://nmimpactlab.org/bills/</loc></url>
   <url><loc>https://nmimpactlab.org/lobbying/</loc></url>
@@ -10,6 +16,8 @@
   <url><loc>https://nmimpactlab.org/investigations/nm-courts.html</loc></url>
   <url><loc>https://nmimpactlab.org/data/</loc></url>
   <url><loc>https://nmimpactlab.org/methodology.html</loc></url>
+  <url><loc>https://nmimpactlab.org/support.html</loc></url>
+  <url><loc>https://nmimpactlab.org/resources.html</loc></url>
   <url><loc>https://nmimpactlab.org/about.html</loc></url>
   <url><loc>https://nmimpactlab.org/contact.html</loc></url>
 </urlset>
