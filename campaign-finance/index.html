@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New Mexico Campaign Finance — New Mexico Impact Lab</title>
+  <meta name="description" content="Explore $248M in New Mexico campaign contributions and spending, 2020–2026 — top donors, sectors, and recipient profiles. Individuals anonymized; organizations named.">
+  <link rel="canonical" href="https://nmimpactlab.org/campaign-finance/">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    .cf { max-width: 1200px; margin: 0 auto; padding: 24px 16px 60px; }
+    .cf h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 6px; }
+    .cf .sub { color: var(--text-soft); margin: 0 0 12px; max-width: 760px; }
+    .privacy { border: 1px solid var(--accent-2); border-radius: 8px; padding: 10px 14px; margin: 0 0 18px; font-size: 0.88rem; max-width: 760px; }
+    .privacy strong { color: var(--accent-2); }
+    .tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
+    .tabs button { padding: 9px 16px; border: 0; background: none; color: var(--text-soft); font-size: 0.95rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .tabs button.on { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab { display: none; } .tab.on { display: block; }
+    .kpis { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); margin-bottom: 24px; }
+    .kpi { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .kpi .n { font-size: 1.7rem; font-weight: 800; color: var(--accent); letter-spacing: -0.02em; }
+    .kpi .l { font-size: 0.85rem; color: var(--text-soft); }
+    .cf h2 { font-size: 1.15rem; margin: 26px 0 10px; }
+    .bars { display: grid; gap: 6px; }
+    .bar { display: grid; grid-template-columns: 190px 1fr auto; gap: 10px; align-items: center; font-size: 0.9rem; }
+    .bar .track { background: var(--bg-soft); border-radius: 5px; height: 18px; overflow: hidden; }
+    .bar .fill { height: 100%; background: var(--accent); border-radius: 5px; }
+    .bar .amt { color: var(--text-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    @media (max-width:560px){ .bar { grid-template-columns: 120px 1fr; } .bar .amt { grid-column: 2; text-align: right; } }
+    .cfsearch { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.95rem; width: 100%; max-width: 420px; margin-bottom: 12px; }
+    table.cft { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    table.cft th, table.cft td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    table.cft th { background: var(--bg-soft); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); }
+    table.cft td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    table.cft tr.click { cursor: pointer; } table.cft tr.click:hover td { background: var(--bg-soft); }
+    .tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+    .subrows td { background: var(--bg-soft); font-size: 0.85rem; color: var(--text-soft); }
+    .subrows ul { margin: 4px 0; padding-left: 18px; } .subrows li { margin: 2px 0; }
+    .profile { border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 18px; background: var(--bg-soft); display: none; }
+    .profile.show { display: block; }
+    .profile h3 { margin: 0 0 2px; } .profile .pt { color: var(--text-soft); font-size: 0.85rem; margin-bottom: 10px; }
+    .profile .pgrid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(230px,1fr)); }
+    .profile h4 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); margin: 0 0 6px; }
+    .profile ol, .profile ul { margin: 0; padding-left: 18px; font-size: 0.9rem; } .profile li { margin: 2px 0; }
+    .dlrow { margin: 6px 0 16px; } .dlrow button { padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); cursor: pointer; font-size: 0.84rem; }
+    .srcnote { margin-top: 22px; font-size: 0.82rem; color: var(--text-soft); }
+    .muted { color: var(--text-soft); }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="/"><span class="mark">NM</span> Impact Lab</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+      <div class="nav-links">
+        <a href="/investigations/">Investigations</a>
+        <a href="/articles/">Articles</a>
+        <a href="/data/">Data</a>
+        <a href="/methodology.html">Methodology</a>
+        <a href="/about.html">About</a>
+        <a href="/support.html">Support</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div class="cf">
+      <p><a href="/investigations/campaign-finance.html">&larr; Campaign Finance</a></p>
+      <h1>New Mexico campaign finance</h1>
+      <p class="sub" id="sub">Loading&hellip;</p>
+      <div class="privacy"><strong>How to read this:</strong> individual donors are <strong>anonymized</strong> (no names or addresses) &mdash; we surface *patterns*, not people. Organizations (PACs, businesses, unions, candidate committees) and recipients are named, because they are public actors. Coverage: <strong>2020&ndash;2026</strong>.</p>
+
+      <div class="tabs">
+        <button data-tab="overview" class="on">Overview</button>
+        <button data-tab="recipients">Recipients</button>
+        <button data-tab="orgs">Organizational donors</button>
+        <button data-tab="sectors">Sectors &amp; employers</button>
+      </div>
+
+      <section class="tab on" id="overview">
+        <div class="kpis" id="kpis"></div>
+        <h2>Money by election cycle</h2>
+        <div class="bars" id="byYear"></div>
+        <h2>Where the money comes from</h2>
+        <div class="bars" id="donorType"></div>
+      </section>
+
+      <section class="tab" id="recipients">
+        <h2>Recipients &mdash; candidates &amp; committees</h2>
+        <input class="cfsearch" id="recSearch" type="search" placeholder="Search a candidate or committee&hellip;" autocomplete="off">
+        <div class="dlrow"><button id="recDl">&#8681; Download recipient totals (CSV)</button></div>
+        <div class="profile" id="recProfile"></div>
+        <div class="tablewrap"><table class="cft"><thead><tr><th>Recipient</th><th>Type</th><th class="num">Raised</th><th class="num">Spent</th></tr></thead><tbody id="recBody"></tbody></table></div>
+      </section>
+
+      <section class="tab" id="orgs">
+        <h2>Organizational donors</h2>
+        <p class="muted" style="font-size:0.88rem;margin:0 0 10px;">PACs, businesses, unions, and candidate committees, by total contributed. Click a row to see who they funded.</p>
+        <input class="cfsearch" id="orgSearch" type="search" placeholder="Search an organization&hellip;" autocomplete="off">
+        <div class="dlrow"><button id="orgDl">&#8681; Download org donors (CSV)</button></div>
+        <div class="tablewrap"><table class="cft"><thead><tr><th>Organization</th><th class="num">Total given</th><th class="num">Gifts</th></tr></thead><tbody id="orgBody"></tbody></table></div>
+      </section>
+
+      <section class="tab" id="sectors">
+        <h2>Sectors &amp; employers</h2>
+        <p class="muted" style="font-size:0.88rem;margin:0 0 10px;">Employers behind individual contributions, by total. "Not employed / Retired / Self-employed" reflect how filers described themselves.</p>
+        <input class="cfsearch" id="secSearch" type="search" placeholder="Search an employer&hellip;" autocomplete="off">
+        <div class="dlrow"><button id="secDl">&#8681; Download employers (CSV)</button></div>
+        <div class="tablewrap"><table class="cft"><thead><tr><th>Employer</th><th class="num">Total</th><th class="num">Gifts</th></tr></thead><tbody id="secBody"></tbody></table></div>
+      </section>
+
+      <p class="srcnote">Source: New Mexico Secretary of State campaign-finance disclosures, 2020&ndash;2026, compiled with the Lab's custom-built data tools and provided as a research aid. Individual donors are pseudonymized and personal identifiers removed. The official record governs &mdash; verify against the source before relying on any figure, and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="disclaimer"><span class="dh">Verify before you rely</span>The data and analysis here are compiled from public records using the New Mexico Impact Lab's own custom-built data tools, and are provided as-is, as a research and finding aid. The original official record always governs: before using any figure, record, or finding in an official, legal, journalistic, or financial capacity, <strong>confirm it against the source document.</strong> This site is not an official record.</div>
+      <div class="footer-bottom">&copy; <span id="year">2026</span> New Mexico Impact Lab. Built on public records.</div>
+    </div>
+  </footer>
+
+  <script>
+    (function(){var b=document.querySelector('.nav-toggle'),l=document.querySelector('.nav-links');if(b&&l){b.addEventListener('click',function(){var o=l.classList.toggle('open');b.setAttribute('aria-expanded',o?'true':'false');});}var y=document.getElementById('year');if(y){y.textContent=new Date().getFullYear();}})();
+
+    var $=function(id){return document.getElementById(id);};
+    function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+    function money(n){n=+n||0;var a=Math.abs(n);if(a>=1e6)return '$'+(n/1e6).toFixed(a>=1e7?1:2)+'M';if(a>=1e3)return '$'+(n/1e3).toFixed(0)+'K';return '$'+n.toFixed(0);}
+    function full(n){return '$'+(+n||0).toLocaleString(undefined,{maximumFractionDigits:0});}
+
+    var SUM, RECIPS, ORGS, EMPS;
+    Promise.all([
+      fetch('/assets/data/cf-summary.json').then(function(r){return r.json();}),
+      fetch('/assets/data/cf-recipients.json').then(function(r){return r.json();}),
+      fetch('/assets/data/cf-orgdonors.json').then(function(r){return r.json();}),
+      fetch('/assets/data/cf-employers.json').then(function(r){return r.json();})
+    ]).then(function(a){
+      SUM=a[0]; RECIPS=a[1].recipients; ORGS=a[2].orgDonors; EMPS=a[3].employers;
+      renderOverview(); renderRecips(''); renderOrgs(''); renderSecs('');
+      $('sub').innerHTML = full(SUM.totals.raised)+' raised &middot; '+full(SUM.totals.spent)+' spent &middot; '
+        + SUM.totals.contributions.toLocaleString()+' contributions from '+SUM.totals.indDonors.toLocaleString()
+        + ' individual donors and '+SUM.totals.orgDonors.toLocaleString()+' organizations to '+SUM.totals.recipients.toLocaleString()+' recipients.';
+    }).catch(function(){ $('sub').textContent='Could not load the data.'; });
+
+    function barRow(label, val, max, amt){
+      var pct = max>0 ? Math.max(1, val/max*100) : 0;
+      return '<div class="bar"><span>'+esc(label)+'</span><span class="track"><span class="fill" style="width:'+pct.toFixed(1)+'%"></span></span><span class="amt">'+amt+'</span></div>';
+    }
+    function renderOverview(){
+      var t=SUM.totals;
+      $('kpis').innerHTML =
+        kpi(money(t.raised),'Raised, 2020–2026')+kpi(money(t.spent),'Spent')+
+        kpi(t.indDonors.toLocaleString(),'Individual donors (anonymized)')+
+        kpi(t.orgDonors.toLocaleString(),'Organizations')+kpi(t.recipients.toLocaleString(),'Recipients');
+      var yrs=SUM.years, maxY=0; yrs.forEach(function(y){maxY=Math.max(maxY,SUM.byYear[y].raised);});
+      $('byYear').innerHTML = yrs.map(function(y){var d=SUM.byYear[y];return barRow(y+' — raised', d.raised, maxY, money(d.raised)+' <span class="muted">/ '+money(d.spent)+' spent</span>');}).join('');
+      var dt=SUM.donorTypeAmt, maxD=0; Object.keys(dt).forEach(function(k){maxD=Math.max(maxD,dt[k]);});
+      $('donorType').innerHTML = Object.keys(dt).map(function(k){return barRow(k, dt[k], maxD, money(dt[k]));}).join('');
+    }
+    function kpi(n,l){return '<div class="kpi"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';}
+
+    // Recipients
+    function renderRecips(q){
+      q=q.toLowerCase();
+      var rows = RECIPS.filter(function(r){return !q || r.name.toLowerCase().indexOf(q)>=0;}).slice(0,150);
+      $('recBody').innerHTML = rows.map(function(r,i){
+        return '<tr class="click" data-oid="'+esc(r.orgid)+'"><td>'+esc(r.name)+'</td><td class="muted">'+esc(r.type)+'</td><td class="num">'+full(r.raised)+'</td><td class="num">'+full(r.spent)+'</td></tr>';
+      }).join('') || '<tr><td colspan="4" class="muted" style="padding:20px">No matches.</td></tr>';
+    }
+    function recProfile(oid){
+      var r=RECIPS.filter(function(x){return x.orgid===oid;})[0]; if(!r) return;
+      var mix=Object.keys(r.typeMix||{}).map(function(k){return '<li>'+esc(k)+': '+full(r.typeMix[k])+'</li>';}).join('');
+      var od=(r.topOrgDonors||[]).map(function(d){return '<li>'+esc(d[0])+' — '+full(d[1])+'</li>';}).join('')||'<li class="muted">none</li>';
+      var em=(r.topEmployers||[]).map(function(d){return '<li>'+esc(d[0])+' — '+full(d[1])+'</li>';}).join('')||'<li class="muted">none</li>';
+      var pm=(r.topPayees||[]).map(function(d){return '<li>'+esc(d[0])+' — '+full(d[1])+'</li>';}).join('')||'<li class="muted">none</li>';
+      var yy=Object.keys(r.byYear||{}).map(function(y){return '<li>'+y+': '+full(r.byYear[y])+'</li>';}).join('');
+      $('recProfile').innerHTML='<h3>'+esc(r.name)+'</h3><div class="pt">'+esc(r.type)+' &middot; '+full(r.raised)+' raised &middot; '+full(r.spent)+' spent &middot; '+r.nIndDonors.toLocaleString()+' individual donors</div>'
+        +'<div class="pgrid"><div><h4>Raised by year</h4><ul>'+yy+'</ul></div><div><h4>By donor type</h4><ul>'+mix+'</ul></div>'
+        +'<div><h4>Top organizational donors</h4><ol>'+od+'</ol></div><div><h4>Top employers behind donors</h4><ol>'+em+'</ol></div>'
+        +'<div><h4>Top payees (spending)</h4><ol>'+pm+'</ol></div></div>';
+      $('recProfile').classList.add('show'); window.scrollTo({top:$('recProfile').offsetTop-70,behavior:'smooth'});
+    }
+    $('recBody').addEventListener('click',function(e){var tr=e.target.closest('tr.click'); if(tr) recProfile(tr.dataset.oid);});
+    $('recSearch').addEventListener('input',function(){renderRecips(this.value);});
+
+    // Org donors
+    function renderOrgs(q){
+      q=q.toLowerCase();
+      var rows=ORGS.filter(function(o){return !q||o.name.toLowerCase().indexOf(q)>=0;}).slice(0,150);
+      $('orgBody').innerHTML=rows.map(function(o){
+        var subs=(o.topRecipients||[]).map(function(t){return '<li>'+esc(t[0])+' — '+full(t[1])+'</li>';}).join('');
+        return '<tr class="click"><td>'+esc(o.name)+'</td><td class="num">'+full(o.total)+'</td><td class="num">'+o.n+'</td></tr>'
+          +'<tr class="subrows" style="display:none"><td colspan="3"><strong>Top recipients:</strong><ul>'+(subs||'<li class="muted">n/a</li>')+'</ul></td></tr>';
+      }).join('')||'<tr><td colspan="3" class="muted" style="padding:20px">No matches.</td></tr>';
+    }
+    $('orgBody').addEventListener('click',function(e){var tr=e.target.closest('tr.click'); if(!tr)return; var sub=tr.nextElementSibling; if(sub&&sub.classList.contains('subrows')) sub.style.display = sub.style.display==='none'?'':'none';});
+    $('orgSearch').addEventListener('input',function(){renderOrgs(this.value);});
+
+    // Sectors
+    function renderSecs(q){
+      q=q.toLowerCase();
+      var rows=EMPS.filter(function(e){return !q||e.employer.toLowerCase().indexOf(q)>=0;}).slice(0,200);
+      $('secBody').innerHTML=rows.map(function(e){return '<tr><td>'+esc(e.employer)+'</td><td class="num">'+full(e.total)+'</td><td class="num">'+e.n.toLocaleString()+'</td></tr>';}).join('')||'<tr><td colspan="3" class="muted" style="padding:20px">No matches.</td></tr>';
+    }
+    $('secSearch').addEventListener('input',function(){renderSecs(this.value);});
+
+    // Tabs
+    document.querySelectorAll('.tabs button').forEach(function(b){
+      b.addEventListener('click',function(){
+        document.querySelectorAll('.tabs button').forEach(function(x){x.classList.remove('on');});
+        document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on');});
+        b.classList.add('on'); $(b.dataset.tab).classList.add('on');
+      });
+    });
+
+    // CSV downloads (with provenance)
+    function dlCSV(fname, cols, rows){
+      var prov=['# New Mexico Impact Lab | https://nmimpactlab.org',
+        '# Source: NM Secretary of State campaign-finance disclosures, 2020-2026',
+        '# Downloaded: '+new Date().toISOString(),
+        "# Compiled with the Lab's custom-built data tools. Individual donors anonymized; organizations and recipients named.",
+        '# The official record governs: verify against the source before any official, legal, journalistic, or financial use. Not an official record.',''];
+      function c(v){v=(v==null?'':String(v));return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+      var lines=prov.concat([cols.join(',')]).concat(rows.map(function(r){return r.map(c).join(',');}));
+      var blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});
+      var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},1000);
+    }
+    $('recDl').addEventListener('click',function(){dlCSV('nm_cf_recipients.csv',['Recipient','Type','Raised','Spent','IndividualDonors'],RECIPS.map(function(r){return [r.name,r.type,r.raised,r.spent,r.nIndDonors];}));});
+    $('orgDl').addEventListener('click',function(){dlCSV('nm_cf_org_donors.csv',['Organization','TotalGiven','Gifts'],ORGS.map(function(o){return [o.name,o.total,o.n];}));});
+    $('secDl').addEventListener('click',function(){dlCSV('nm_cf_employers.csv',['Employer','Total','Gifts'],EMPS.map(function(e){return [e.employer,e.total,e.n];}));});
+  </script>
+</body>
+</html>
