@@ -52,6 +52,10 @@
     .pager button:disabled { opacity: 0.4; cursor: default; }
     .loading, .empty { padding: 40px; text-align: center; color: var(--text-soft); }
     .srcnote { margin-top: 22px; font-size: 0.82rem; color: var(--text-soft); }
+    .dltools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 0 0 14px; }
+    .dltools button { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); cursor: pointer; font-size: 0.85rem; }
+    .dltools button:hover { background: var(--bg-soft); }
+    .dltools .dlnote { font-size: 0.8rem; color: var(--text-soft); }
   </style>
 </head>
 <body>
@@ -100,6 +104,12 @@
       <div class="resultbar">
         <span id="count" aria-live="polite">Loading&hellip;</span>
         <span id="pageinfo"></span>
+      </div>
+
+      <div class="dltools">
+        <button id="dlResults" type="button">&#8681; Download results (CSV)</button>
+        <button id="dlAll" type="button">&#8681; Download full dataset (CSV)</button>
+        <span class="dlnote">Each file includes its source and a verify-before-you-rely notice. Reuse with attribution.</span>
       </div>
 
       <div class="tablewrap">
@@ -284,6 +294,48 @@
 
     $('prev').addEventListener('click', function () { page--; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
     $('next').addEventListener('click', function () { page++; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+    // ---- CSV export (client-side, with provenance + verify notice) ----
+    function csvCell(v) { v = (v == null ? '' : String(v)); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    function todayStr() { var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+    function provenance(sourceDesc, dict) {
+      var lines = [
+        '# New Mexico Impact Lab  |  https://nmimpactlab.org',
+        '# Source: ' + sourceDesc,
+        '# Downloaded: ' + new Date().toISOString(),
+        '# NOTICE: Derived from public records via automated processing and MAY CONTAIN ERRORS.',
+        '# Verify every value against the original source record before any official, legal, journalistic, or financial use. This is a finding aid, not an official record.',
+        '# Reuse welcome with attribution to the New Mexico Impact Lab (nmimpactlab.org).'
+      ];
+      if (dict) { lines.push('# Column dictionary: ' + dict); }
+      lines.push('');
+      return lines;
+    }
+    function saveCSV(filename, headerCols, dataRows, sourceDesc, dict) {
+      if (!dataRows.length) { alert('No rows to download — adjust your search first.'); return; }
+      var lines = provenance(sourceDesc, dict);
+      lines.push(headerCols.map(csvCell).join(','));
+      for (var i = 0; i < dataRows.length; i++) lines.push(dataRows[i].map(csvCell).join(','));
+      var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a'); a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    }
+    var BILLS_COLS = ['Bill', 'Year', 'Session', 'Chamber', 'Title', 'Status', 'Committee path', 'Floor votes', 'Sponsors', 'Roll-call vote sheet URLs'];
+    var BILLS_SRC = 'New Mexico Legislature public bill records (nmlegis.gov), 1996-2026';
+    var BILLS_DICT = 'Bill=bill number; Year=year of session; Session=legislative session; Chamber=bill type/chamber; Title=official title; Status=final status as recorded; Committee path=committees traversed; Floor votes=count of recorded roll-call votes; Sponsors=listed sponsors (semicolon-separated); Roll-call vote sheet URLs=links to official PDF vote sheets on nmlegis.gov (space-separated)';
+    function billRow(r) {
+      var v = (r[COL.votes] || []).map(function (x) { return x[2]; }).filter(Boolean).join(' ');
+      return [r[COL.bill], r[COL.year], r[COL.session], r[COL.chamber], r[COL.title], r[COL.status], r[COL.committee], r[COL.votecount], r[COL.sponsors], v];
+    }
+    $('dlResults').addEventListener('click', function () {
+      saveCSV('nmimpactlab_bills_results_' + todayStr() + '.csv', BILLS_COLS, view.map(billRow), BILLS_SRC, BILLS_DICT);
+    });
+    $('dlAll').addEventListener('click', function () {
+      saveCSV('nmimpactlab_bills_full_' + todayStr() + '.csv', BILLS_COLS, DATA.map(billRow), BILLS_SRC, BILLS_DICT);
+    });
   </script>
 </body>
 </html>
