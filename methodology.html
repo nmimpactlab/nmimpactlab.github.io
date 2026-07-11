@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Methodology &amp; sourcing — New Mexico Impact Lab</title>
+  <meta name="description" content="How the New Mexico Impact Lab collects, verifies, and publishes public records — and the principles that govern what we post.">
+  <link rel="canonical" href="https://nmimpactlab.org/methodology.html">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="/"><span class="mark">NM</span> Impact Lab</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+      <div class="nav-links">
+        <a href="/investigations/">Investigations</a>
+        <a href="/data/">Data</a>
+        <a href="/methodology.html">Methodology</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <article class="prose">
+      <h1>Methodology &amp; sourcing</h1>
+      <p class="byline">How we collect, verify, and publish &mdash; and what we won't post.</p>
+
+      <p>Everything on this site is built from public records: documents and data that New Mexico law already makes available to anyone. Our job is to make them findable and usable.</p>
+
+      <h2>Where the data comes from</h2>
+      <p>Our sources are government systems and public filings &mdash; for example the New Mexico Legislature's bill records and published proceedings, state campaign-finance and lobbying disclosures, court dockets, and agency spending records. Each dataset page names its source and links back to the originating system wherever possible.</p>
+
+      <h2>How we collect it</h2>
+      <p>Where records are available only through a website, we retrieve them programmatically at a modest, respectful rate. We collect only material that is publicly reachable, we do not bypass logins or access controls, and we honor published access rules. We keep a copy of the original record so that our published version can always be checked against its source.</p>
+
+      <h2>How we verify it</h2>
+      <p>Data is normalized &mdash; names, dates, and amounts made consistent &mdash; without changing the underlying facts. We preserve the original values alongside cleaned values so anyone can audit our transformations. When we are uncertain about a record, we say so.</p>
+
+      <h2>What we publish &mdash; and what we don't</h2>
+      <ul>
+        <li>We publish facts drawn from public records, with sources, and let readers draw their own conclusions.</li>
+        <li>We focus on public officials and institutions acting in their official capacity.</li>
+        <li>We do not publish private personal information &mdash; such as home addresses, personal contact details, or other sensitive identifiers &mdash; even when it appears in a record.</li>
+        <li>We correct errors promptly. See <a href="/contact.html">Contact</a>.</li>
+      </ul>
+
+      <div class="callout">
+        A note on independence: this project is not affiliated with any campaign, party, agency, or single institution. Our aim is a durable, statewide public record &mdash; not any one target.
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <h4>New Mexico Impact Lab</h4>
+          <p style="max-width:340px;margin:0 0 8px;">Public-interest data and accountability for New Mexico.</p>
+          <p style="margin:0;"><a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a></p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="/investigations/">Investigations</a></li>
+            <li><a href="/data/">Data</a></li>
+            <li><a href="/methodology.html">Methodology &amp; sourcing</a></li>
+            <li><a href="/about.html">About</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">&copy; <span id="year">2026</span> New Mexico Impact Lab. Built on public records.</div>
+    </div>
+  </footer>
+  <script>
+    (function(){var b=document.querySelector('.nav-toggle'),l=document.querySelector('.nav-links');if(b&&l){b.addEventListener('click',function(){var o=l.classList.toggle('open');b.setAttribute('aria-expanded',o?'true':'false');});}var y=document.getElementById('year');if(y){y.textContent=new Date().getFullYear();}})();
+  </script>
+</body>
+</html>

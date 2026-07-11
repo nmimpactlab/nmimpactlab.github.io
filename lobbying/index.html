@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Search NM Lobbyists &amp; Employers — New Mexico Impact Lab</title>
+  <meta name="description" content="Search New Mexico lobbyist registrations by lobbyist or employer. Public disclosure data; personal contact details omitted.">
+  <link rel="canonical" href="https://nmimpactlab.org/lobbying/">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    .tool { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+    .tool h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 6px; }
+    .tool .sub { color: var(--text-soft); margin: 0 0 22px; }
+    .controls { display: grid; gap: 12px; grid-template-columns: 3fr 1fr; align-items: end; margin-bottom: 8px; }
+    @media (max-width: 640px) { .controls { grid-template-columns: 1fr; } }
+    .field label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-soft); margin-bottom: 4px; }
+    .field input, .field select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.95rem; }
+    .field input:focus, .field select:focus { outline: 2px solid var(--ring); outline-offset: 1px; }
+    .resultbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin: 10px 0 12px; color: var(--text-soft); font-size: 0.9rem; }
+    .tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+    table.lob { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    table.lob th, table.lob td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    table.lob th { background: var(--bg-soft); position: sticky; top: 0; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); }
+    table.lob tr:last-child td { border-bottom: 0; }
+    table.lob td.name { font-weight: 600; white-space: nowrap; }
+    .pill { display: inline-block; font-size: 0.72rem; padding: 2px 7px; border-radius: 20px; background: var(--bg-soft); color: var(--text-soft); white-space: nowrap; }
+    .pager { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 18px; }
+    .pager button { padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); cursor: pointer; font-size: 0.9rem; }
+    .pager button:disabled { opacity: 0.4; cursor: default; }
+    .empty { padding: 40px; text-align: center; color: var(--text-soft); }
+    .srcnote { margin-top: 22px; font-size: 0.82rem; color: var(--text-soft); }
+    .privacy { background: var(--bg-soft); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 6px; margin: 0 0 20px; font-size: 0.9rem; color: var(--text-soft); }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="/"><span class="mark">NM</span> Impact Lab</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+      <div class="nav-links">
+        <a href="/investigations/">Investigations</a>
+        <a href="/data/">Data</a>
+        <a href="/methodology.html">Methodology</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div class="tool">
+      <p><a href="/investigations/lobbying.html">&larr; Lobbying &amp; Employers</a></p>
+      <h1>Search lobbyists &amp; employers</h1>
+      <p class="sub">Who lobbies the New Mexico Legislature, and who pays them &mdash; search by either side of the relationship.</p>
+
+      <div class="privacy">This index shows public registration facts only: lobbyist name, employer, the employer's city/state, and the years registered. Personal contact details (email, phone, home address) are intentionally omitted.</div>
+
+      <div class="controls">
+        <div class="field">
+          <label for="q">Search by lobbyist or employer</label>
+          <input type="search" id="q" placeholder="e.g. Oil &amp; Gas Association, or a lobbyist's name" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="year">Registered in year</label>
+          <select id="year"><option value="">Any year</option></select>
+        </div>
+      </div>
+
+      <div class="resultbar">
+        <span id="count" aria-live="polite">Loading&hellip;</span>
+        <span id="pageinfo"></span>
+      </div>
+
+      <div class="tablewrap">
+        <table class="lob" aria-label="NM lobbyist registrations">
+          <thead>
+            <tr>
+              <th scope="col">Lobbyist</th>
+              <th scope="col">Employer</th>
+              <th scope="col">Employer location</th>
+              <th scope="col">Years registered</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="4" class="empty">Loading&hellip;</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pager">
+        <button id="prev" disabled>&larr; Previous</button>
+        <span id="pagenum" style="color:var(--text-soft);font-size:0.9rem;"></span>
+        <button id="next" disabled>Next &rarr;</button>
+      </div>
+
+      <p class="srcnote">Source: New Mexico lobbyist registration disclosures (public record). Automated processing can contain errors &mdash; verify against the source and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-bottom">&copy; <span id="year2">2026</span> New Mexico Impact Lab. Built on public records.</div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var b = document.querySelector('.nav-toggle'), l = document.querySelector('.nav-links');
+      if (b && l) b.addEventListener('click', function () { var o = l.classList.toggle('open'); b.setAttribute('aria-expanded', o ? 'true' : 'false'); });
+      var yy = document.getElementById('year2'); if (yy) yy.textContent = new Date().getFullYear();
+    })();
+
+    var PAGE = 100;
+    var DATA = [], view = [], page = 0, YMIN = null, YMAX = null;
+    var COL = { lobbyist:0, employer:1, city:2, state:3, years:4, n:5 };
+    var $ = function (id) { return document.getElementById(id); };
+    function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+    function yearInRange(yearsStr, y) {
+      if (!y) return true;
+      y = +y;
+      var parts = String(yearsStr).split('-');
+      var lo = +parts[0], hi = +parts[parts.length - 1];
+      return y >= lo && y <= hi;
+    }
+
+    function render() {
+      var tb = $('tbody');
+      if (!view.length) {
+        tb.innerHTML = '<tr><td colspan="4" class="empty">No registrations match your search.</td></tr>';
+        $('pagenum').textContent = ''; $('prev').disabled = true; $('next').disabled = true; $('pageinfo').textContent = '';
+        return;
+      }
+      var pages = Math.ceil(view.length / PAGE);
+      if (page >= pages) page = pages - 1;
+      if (page < 0) page = 0;
+      var start = page * PAGE, slice = view.slice(start, start + PAGE), html = '';
+      for (var i = 0; i < slice.length; i++) {
+        var r = slice[i];
+        var loc = [r[COL.city], r[COL.state]].filter(Boolean).join(', ');
+        html += '<tr>'
+          + '<td class="name">' + esc(r[COL.lobbyist]) + '</td>'
+          + '<td>' + esc(r[COL.employer]) + '</td>'
+          + '<td>' + esc(loc) + '</td>'
+          + '<td>' + esc(r[COL.years]) + (r[COL.n] > 1 ? ' <span class="pill">' + r[COL.n] + ' yrs</span>' : '') + '</td>'
+          + '</tr>';
+      }
+      tb.innerHTML = html;
+      $('pagenum').textContent = 'Page ' + (page + 1) + ' of ' + pages;
+      $('pageinfo').textContent = 'Showing ' + (start + 1) + '–' + (start + slice.length);
+      $('prev').disabled = page === 0;
+      $('next').disabled = page >= pages - 1;
+    }
+
+    function apply() {
+      var q = $('q').value.trim().toLowerCase();
+      var y = $('year').value;
+      var terms = q ? q.split(/\s+/) : [];
+      view = DATA.filter(function (r) {
+        if (y && !yearInRange(r[COL.years], y)) return false;
+        if (terms.length) {
+          var hay = (r[COL.lobbyist] + ' ' + r[COL.employer] + ' ' + r[COL.city] + ' ' + r[COL.state]).toLowerCase();
+          for (var t = 0; t < terms.length; t++) if (hay.indexOf(terms[t]) === -1) return false;
+        }
+        return true;
+      });
+      page = 0;
+      $('count').textContent = view.length.toLocaleString() + ' of ' + DATA.length.toLocaleString() + ' registrations';
+      render();
+    }
+    var debounce;
+    function onInput() { clearTimeout(debounce); debounce = setTimeout(apply, 150); }
+
+    fetch('/assets/data/lobbying.json').then(function (r) { return r.json(); }).then(function (d) {
+      DATA = d.rows; YMIN = d.year_min; YMAX = d.year_max;
+      var ys = $('year');
+      if (YMIN && YMAX) for (var y = YMAX; y >= YMIN; y--) { var o = document.createElement('option'); o.value = y; o.textContent = y; ys.appendChild(o); }
+      $('q').addEventListener('input', onInput);
+      $('year').addEventListener('change', apply);
+      apply();
+    }).catch(function () {
+      $('tbody').innerHTML = '<tr><td colspan="4" class="empty">Could not load the dataset. Please refresh, or email research@nmimpactlab.org.</td></tr>';
+      $('count').textContent = '';
+    });
+
+    $('prev').addEventListener('click', function () { page--; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    $('next').addEventListener('click', function () { page++; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  </script>
+</body>
+</html>

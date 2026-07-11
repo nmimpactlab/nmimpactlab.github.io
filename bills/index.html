@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Search New Mexico Bills — New Mexico Impact Lab</title>
+  <meta name="description" content="Search 48,000+ New Mexico legislative bills (1996–2026) by keyword, sponsor, year, and chamber. Built from public nmlegis.gov records.">
+  <link rel="canonical" href="https://nmimpactlab.org/bills/">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    .tool { max-width: 1200px; margin: 0 auto; padding: 28px 20px 60px; }
+    .tool h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 6px; }
+    .tool .sub { color: var(--text-soft); margin: 0 0 22px; }
+    .controls {
+      display: grid; gap: 12px; grid-template-columns: 2fr 1fr 1fr auto;
+      align-items: end; margin-bottom: 16px;
+    }
+    @media (max-width: 720px) { .controls { grid-template-columns: 1fr 1fr; } }
+    .field label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-soft); margin-bottom: 4px; }
+    .field input, .field select {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+      border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.95rem;
+    }
+    .field input:focus, .field select:focus { outline: 2px solid var(--ring); outline-offset: 1px; }
+    .resultbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin: 10px 0 12px; color: var(--text-soft); font-size: 0.9rem; }
+    .tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+    table.bills { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    table.bills th, table.bills td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    table.bills th { background: var(--bg-soft); position: sticky; top: 0; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); }
+    table.bills tr:last-child td { border-bottom: 0; }
+    table.bills td.billid { font-weight: 700; white-space: nowrap; }
+    table.bills td.title { min-width: 240px; }
+    table.bills td.spon { color: var(--text-soft); min-width: 160px; }
+    .pill { display: inline-block; font-size: 0.72rem; padding: 2px 7px; border-radius: 20px; background: var(--bg-soft); color: var(--text-soft); white-space: nowrap; }
+    table.bills tr.billrow.expandable { cursor: pointer; }
+    table.bills tr.billrow.expandable:hover td { background: var(--bg-soft); }
+    td.caret { width: 18px; color: var(--text-soft); }
+    tr.billrow.open td.caret { transform: none; }
+    .votepill { background: var(--accent); color: #fff; cursor: pointer; }
+    tr.detailrow td { background: var(--bg-soft); padding: 14px 16px 16px 40px; }
+    .detail h4 { margin: 0 0 6px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); }
+    .detail .votes { list-style: none; margin: 0 0 6px; padding: 0; }
+    .detail .votes li { margin: 3px 0; font-size: 0.9rem; }
+    .detail .sponsors { font-size: 0.9rem; color: var(--text); margin: 0 0 10px; }
+    .detail .novotes { color: var(--text-soft); font-size: 0.9rem; }
+    .detail .actionpath { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 10px; font-size: 0.9rem; }
+    .detail .step { display: inline-flex; align-items: baseline; gap: 5px; padding: 3px 9px; border: 1px solid var(--border); border-radius: 20px; background: var(--bg); }
+    .detail .stepstat { font-size: 0.75rem; color: var(--text-soft); }
+    .detail .arrow { color: var(--text-soft); }
+    .pager { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 18px; }
+    .pager button { padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); cursor: pointer; font-size: 0.9rem; }
+    .pager button:disabled { opacity: 0.4; cursor: default; }
+    .loading, .empty { padding: 40px; text-align: center; color: var(--text-soft); }
+    .srcnote { margin-top: 22px; font-size: 0.82rem; color: var(--text-soft); }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="/"><span class="mark">NM</span> Impact Lab</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+      <div class="nav-links">
+        <a href="/investigations/">Investigations</a>
+        <a href="/data/">Data</a>
+        <a href="/methodology.html">Methodology</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div class="tool">
+      <p><a href="/investigations/legislation.html">&larr; Bills, Votes &amp; the Record</a></p>
+      <h1>Search New Mexico bills</h1>
+      <p class="sub">Every bill in the New Mexico Legislature's public record, 1996&ndash;2026 &mdash; searchable by keyword, sponsor, year, and chamber.</p>
+
+      <div class="controls">
+        <div class="field">
+          <label for="q">Search title, bill number, or sponsor</label>
+          <input type="search" id="q" placeholder="e.g. water rights, HB 2, Rick Miera" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="year">Year</label>
+          <select id="year"><option value="">All years</option></select>
+        </div>
+        <div class="field">
+          <label for="chamber">Chamber</label>
+          <select id="chamber"><option value="">All</option></select>
+        </div>
+        <div class="field">
+          <label for="died">&nbsp;</label>
+          <label style="font-weight:500;color:var(--text);font-size:0.9rem;"><input type="checkbox" id="died" style="width:auto;margin-right:6px;">Died in committee/session</label>
+        </div>
+      </div>
+
+      <div class="resultbar">
+        <span id="count" aria-live="polite">Loading&hellip;</span>
+        <span id="pageinfo"></span>
+      </div>
+
+      <div class="tablewrap">
+        <table class="bills" aria-label="New Mexico bills">
+          <thead>
+            <tr>
+              <th scope="col" aria-label="Expand"></th>
+              <th scope="col">Bill</th>
+              <th scope="col">Year</th>
+              <th scope="col">Title</th>
+              <th scope="col">Status</th>
+              <th scope="col">Committee path</th>
+              <th scope="col">Votes</th>
+              <th scope="col">Sponsor(s)</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="8" class="loading">Loading 48,000+ bills&hellip;</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pager">
+        <button id="prev" disabled>&larr; Previous</button>
+        <span id="pagenum" style="color:var(--text-soft);font-size:0.9rem;"></span>
+        <button id="next" disabled>Next &rarr;</button>
+      </div>
+
+      <p class="srcnote">Source: New Mexico Legislature public bill records (nmlegis.gov). These are facts drawn from the public record; automated processing can contain errors &mdash; verify against the source before relying on any entry, and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-bottom">&copy; <span id="year2">2026</span> New Mexico Impact Lab. Built on public records.</div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var b = document.querySelector('.nav-toggle'), l = document.querySelector('.nav-links');
+      if (b && l) b.addEventListener('click', function () { var o = l.classList.toggle('open'); b.setAttribute('aria-expanded', o ? 'true' : 'false'); });
+      var yy = document.getElementById('year2'); if (yy) yy.textContent = new Date().getFullYear();
+    })();
+
+    var PAGE = 100;
+    var DATA = [], view = [], page = 0;
+    var COL = { bill:0, year:1, session:2, chamber:3, title:4, status:5, committee:6, votecount:7, sponsors:8, votes:9, actions:10 };
+    var $ = function (id) { return document.getElementById(id); };
+
+    function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+    function render() {
+      var tb = $('tbody');
+      if (!view.length) {
+        tb.innerHTML = '<tr><td colspan="8" class="empty">No bills match your search.</td></tr>';
+        $('pagenum').textContent = ''; $('prev').disabled = true; $('next').disabled = true;
+        $('pageinfo').textContent = '';
+        return;
+      }
+      var pages = Math.ceil(view.length / PAGE);
+      if (page >= pages) page = pages - 1;
+      if (page < 0) page = 0;
+      var start = page * PAGE, slice = view.slice(start, start + PAGE);
+      var html = '';
+      for (var i = 0; i < slice.length; i++) {
+        var r = slice[i];
+        var nv = r[COL.votecount];
+        var votes = nv ? '<span class="pill votepill">' + nv + ' &#9662;</span>' : '';
+        var expandable = nv > 0;
+        html += '<tr class="billrow' + (expandable ? ' expandable' : '') + '" data-vi="' + (start + i) + '">'
+          + '<td class="caret">' + (expandable ? '&#9656;' : '') + '</td>'
+          + '<td class="billid">' + esc(r[COL.bill]) + '</td>'
+          + '<td>' + esc(r[COL.year]) + '</td>'
+          + '<td class="title">' + esc(r[COL.title]) + '</td>'
+          + '<td>' + esc(r[COL.status]) + '</td>'
+          + '<td>' + esc(r[COL.committee]) + '</td>'
+          + '<td>' + votes + '</td>'
+          + '<td class="spon">' + esc(r[COL.sponsors]) + '</td>'
+          + '</tr>';
+      }
+      tb.innerHTML = html;
+      $('pagenum').textContent = 'Page ' + (page + 1) + ' of ' + pages;
+      $('pageinfo').textContent = 'Showing ' + (start + 1) + '–' + (start + slice.length);
+      $('prev').disabled = page === 0;
+      $('next').disabled = page >= pages - 1;
+    }
+
+    // Expand/collapse a bill row to show roll-call vote sheets + full sponsors
+    $('tbody').addEventListener('click', function (e) {
+      var tr = e.target.closest ? e.target.closest('tr.billrow.expandable') : null;
+      if (!tr) return;
+      var next = tr.nextElementSibling;
+      if (next && next.classList.contains('detailrow')) {
+        next.parentNode.removeChild(next);
+        tr.classList.remove('open');
+        tr.querySelector('.caret').innerHTML = '&#9656;';
+        return;
+      }
+      var r = view[+tr.dataset.vi];
+      if (!r) return;
+      var vs = r[COL.votes] || [];
+      var acts = r[COL.actions] || [];
+      var html = '<div class="detail">';
+      if (r[COL.sponsors]) html += '<h4>Sponsors</h4><div class="sponsors">' + esc(r[COL.sponsors]) + '</div>';
+      html += '<h4>Committee path</h4>';
+      if (acts.length) {
+        var steps = [];
+        for (var a = 0; a < acts.length; a++) {
+          var cm = esc(acts[a][0]);
+          var status = acts[a][2] ? 'reported out' : (acts[a][1] ? 'referred' : '');
+          steps.push('<span class="step"><strong>' + cm + '</strong>' + (status ? ' <span class="stepstat">' + status + '</span>' : '') + '</span>');
+        }
+        html += '<div class="actionpath">' + steps.join('<span class="arrow">&#8594;</span>') + '</div>';
+      } else {
+        html += '<div class="novotes">' + (r[COL.committee] ? esc(r[COL.committee]) : 'No committee actions on file.') + '</div>';
+      }
+      html += '<h4>Roll-call votes</h4>';
+      if (vs.length) {
+        html += '<ul class="votes">';
+        for (var i = 0; i < vs.length; i++) {
+          var label = esc(vs[i][0]) + (vs[i][1] ? ' <span style="color:var(--text-soft)">(' + esc(vs[i][1]) + ')</span>' : '');
+          html += '<li>' + (vs[i][2]
+            ? '<a href="' + esc(vs[i][2]) + '" target="_blank" rel="noopener">' + label + ' &#8599;</a>'
+            : label) + '</li>';
+        }
+        html += '</ul><div class="novotes">Official vote sheets (PDF) on nmlegis.gov.</div>';
+      } else {
+        html += '<div class="novotes">No roll-call vote sheet on file.</div>';
+      }
+      html += '</div>';
+      var dr = document.createElement('tr');
+      dr.className = 'detailrow';
+      dr.innerHTML = '<td colspan="8">' + html + '</td>';
+      tr.parentNode.insertBefore(dr, tr.nextSibling);
+      tr.classList.add('open');
+      tr.querySelector('.caret').innerHTML = '&#9662;';
+    });
+
+    function apply() {
+      var q = $('q').value.trim().toLowerCase();
+      var yr = $('year').value;
+      var ch = $('chamber').value;
+      var diedOnly = $('died').checked;
+      var terms = q ? q.split(/\s+/) : [];
+      view = DATA.filter(function (r) {
+        if (yr && String(r[COL.year]) !== yr) return false;
+        if (ch && r[COL.chamber] !== ch) return false;
+        if (diedOnly && !/died/i.test(r[COL.status])) return false;
+        if (terms.length) {
+          var hay = (r[COL.bill] + ' ' + r[COL.title] + ' ' + r[COL.sponsors] + ' ' + r[COL.status]).toLowerCase();
+          for (var t = 0; t < terms.length; t++) if (hay.indexOf(terms[t]) === -1) return false;
+        }
+        return true;
+      });
+      page = 0;
+      $('count').textContent = view.length.toLocaleString() + ' of ' + DATA.length.toLocaleString() + ' bills';
+      render();
+    }
+
+    var debounce;
+    function onInput() { clearTimeout(debounce); debounce = setTimeout(apply, 150); }
+
+    fetch('/assets/data/bills.json').then(function (r) { return r.json(); }).then(function (d) {
+      DATA = d.rows;
+      // year dropdown
+      var ys = $('year');
+      (d.years || []).forEach(function (y) { var o = document.createElement('option'); o.value = y; o.textContent = y; ys.appendChild(o); });
+      // chamber dropdown (distinct)
+      var chs = {}; DATA.forEach(function (r) { if (r[COL.chamber]) chs[r[COL.chamber]] = 1; });
+      var cs = $('chamber'); Object.keys(chs).sort().forEach(function (c) { var o = document.createElement('option'); o.value = c; o.textContent = c; cs.appendChild(o); });
+      $('q').addEventListener('input', onInput);
+      $('year').addEventListener('change', apply);
+      $('chamber').addEventListener('change', apply);
+      $('died').addEventListener('change', apply);
+      apply();
+    }).catch(function (e) {
+      $('tbody').innerHTML = '<tr><td colspan="8" class="empty">Could not load the dataset. Please refresh, or email research@nmimpactlab.org.</td></tr>';
+      $('count').textContent = '';
+    });
+
+    $('prev').addEventListener('click', function () { page--; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    $('next').addEventListener('click', function () { page++; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  </script>
+</body>
+</html>
