@@ -35,7 +35,7 @@
     #net { display: block; width: 100%; height: 72vh; min-height: 440px; touch-action: none; cursor: grab; }
     #net:active { cursor: grabbing; }
     .maphint { position: absolute; left: 12px; bottom: 10px; font-size: 0.78rem; color: var(--text-soft); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px; opacity: 0.92; }
-    .nodelabel { font-size: 9px; fill: var(--text); pointer-events: none; paint-order: stroke; stroke: var(--bg); stroke-width: 2.5px; }
+    .nodelabel { fill: var(--text); pointer-events: none; paint-order: stroke; stroke: var(--bg); }
     .panel { position: absolute; top: 12px; right: 12px; width: 300px; max-width: 78%; max-height: 82%; overflow: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); padding: 14px 16px; display: none; font-size: 0.9rem; }
     .panel.show { display: block; }
     .panel h3 { margin: 0 4px 2px 0; font-size: 1.05rem; }
@@ -129,9 +129,140 @@
 
     function $(id){return document.getElementById(id);}
     function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-    function setVB(){svg.setAttribute('viewBox',vb.x+' '+vb.y+' '+vb.w+' '+vb.h);}
+    function setVB(){svg.setAttribute('viewBox',vb.x+' '+vb.y+' '+vb.w+' '+vb.h); rescale();}
+    // keep labels/strokes a constant SIZE ON SCREEN regardless of zoom
+    function rescale(){
+      if(!NODES.length) return;
+      var px=svg.clientWidth||svg.getBoundingClientRect().width;
+      if(!px||px<=0) return;              // not laid out yet; don't compute a bogus scale
+      var k=vb.w/px;                        // user units per screen pixel
+      var fs=11*k;                          // ~11px on screen
+      for(var i=0;i<NODES.length;i++){
+        var t=labelEls[i]; if(!t) continue;
+        t.style.fontSize=fs+'px';
+        t.style.strokeWidth=(3*k)+'px';
+        t.setAttribute('x',NODES[i].x+rad(NODES[i])+2*k);
+        t.setAttribute('y',NODES[i].y+fs*0.34);
+        if(nodeEls[i]) nodeEls[i].style.strokeWidth=(1.2*k)+'px';
+      }
+      for(var j=0;j<EDGES.length;j++){
+        if(EDGES[j].el) EDGES[j].el.style.strokeWidth=((focus?1.1:0.8)*k)+'px';
+      }
+    }
+    window.addEventListener('resize',rescale);
     function rad(n){var b=n.kind==='employer'?2.2:1.7,m=n.kind==='employer'?26:16,mn=n.kind==='employer'?4:2.5;
       return Math.max(mn,Math.min(m,mn+Math.sqrt(n.deg)*b));}
+
+
+    // ===== force-directed physics (ported from Amy's p5 sketch: Coulomb repulsion,
+    // Hooke springs, center pull, velocity damping; drag pins a node so others resettle)
+    var PHYS={repulsion:9000, springK:0.02, restLength:85, centerPull:0.0006, damping:0.85,
+              maxF:35, maxV:25, cool:0.985, minAlpha:0.02};
+    var sim={raf:null, drag:null, moved:false, alpha:0};
+
+    function focusList(){
+      if(!focus) return [];
+      var a=[]; focus.forEach(function(i){ if(!catOff(i)) a.push(i); }); return a;
+    }
+    function toUser(ev){
+      var r=svg.getBoundingClientRect();
+      return {x:vb.x+(ev.clientX-r.left)/r.width*vb.w, y:vb.y+(ev.clientY-r.top)/r.height*vb.h};
+    }
+    function syncNode(i){
+      var n=NODES[i];
+      if(nodeEls[i]){nodeEls[i].setAttribute('cx',n.x); nodeEls[i].setAttribute('cy',n.y);}
+      var t=labelEls[i];
+      if(t){var fs=parseFloat(t.style.fontSize)||9;
+            t.setAttribute('x',n.x+rad(n)+2); t.setAttribute('y',n.y+fs*0.34);}
+    }
+    function syncEdges(){
+      for(var j=0;j<EDGES.length;j++){
+        var e=EDGES[j]; if(!e.el||e.el.style.display==='none') continue;
+        var a=NODES[e[0]],b=NODES[e[1]];
+        e.el.setAttribute('x1',a.x); e.el.setAttribute('y1',a.y);
+        e.el.setAttribute('x2',b.x); e.el.setAttribute('y2',b.y);
+      }
+    }
+    function simStep(){
+      var ns=focusList(); if(ns.length<2) return 0;
+      var i,j,a,b,k;
+      for(k=0;k<ns.length;k++){var n=NODES[ns[k]]; n._fx=0; n._fy=0; if(n._vx===undefined){n._vx=0;n._vy=0;}}
+      // repulsion
+      for(i=0;i<ns.length;i++){
+        for(j=i+1;j<ns.length;j++){
+          a=NODES[ns[i]]; b=NODES[ns[j]];
+          var dx=b.x-a.x, dy=b.y-a.y, d2=dx*dx+dy*dy+0.01, d=Math.sqrt(d2);
+          var f=PHYS.repulsion/d2, fx=f*dx/d, fy=f*dy/d;
+          a._fx-=fx; a._fy-=fy; b._fx+=fx; b._fy+=fy;
+        }
+      }
+      // springs on visible edges
+      var inSet={}; for(k=0;k<ns.length;k++) inSet[ns[k]]=1;
+      for(j=0;j<EDGES.length;j++){
+        var e=EDGES[j]; if(!inSet[e[0]]||!inSet[e[1]]) continue;
+        a=NODES[e[0]]; b=NODES[e[1]];
+        var ex=b.x-a.x, ey=b.y-a.y, ed=Math.sqrt(ex*ex+ey*ey)+0.01;
+        var force=PHYS.springK*(ed-PHYS.restLength);
+        var sfx=force*ex/ed, sfy=force*ey/ed;
+        a._fx+=sfx; a._fy+=sfy; b._fx-=sfx; b._fy-=sfy;
+      }
+      // center pull toward current view centre
+      var cx=vb.x+vb.w/2, cy=vb.y+vb.h/2;
+      for(k=0;k<ns.length;k++){var m=NODES[ns[k]]; m._fx+=(cx-m.x)*PHYS.centerPull*vb.w*0.02; m._fy+=(cy-m.y)*PHYS.centerPull*vb.w*0.02;}
+      // integrate (clamped: raw Coulomb spikes to ~1e6 when nodes near-coincide)
+      var energy=0;
+      for(k=0;k<ns.length;k++){
+        var q=NODES[ns[k]];
+        if(sim.drag&&sim.drag.i===ns[k]){q._vx=0;q._vy=0; continue;}
+        var fm=Math.sqrt(q._fx*q._fx+q._fy*q._fy);
+        if(fm>PHYS.maxF){q._fx=q._fx/fm*PHYS.maxF; q._fy=q._fy/fm*PHYS.maxF;}
+        q._vx=(q._vx+q._fx*sim.alpha)*PHYS.damping; q._vy=(q._vy+q._fy*sim.alpha)*PHYS.damping;
+        var vm=Math.sqrt(q._vx*q._vx+q._vy*q._vy);
+        if(vm>PHYS.maxV){q._vx=q._vx/vm*PHYS.maxV; q._vy=q._vy/vm*PHYS.maxV;}
+        q.x+=q._vx; q.y+=q._vy;
+        energy+=q._vx*q._vx+q._vy*q._vy;
+        syncNode(ns[k]);
+      }
+      syncEdges();
+      return energy;
+    }
+    function simLoop(){
+      simStep();
+      if(sim.drag){ sim.alpha=Math.max(sim.alpha,0.35); }
+      else { sim.alpha*=PHYS.cool; }
+      if(sim.drag || sim.alpha>PHYS.minAlpha){ sim.raf=requestAnimationFrame(simLoop); }
+      else { sim.raf=null; if(!userMoved) zoomToFit(); else rescale(); }   // reframe the settled layout
+    }
+    function startSim(heat){
+      sim.alpha=Math.max(sim.alpha, heat===undefined?1:heat);
+      if(!sim.raf) sim.raf=requestAnimationFrame(simLoop);
+    }
+    function stopSim(){ if(sim.raf){cancelAnimationFrame(sim.raf); sim.raf=null;} }
+
+    function onNodePointerDown(i,ev){
+      if(!focus) return;                       // physics/drag only while tracing
+      ev.stopPropagation();                    // don't start a background pan
+      sim.drag={i:i}; sim.moved=false;
+      NODES[i]._vx=0; NODES[i]._vy=0; sim.alpha=Math.max(sim.alpha,0.5);
+      document.addEventListener('pointermove',onDragMove);
+      document.addEventListener('pointerup',onDragUp);
+      startSim();
+    }
+    function onDragMove(ev){
+      if(!sim.drag) return;
+      var u=toUser(ev); var n=NODES[sim.drag.i];
+      if(Math.abs(u.x-n.x)+Math.abs(u.y-n.y)>0.5) sim.moved=true;
+      n.x=u.x; n.y=u.y; syncNode(sim.drag.i); syncEdges();
+      startSim(0.5);
+    }
+    function onDragUp(){
+      document.removeEventListener('pointermove',onDragMove);
+      document.removeEventListener('pointerup',onDragUp);
+      var i=sim.drag?sim.drag.i:null, moved=sim.moved;
+      sim.drag=null;
+      if(i!=null && !moved){ onNodeClick(i); }   // a tap = open connections
+      startSim(0.5);
+    }
 
     fetch('/assets/data/school-network.json').then(function(r){return r.json();}).then(function(d){
       NODES=d.nodes; EDGES=d.edges;
@@ -145,7 +276,7 @@
         el.addEventListener('click',function(){off[cat]=!off[cat]; el.classList.toggle('off',off[cat]); applyVis();});
         lg.appendChild(el);
       });
-      draw(); base=Object.assign({},vb); setVB(); applyVis();
+      draw(); base=Object.assign({},vb); setVB(); applyVis(); requestAnimationFrame(rescale);
     }).catch(function(){$('stat').textContent='Could not load the network data.';});
 
     var gEdges,gNodes,gLabels;
@@ -167,7 +298,8 @@
         c.style.cursor='pointer'; nodeEls[i]=c; n._i=i;
         c.addEventListener('mouseenter',function(){if(!drag&&!focus)hover(i);});
         c.addEventListener('mouseleave',function(){if(!drag&&!focus&&!pinned)clearHi();});
-        c.addEventListener('click',function(ev){ev.stopPropagation(); if(didDrag)return; onNodeClick(i);});
+        c.addEventListener('pointerdown',function(ev){onNodePointerDown(i,ev);});
+        c.addEventListener('click',function(ev){ev.stopPropagation(); if(didDrag||focus)return; onNodeClick(i);});
         gNodes.appendChild(c);
         var t=document.createElementNS(SVGNS,'text'); t.setAttribute('class','nodelabel');
         t.setAttribute('x',n.x+rad(n)+1.5); t.setAttribute('y',n.y+3);
@@ -189,7 +321,6 @@
       EDGES.forEach(function(e){
         e.el.style.display=(visible(e[0])&&visible(e[1]))?'':'none';
         e.el.setAttribute('stroke-opacity',focus?0.5:0.22);
-        e.el.setAttribute('stroke-width',focus?0.9:0.6);
       });
     }
 
@@ -207,12 +338,12 @@
       afterFocus();
     }
     function afterFocus(){
-      applyVis(); renderTrail(); zoomToFit(); clearHi();
-      $('hint').textContent='Click any dot to open its connections · '+focus.size+' entities shown';
+      applyVis(); renderTrail(); userMoved=false; zoomToFit(); clearHi(); rescale(); startSim();
+      $('hint').textContent='Drag dots to rearrange · click one to open its connections · '+focus.size+' entities shown';
     }
     function clearFocus(){
       focus=null; expanded=new Set(); trail=[];
-      applyVis(); renderTrail(); if(base){vb=Object.assign({},base);setVB();}
+      stopSim(); sim.alpha=0; applyVis(); renderTrail(); if(base){vb=Object.assign({},base);setVB();}
       panel.classList.remove('show'); pinned=false; clearHi();
       $('hint').textContent='Search an entity, or click any dot to start tracing';
     }
@@ -326,18 +457,18 @@
     });
 
     // ---- pan / zoom ----
-    var drag=null,didDrag=false;
+    var drag=null,didDrag=false,userMoved=false;
     svg.addEventListener('pointerdown',function(e){drag={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y};didDrag=false;});
     svg.addEventListener('pointermove',function(e){
       if(!drag)return;
-      if(Math.abs(e.clientX-drag.x)+Math.abs(e.clientY-drag.y)>3)didDrag=true;
+      if(Math.abs(e.clientX-drag.x)+Math.abs(e.clientY-drag.y)>3){didDrag=true;userMoved=true;}
       var r=svg.getBoundingClientRect();
       vb.x=drag.vx-(e.clientX-drag.x)*(vb.w/r.width); vb.y=drag.vy-(e.clientY-drag.y)*(vb.h/r.height); setVB();
     });
     svg.addEventListener('pointerup',function(){drag=null;});
     svg.addEventListener('pointerleave',function(){drag=null;});
     svg.addEventListener('click',function(){if(didDrag)return; if(pinned){panel.classList.remove('show');pinned=false;if(!focus)clearHi();}});
-    svg.addEventListener('wheel',function(e){
+    svg.addEventListener('wheel',function(e){ userMoved=true;
       e.preventDefault(); var r=svg.getBoundingClientRect();
       var mx=vb.x+(e.clientX-r.left)/r.width*vb.w, my=vb.y+(e.clientY-r.top)/r.height*vb.h;
       var f=e.deltaY<0?0.85:1.176; vb.w*=f; vb.h*=f; vb.x=mx-(mx-vb.x)*f; vb.y=my-(my-vb.y)*f; setVB();
