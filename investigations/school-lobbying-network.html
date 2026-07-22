@@ -4,34 +4,47 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>New Mexico public-education lobbying network — New Mexico Impact Lab</title>
-  <meta name="description" content="An interactive map of who lobbies for New Mexico's public schools, charters, and education groups — and the lobbyists who connect them.">
+  <meta name="description" content="Trace who lobbies for New Mexico's public schools, charters, and education groups. Search an entity, follow its connections one step at a time, and export what you find.">
   <link rel="canonical" href="https://nmimpactlab.org/investigations/school-lobbying-network.html">
   <link rel="stylesheet" href="/assets/css/style.css">
   <style>
     .maptool { max-width: 1280px; margin: 0 auto; padding: 24px 16px 60px; }
     .maptool h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); margin: 0 0 6px; }
-    .maptool .sub { color: var(--text-soft); margin: 0 0 10px; max-width: 720px; }
-    .coverage { display: inline-block; border: 1px solid var(--accent-2); border-radius: 8px; padding: 8px 12px; margin: 0 0 16px; font-size: 0.88rem; color: var(--text); background: var(--bg); max-width: 720px; }
+    .maptool .sub { color: var(--text-soft); margin: 0 0 10px; max-width: 760px; }
+    .coverage { display: inline-block; border: 1px solid var(--accent-2); border-radius: 8px; padding: 8px 12px; margin: 0 0 16px; font-size: 0.88rem; color: var(--text); background: var(--bg); max-width: 760px; }
     .coverage strong { color: var(--accent-2); }
-    .mapcontrols { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
-    .mapcontrols input[type=search] { padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.92rem; min-width: 240px; }
+    .mapcontrols { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+    .searchwrap { position: relative; }
+    .searchwrap input { padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.92rem; min-width: 290px; }
+    .results { position: absolute; z-index: 30; top: 100%; left: 0; right: 0; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow); max-height: 280px; overflow: auto; display: none; }
+    .results.show { display: block; }
+    .results button { display: block; width: 100%; text-align: left; padding: 8px 12px; border: 0; background: none; color: var(--text); font-size: 0.88rem; cursor: pointer; }
+    .results button:hover { background: var(--bg-soft); }
+    .results .rk { color: var(--text-soft); font-size: 0.76rem; }
+    .trailbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-soft); font-size: 0.86rem; }
+    .trailbar.hide { display: none; }
+    .chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; background: var(--bg); border: 1px solid var(--border); }
+    .chip .n { font-weight: 600; }
+    .trailbar .arrow { color: var(--text-soft); }
+    .trailbar button { padding: 5px 10px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg); color: var(--text); cursor: pointer; font-size: 0.8rem; }
     .legend { display: flex; gap: 6px 14px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; font-size: 0.85rem; }
     .legend .lg { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; padding: 2px 6px; border-radius: 20px; user-select: none; }
     .legend .lg .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
     .legend .lg.off { opacity: 0.35; text-decoration: line-through; }
     .mapwrap { position: relative; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-soft); }
-    #net { display: block; width: 100%; height: 74vh; min-height: 460px; touch-action: none; cursor: grab; }
+    #net { display: block; width: 100%; height: 72vh; min-height: 440px; touch-action: none; cursor: grab; }
     #net:active { cursor: grabbing; }
-    .maphint { position: absolute; left: 12px; bottom: 10px; font-size: 0.78rem; color: var(--text-soft); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px; opacity: 0.9; }
+    .maphint { position: absolute; left: 12px; bottom: 10px; font-size: 0.78rem; color: var(--text-soft); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px; opacity: 0.92; }
     .nodelabel { font-size: 9px; fill: var(--text); pointer-events: none; paint-order: stroke; stroke: var(--bg); stroke-width: 2.5px; }
-    .panel { position: absolute; top: 12px; right: 12px; width: 300px; max-width: 78%; max-height: 84%; overflow: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); padding: 14px 16px; display: none; font-size: 0.9rem; }
+    .panel { position: absolute; top: 12px; right: 12px; width: 300px; max-width: 78%; max-height: 82%; overflow: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); padding: 14px 16px; display: none; font-size: 0.9rem; }
     .panel.show { display: block; }
     .panel h3 { margin: 0 4px 2px 0; font-size: 1.05rem; }
     .panel .kind { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-soft); }
     .panel .close { position: absolute; top: 8px; right: 10px; cursor: pointer; border: 0; background: none; font-size: 1.2rem; color: var(--text-soft); }
-    .panel ul { margin: 8px 0 0; padding-left: 18px; }
-    .panel li { margin: 2px 0; }
+    .panel ul { margin: 8px 0 0; padding-left: 16px; }
+    .panel li { margin: 3px 0; }
     .panel a.nlink { cursor: pointer; }
+    .panel .yrs { color: var(--text-soft); font-size: 0.8rem; }
     .zoombtns { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 6px; }
     .zoombtns button { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 1.1rem; cursor: pointer; }
     .srcnote { margin-top: 18px; font-size: 0.82rem; color: var(--text-soft); }
@@ -59,18 +72,30 @@
     <div class="maptool">
       <p><a href="/investigations/lobbying.html">&larr; Lobbying &amp; Employers</a></p>
       <h1>New Mexico's public-education lobbying network</h1>
-      <p class="sub">Who lobbies for New Mexico's school districts, charter schools, and education groups &mdash; and the lobbyists who connect them. Each line links a lobbyist to an entity that registered them. Drag to pan, scroll to zoom, hover to trace a node's ties, click for details.</p>
+      <p class="sub">Who lobbies for New Mexico's school districts, charter schools, and education groups &mdash; and the lobbyists who connect them. <strong>Search an entity to isolate it and its direct connections</strong>, then click any connection to open up <em>its</em> connections, one step at a time. Export whatever you trace.</p>
       <p class="coverage"><strong>Coverage: registrations 2013&ndash;2026.</strong> Combining New Mexico's former and current lobbyist-disclosure systems. Entities are those the state itself tags with an <em>Education</em> business interest, plus school-name matches for older records the state left untagged &mdash; so the map includes some education-adjacent advocacy groups alongside districts and charters. Use the legend to filter by type.</p>
 
       <div class="mapcontrols">
-        <input type="search" id="search" placeholder="Find a school, group, or lobbyist&hellip;" autocomplete="off" aria-label="Search the network">
+        <div class="searchwrap">
+          <input type="search" id="search" placeholder="Search a school, group, or lobbyist&hellip;" autocomplete="off" aria-label="Search the network">
+          <div class="results" id="results" role="listbox"></div>
+        </div>
         <span id="stat" style="color:var(--text-soft);font-size:0.88rem;"></span>
       </div>
+
+      <div class="trailbar hide" id="trailbar">
+        <span style="color:var(--text-soft)">Tracing:</span>
+        <span id="trail"></span>
+        <button id="expandAll" type="button">Expand all shown</button>
+        <button id="dlTrace" type="button">&#8681; Download traced (CSV)</button>
+        <button id="clearFocus" type="button">Show whole map</button>
+      </div>
+
       <div class="legend" id="legend"></div>
 
       <div class="mapwrap">
         <svg id="net" role="img" aria-label="Public-education lobbying network map"></svg>
-        <div class="maphint">Circles sized by number of connections &middot; hover to trace ties</div>
+        <div class="maphint" id="hint">Search an entity, or click any dot to start tracing</div>
         <div class="zoombtns">
           <button id="zin" aria-label="Zoom in">+</button>
           <button id="zout" aria-label="Zoom out">&minus;</button>
@@ -79,7 +104,7 @@
         <div class="panel" id="panel"></div>
       </div>
 
-      <p class="srcnote">Source: New Mexico lobbyist-registration disclosures (public record), 2013&ndash;2020, compiled with the Lab's custom-built data tools and provided as a research aid. Entity names have been normalized to merge filing variants; the official record governs &mdash; verify against the source before relying on any entry, and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+      <p class="srcnote">Source: New Mexico lobbyist-registration disclosures (public record), 2013&ndash;2026, compiled with the Lab's custom-built data tools and provided as a research aid. Entity names are normalized across the state's former and current systems; the official record governs &mdash; verify against the source before relying on any entry, and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
     </div>
   </main>
 
@@ -93,109 +118,234 @@
   <script>
     (function(){var b=document.querySelector('.nav-toggle'),l=document.querySelector('.nav-links');if(b&&l){b.addEventListener('click',function(){var o=l.classList.toggle('open');b.setAttribute('aria-expanded',o?'true':'false');});}var y=document.getElementById('year');if(y){y.textContent=new Date().getFullYear();}})();
 
-    var SVGNS = 'http://www.w3.org/2000/svg';
-    var COLORS = {
-      'District': '#2563eb', 'Charter / school': '#0d9488', 'Association / union': '#7c3aed',
-      'State school': '#ea580c', 'Education nonprofit': '#db2777', 'Lobbyist': '#9ca3af'
-    };
-    var svg = document.getElementById('net'), panel = document.getElementById('panel');
-    var vb = { x: -60, y: -60, w: 1120, h: 1120 }, base = null;
-    var NODES = [], EDGES = [], adj = [], nodeEls = [], off = {};
+    var SVGNS='http://www.w3.org/2000/svg';
+    var COLORS={'District':'#2563eb','Charter / school':'#0d9488','Association / union':'#7c3aed',
+                'State school':'#ea580c','Education nonprofit':'#db2777','Lobbyist':'#9ca3af'};
+    var svg=document.getElementById('net'), panel=document.getElementById('panel'),
+        resultsEl=document.getElementById('results'), trailbar=document.getElementById('trailbar');
+    var vb={x:-60,y:-60,w:1120,h:1120}, base=null;
+    var NODES=[],EDGES=[],adj=[],nodeEls=[],labelEls=[],off={};
+    var focus=null, expanded=new Set(), trail=[];
 
-    function setVB(){ svg.setAttribute('viewBox', vb.x+' '+vb.y+' '+vb.w+' '+vb.h); }
-    function rad(n){ var b = n.kind==='employer'?2.2:1.7, m = n.kind==='employer'?26:16; return Math.max(n.kind==='employer'?4:2.5, Math.min(m, (n.kind==='employer'?4:2.5)+Math.sqrt(n.deg)*b)); }
+    function $(id){return document.getElementById(id);}
+    function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+    function setVB(){svg.setAttribute('viewBox',vb.x+' '+vb.y+' '+vb.w+' '+vb.h);}
+    function rad(n){var b=n.kind==='employer'?2.2:1.7,m=n.kind==='employer'?26:16,mn=n.kind==='employer'?4:2.5;
+      return Math.max(mn,Math.min(m,mn+Math.sqrt(n.deg)*b));}
 
     fetch('/assets/data/school-network.json').then(function(r){return r.json();}).then(function(d){
-      NODES = d.nodes; EDGES = d.edges;
-      document.getElementById('stat').textContent = d.counts.employers + ' education entities · ' + d.counts.lobbyists + ' lobbyists · ' + d.counts.edges + ' connections';
-      adj = NODES.map(function(){return [];});
-      EDGES.forEach(function(e){ adj[e[0]].push(e[1]); adj[e[1]].push(e[0]); });
-      // legend
-      var lg = document.getElementById('legend');
+      NODES=d.nodes; EDGES=d.edges;
+      $('stat').textContent=d.counts.employers+' education entities · '+d.counts.lobbyists+' lobbyists · '+d.counts.edges+' connections';
+      adj=NODES.map(function(){return [];});
+      EDGES.forEach(function(e,ei){adj[e[0]].push({n:e[1],e:ei}); adj[e[1]].push({n:e[0],e:ei});});
+      var lg=$('legend');
       Object.keys(COLORS).forEach(function(cat){
-        var el = document.createElement('span'); el.className='lg'; el.dataset.cat=cat;
-        el.innerHTML = '<span class="dot" style="background:'+COLORS[cat]+'"></span>'+cat;
-        el.addEventListener('click', function(){ off[cat]=!off[cat]; el.classList.toggle('off',off[cat]); applyFilter(); });
+        var el=document.createElement('span'); el.className='lg'; el.dataset.cat=cat;
+        el.innerHTML='<span class="dot" style="background:'+COLORS[cat]+'"></span>'+cat;
+        el.addEventListener('click',function(){off[cat]=!off[cat]; el.classList.toggle('off',off[cat]); applyVis();});
         lg.appendChild(el);
       });
-      draw(); base = Object.assign({}, vb); setVB();
-    }).catch(function(){ document.getElementById('stat').textContent = 'Could not load the network data.'; });
+      draw(); base=Object.assign({},vb); setVB(); applyVis();
+    }).catch(function(){$('stat').textContent='Could not load the network data.';});
 
-    var gEdges, gNodes, gLabels;
+    var gEdges,gNodes,gLabels;
     function draw(){
-      gEdges = document.createElementNS(SVGNS,'g'); gEdges.setAttribute('stroke','#888'); gEdges.setAttribute('stroke-opacity','0.22');
+      gEdges=document.createElementNS(SVGNS,'g'); gEdges.setAttribute('stroke','#888'); gEdges.setAttribute('stroke-opacity','0.22');
       EDGES.forEach(function(e){
-        var a=NODES[e[0]], b=NODES[e[1]];
-        var ln=document.createElementNS(SVGNS,'line'); ln.setAttribute('x1',a.x);ln.setAttribute('y1',a.y);ln.setAttribute('x2',b.x);ln.setAttribute('y2',b.y);
+        var a=NODES[e[0]],b=NODES[e[1]];
+        var ln=document.createElementNS(SVGNS,'line');
+        ln.setAttribute('x1',a.x);ln.setAttribute('y1',a.y);ln.setAttribute('x2',b.x);ln.setAttribute('y2',b.y);
         ln.setAttribute('stroke-width','0.6'); e.el=ln; gEdges.appendChild(ln);
       });
       svg.appendChild(gEdges);
-      gNodes = document.createElementNS(SVGNS,'g');
+      gNodes=document.createElementNS(SVGNS,'g');
+      gLabels=document.createElementNS(SVGNS,'g');
       NODES.forEach(function(n,i){
-        var c=document.createElementNS(SVGNS,'circle'); c.setAttribute('cx',n.x);c.setAttribute('cy',n.y);c.setAttribute('r',rad(n));
-        c.setAttribute('fill',COLORS[n.cat]||'#999'); c.setAttribute('stroke','var(--bg)'); c.setAttribute('stroke-width','0.6');
+        var c=document.createElementNS(SVGNS,'circle');
+        c.setAttribute('cx',n.x);c.setAttribute('cy',n.y);c.setAttribute('r',rad(n));
+        c.setAttribute('fill',COLORS[n.cat]||'#999');c.setAttribute('stroke','var(--bg)');c.setAttribute('stroke-width','0.6');
         c.style.cursor='pointer'; nodeEls[i]=c; n._i=i;
-        c.addEventListener('mouseenter',function(){ if(!drag) highlight(i);}); c.addEventListener('mouseleave',function(){ if(!pinned&&!drag) clearHi(); });
-        c.addEventListener('click',function(ev){ev.stopPropagation(); if(didDrag) return; showPanel(i); });
+        c.addEventListener('mouseenter',function(){if(!drag&&!focus)hover(i);});
+        c.addEventListener('mouseleave',function(){if(!drag&&!focus&&!pinned)clearHi();});
+        c.addEventListener('click',function(ev){ev.stopPropagation(); if(didDrag)return; onNodeClick(i);});
         gNodes.appendChild(c);
+        var t=document.createElementNS(SVGNS,'text'); t.setAttribute('class','nodelabel');
+        t.setAttribute('x',n.x+rad(n)+1.5); t.setAttribute('y',n.y+3);
+        t.textContent=n.label.length>34?n.label.slice(0,32)+'…':n.label;
+        labelEls[i]=t; gLabels.appendChild(t);
       });
-      svg.appendChild(gNodes);
-      gLabels = document.createElementNS(SVGNS,'g');
-      NODES.forEach(function(n,i){
-        if((n.kind==='employer'&&n.deg>=4)||(n.kind==='lobbyist'&&n.deg>=8)){
-          var t=document.createElementNS(SVGNS,'text'); t.setAttribute('class','nodelabel'); t.setAttribute('x',n.x+rad(n)+1.5);t.setAttribute('y',n.y+3);
-          t.textContent = n.label.length>34?n.label.slice(0,32)+'…':n.label; n._lab=t; gLabels.appendChild(t);
-        }
-      });
-      svg.appendChild(gLabels);
+      svg.appendChild(gNodes); svg.appendChild(gLabels);
     }
 
+    function catOff(i){var n=NODES[i]; return n.kind==='employer'&&off[n.cat];}
+    function visible(i){return (!focus||focus.has(i))&&!catOff(i);}
+    function applyVis(){
+      NODES.forEach(function(n,i){
+        var v=visible(i);
+        nodeEls[i].style.display=v?'':'none';
+        var showLab=v&&(focus?true:(n.kind==='employer'?n.deg>=4:n.deg>=8));
+        labelEls[i].style.display=showLab?'':'none';
+      });
+      EDGES.forEach(function(e){
+        e.el.style.display=(visible(e[0])&&visible(e[1]))?'':'none';
+        e.el.setAttribute('stroke-opacity',focus?0.5:0.22);
+        e.el.setAttribute('stroke-width',focus?0.9:0.6);
+      });
+    }
+
+    // ---- focus / tracing ----
+    function neighbors(i){return adj[i].map(function(a){return a.n;});}
+    function focusOn(i){
+      focus=new Set([i]); neighbors(i).forEach(function(j){focus.add(j);});
+      expanded=new Set([i]); trail=[i];
+      afterFocus();
+    }
+    function expandNode(i){
+      if(!focus) return focusOn(i);
+      neighbors(i).forEach(function(j){focus.add(j);});
+      if(!expanded.has(i)){expanded.add(i); trail.push(i);}
+      afterFocus();
+    }
+    function afterFocus(){
+      applyVis(); renderTrail(); zoomToFit(); clearHi();
+      $('hint').textContent='Click any dot to open its connections · '+focus.size+' entities shown';
+    }
+    function clearFocus(){
+      focus=null; expanded=new Set(); trail=[];
+      applyVis(); renderTrail(); if(base){vb=Object.assign({},base);setVB();}
+      panel.classList.remove('show'); pinned=false; clearHi();
+      $('hint').textContent='Search an entity, or click any dot to start tracing';
+    }
+    function zoomToFit(){
+      if(!focus||!focus.size) return;
+      var xs=[],ys=[];
+      focus.forEach(function(i){ if(!catOff(i)){xs.push(NODES[i].x); ys.push(NODES[i].y);} });
+      if(!xs.length) return;
+      var mnx=Math.min.apply(null,xs),mxx=Math.max.apply(null,xs),
+          mny=Math.min.apply(null,ys),mxy=Math.max.apply(null,ys);
+      var w=Math.max(mxx-mnx,60), h=Math.max(mxy-mny,60), pad=Math.max(w,h)*0.22;
+      var side=Math.max(w,h)+pad*2;
+      vb={x:(mnx+mxx)/2-side/2, y:(mny+mxy)/2-side/2, w:side, h:side};
+      setVB();
+    }
+    function renderTrail(){
+      trailbar.classList.toggle('hide',!focus);
+      if(!focus) return;
+      $('trail').innerHTML=trail.map(function(i,k){
+        var n=NODES[i];
+        return (k?'<span class="arrow">›</span> ':'')+'<span class="chip"><span class="dot" style="width:9px;height:9px;border-radius:50%;display:inline-block;background:'+(COLORS[n.cat]||'#999')+'"></span><span class="n">'+esc(n.label)+'</span></span>';
+      }).join(' ');
+    }
+
+    function onNodeClick(i){ if(!focus){focusOn(i);} else {expandNode(i);} showPanel(i); }
+
+    // ---- hover highlight (only when not focused) ----
     var pinned=false;
-    function neighbors(i){ var s={}; s[i]=1; adj[i].forEach(function(j){s[j]=1;}); return s; }
-    function highlight(i){
-      var s=neighbors(i);
-      NODES.forEach(function(n,j){ nodeEls[j].setAttribute('opacity', s[j]?1:0.12); });
-      EDGES.forEach(function(e){ e.el.setAttribute('stroke-opacity',(e[0]===i||e[1]===i)?0.85:0.04); e.el.setAttribute('stroke', (e[0]===i||e[1]===i)?(COLORS[NODES[i].kind==='employer'?NODES[i].cat:'Lobbyist']):'#888'); });
+    function hover(i){
+      var s={}; s[i]=1; neighbors(i).forEach(function(j){s[j]=1;});
+      NODES.forEach(function(n,j){nodeEls[j].setAttribute('opacity',s[j]?1:0.12);});
+      EDGES.forEach(function(e){e.el.setAttribute('stroke-opacity',(e[0]===i||e[1]===i)?0.85:0.04);});
     }
-    function clearHi(){ NODES.forEach(function(n,j){ nodeEls[j].setAttribute('opacity',1); }); EDGES.forEach(function(e){ e.el.setAttribute('stroke-opacity',0.22); e.el.setAttribute('stroke','#888'); }); }
-    function applyFilter(){
-      NODES.forEach(function(n,j){ var hide = n.kind==='employer' && off[n.cat]; nodeEls[j].style.display=hide?'none':''; if(n._lab) n._lab.style.display=hide?'none':''; });
-      EDGES.forEach(function(e){ var h = (NODES[e[0]].kind==='employer'&&off[NODES[e[0]].cat])||(NODES[e[1]].kind==='employer'&&off[NODES[e[1]].cat]); e.el.style.display=h?'none':''; });
+    function clearHi(){
+      NODES.forEach(function(n,j){nodeEls[j].setAttribute('opacity',1);});
+      EDGES.forEach(function(e){e.el.setAttribute('stroke-opacity',focus?0.5:0.22);});
     }
+
     function showPanel(i){
-      pinned=true; highlight(i); var n=NODES[i];
-      var nb=adj[i].map(function(j){return NODES[j];}).sort(function(a,b){return b.deg-a.deg;});
-      var html='<button class="close" aria-label="Close">&times;</button><div class="kind">'+(n.kind==='employer'?n.cat:'Lobbyist')+'</div><h3>'+esc(n.label)+'</h3>'
-        +'<div style="color:var(--text-soft);font-size:0.85rem;margin-bottom:6px;">'+n.deg+(n.kind==='employer'?' registered lobbyist(s)':' education client(s)')+'</div><ul>';
-      nb.forEach(function(m){ html+='<li><a class="nlink" data-i="'+m._i+'">'+esc(m.label)+'</a></li>'; });
+      pinned=true; var n=NODES[i];
+      var nb=adj[i].slice().sort(function(a,b){return NODES[b.n].deg-NODES[a.n].deg;});
+      var html='<button class="close" aria-label="Close">&times;</button><div class="kind">'+(n.kind==='employer'?esc(n.cat):'Lobbyist')+'</div><h3>'+esc(n.label)+'</h3>'
+        +'<div style="color:var(--text-soft);font-size:0.85rem;margin-bottom:6px;">'+n.deg+(n.kind==='employer'?' registered lobbyist(s)':' education client(s)')+' &middot; click a name to open its connections</div><ul>';
+      nb.forEach(function(a){
+        var yrs=EDGES[a.e][2]||'';
+        html+='<li><a class="nlink" data-i="'+a.n+'">'+esc(NODES[a.n].label)+'</a>'+(yrs?' <span class="yrs">('+esc(yrs)+')</span>':'')+'</li>';
+      });
       html+='</ul>';
       panel.innerHTML=html; panel.classList.add('show');
-      panel.querySelector('.close').addEventListener('click',function(){panel.classList.remove('show');pinned=false;clearHi();});
-      panel.querySelectorAll('.nlink').forEach(function(a){a.addEventListener('click',function(){showPanel(+a.dataset.i);});});
+      panel.querySelector('.close').addEventListener('click',function(){panel.classList.remove('show');pinned=false;if(!focus)clearHi();});
+      panel.querySelectorAll('.nlink').forEach(function(a){
+        a.addEventListener('click',function(){var j=+a.dataset.i; if(focus)expandNode(j); else focusOn(j); showPanel(j);});
+      });
     }
-    function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 
-    // search
-    document.getElementById('search').addEventListener('input', function(){
+    // ---- search -> pick an entity ----
+    $('search').addEventListener('input',function(){
       var q=this.value.trim().toLowerCase();
-      if(!q){ if(!pinned) clearHi(); NODES.forEach(function(n,j){nodeEls[j].setAttribute('opacity',1);}); return; }
-      var hit=-1;
-      NODES.forEach(function(n,j){ var m=n.label.toLowerCase().indexOf(q)>=0; nodeEls[j].setAttribute('opacity',m?1:0.1); if(m&&(hit<0||n.deg>NODES[hit].deg)) hit=j; });
-      EDGES.forEach(function(e){ e.el.setAttribute('stroke-opacity',0.04); });
+      if(!q){resultsEl.classList.remove('show'); resultsEl.innerHTML=''; return;}
+      var hits=[];
+      for(var i=0;i<NODES.length&&hits.length<14;i++){
+        if(NODES[i].label.toLowerCase().indexOf(q)>=0) hits.push(i);
+      }
+      hits.sort(function(a,b){return NODES[b].deg-NODES[a].deg;});
+      resultsEl.innerHTML=hits.length?hits.map(function(i){
+        var n=NODES[i];
+        return '<button type="button" data-i="'+i+'"><span class="dot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'+(COLORS[n.cat]||'#999')+';margin-right:6px"></span>'+esc(n.label)+' <span class="rk">· '+(n.kind==='employer'?esc(n.cat):'Lobbyist')+' · '+n.deg+'</span></button>';
+      }).join(''):'<button type="button" disabled>No matches</button>';
+      resultsEl.classList.add('show');
+      resultsEl.querySelectorAll('button[data-i]').forEach(function(b){
+        b.addEventListener('click',function(){
+          var i=+b.dataset.i; resultsEl.classList.remove('show'); $('search').value=NODES[i].label;
+          focusOn(i); showPanel(i);
+        });
+      });
+    });
+    document.addEventListener('click',function(e){ if(!e.target.closest('.searchwrap')) resultsEl.classList.remove('show'); });
+
+    $('clearFocus').addEventListener('click',function(){ $('search').value=''; clearFocus(); });
+    $('expandAll').addEventListener('click',function(){
+      if(!focus) return;
+      Array.from(focus).forEach(function(i){ if(!expanded.has(i)){ neighbors(i).forEach(function(j){focus.add(j);}); expanded.add(i);} });
+      afterFocus();
     });
 
-    // pan + zoom
-    var drag=null, didDrag=false;
-    svg.addEventListener('pointerdown',function(e){ drag={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y}; didDrag=false; });
-    svg.addEventListener('pointermove',function(e){ if(!drag) return; if(Math.abs(e.clientX-drag.x)+Math.abs(e.clientY-drag.y)>3) didDrag=true; var r=svg.getBoundingClientRect(); var sx=vb.w/r.width, sy=vb.h/r.height; vb.x=drag.vx-(e.clientX-drag.x)*sx; vb.y=drag.vy-(e.clientY-drag.y)*sy; setVB(); });
-    svg.addEventListener('pointerup',function(e){ drag=null; });
-    svg.addEventListener('pointerleave',function(){ drag=null; });
-    svg.addEventListener('click',function(){ if(didDrag) return; if(pinned){panel.classList.remove('show');pinned=false;clearHi();} });
-    svg.addEventListener('wheel',function(e){ e.preventDefault(); var r=svg.getBoundingClientRect(); var mx=vb.x+(e.clientX-r.left)/r.width*vb.w, my=vb.y+(e.clientY-r.top)/r.height*vb.h; var f=e.deltaY<0?0.85:1.176; f=Math.max(0.2,Math.min(5, f)); vb.w*=f; vb.h*=f; vb.x=mx-(mx-vb.x)*f; vb.y=my-(my-vb.y)*f; setVB(); },{passive:false});
-    function zoom(f){ var cx=vb.x+vb.w/2, cy=vb.y+vb.h/2; vb.w*=f; vb.h*=f; vb.x=cx-vb.w/2; vb.y=cy-vb.h/2; setVB(); }
-    document.getElementById('zin').addEventListener('click',function(){zoom(0.8);});
-    document.getElementById('zout').addEventListener('click',function(){zoom(1.25);});
-    document.getElementById('zreset').addEventListener('click',function(){ if(base){vb=Object.assign({},base);setVB();} });
+    // ---- CSV export of the traced subgraph ----
+    $('dlTrace').addEventListener('click',function(){
+      var rows=[];
+      EDGES.forEach(function(e){
+        if(focus&&(!focus.has(e[0])||!focus.has(e[1]))) return;
+        if(!visible(e[0])||!visible(e[1])) return;
+        var A=NODES[e[0]],B=NODES[e[1]];
+        var emp=A.kind==='employer'?A:B, lob=A.kind==='employer'?B:A;
+        rows.push([emp.label,emp.cat,lob.label,e[2]||'']);
+      });
+      if(!rows.length){alert('Nothing traced yet — search an entity first.');return;}
+      function c(v){v=(v==null?'':String(v));return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+      var prov=['# New Mexico Impact Lab | https://nmimpactlab.org',
+        '# NM public-education lobbying network — traced connections',
+        '# Traced from: '+(trail.length?trail.map(function(i){return NODES[i].label;}).join(' > '):'(whole map)'),
+        '# Source: NM lobbyist-registration disclosures (public), 2013-2026',
+        '# Downloaded: '+new Date().toISOString(),
+        "# Compiled with the Lab's custom-built data tools. Provided as-is, as a research aid.",
+        '# The official record governs: verify against the source before any official, legal, journalistic, or financial use. Not an official record.',''];
+      var lines=prov.concat([['Education entity','Entity type','Lobbyist','Years registered'].join(',')])
+                    .concat(rows.map(function(r){return r.map(c).join(',');}));
+      var blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});
+      var u=URL.createObjectURL(blob),a=document.createElement('a');
+      a.href=u;a.download='nm_education_lobbying_traced.csv';document.body.appendChild(a);a.click();
+      document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},1000);
+    });
+
+    // ---- pan / zoom ----
+    var drag=null,didDrag=false;
+    svg.addEventListener('pointerdown',function(e){drag={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y};didDrag=false;});
+    svg.addEventListener('pointermove',function(e){
+      if(!drag)return;
+      if(Math.abs(e.clientX-drag.x)+Math.abs(e.clientY-drag.y)>3)didDrag=true;
+      var r=svg.getBoundingClientRect();
+      vb.x=drag.vx-(e.clientX-drag.x)*(vb.w/r.width); vb.y=drag.vy-(e.clientY-drag.y)*(vb.h/r.height); setVB();
+    });
+    svg.addEventListener('pointerup',function(){drag=null;});
+    svg.addEventListener('pointerleave',function(){drag=null;});
+    svg.addEventListener('click',function(){if(didDrag)return; if(pinned){panel.classList.remove('show');pinned=false;if(!focus)clearHi();}});
+    svg.addEventListener('wheel',function(e){
+      e.preventDefault(); var r=svg.getBoundingClientRect();
+      var mx=vb.x+(e.clientX-r.left)/r.width*vb.w, my=vb.y+(e.clientY-r.top)/r.height*vb.h;
+      var f=e.deltaY<0?0.85:1.176; vb.w*=f; vb.h*=f; vb.x=mx-(mx-vb.x)*f; vb.y=my-(my-vb.y)*f; setVB();
+    },{passive:false});
+    function zoom(f){var cx=vb.x+vb.w/2,cy=vb.y+vb.h/2; vb.w*=f;vb.h*=f; vb.x=cx-vb.w/2;vb.y=cy-vb.h/2; setVB();}
+    $('zin').addEventListener('click',function(){zoom(0.8);});
+    $('zout').addEventListener('click',function(){zoom(1.25);});
+    $('zreset').addEventListener('click',function(){ if(focus){zoomToFit();} else if(base){vb=Object.assign({},base);setVB();} });
   </script>
 </body>
 </html>
