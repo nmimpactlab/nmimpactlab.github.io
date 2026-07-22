@@ -11,7 +11,7 @@
     .tool { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
     .tool h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 6px; }
     .tool .sub { color: var(--text-soft); margin: 0 0 22px; }
-    .controls { display: grid; gap: 12px; grid-template-columns: 3fr 1fr; align-items: end; margin-bottom: 8px; }
+    .controls { display: grid; gap: 12px; grid-template-columns: 3fr 1fr 1fr; align-items: end; margin-bottom: 8px; }
     @media (max-width: 640px) { .controls { grid-template-columns: 1fr; } }
     .field label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-soft); margin-bottom: 4px; }
     .field input, .field select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.95rem; }
@@ -71,6 +71,10 @@
           <label for="year">Registered in year</label>
           <select id="year"><option value="">Any year</option></select>
         </div>
+        <div class="field">
+          <label for="sector">Industry sector</label>
+          <select id="sector"><option value="">All sectors</option></select>
+        </div>
       </div>
 
       <div class="resultbar">
@@ -91,11 +95,12 @@
               <th scope="col">Lobbyist</th>
               <th scope="col">Employer</th>
               <th scope="col">Employer location</th>
+              <th scope="col">Sector</th>
               <th scope="col">Years registered</th>
             </tr>
           </thead>
           <tbody id="tbody">
-            <tr><td colspan="4" class="empty">Loading&hellip;</td></tr>
+            <tr><td colspan="5" class="empty">Loading&hellip;</td></tr>
           </tbody>
         </table>
       </div>
@@ -126,7 +131,7 @@
 
     var PAGE = 100;
     var DATA = [], view = [], page = 0, YMIN = null, YMAX = null;
-    var COL = { lobbyist:0, employer:1, city:2, state:3, years:4, n:5 };
+    var COL = { lobbyist:0, employer:1, city:2, state:3, years:4, n:5, sector:6 };
     var $ = function (id) { return document.getElementById(id); };
     function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 
@@ -141,7 +146,7 @@
     function render() {
       var tb = $('tbody');
       if (!view.length) {
-        tb.innerHTML = '<tr><td colspan="4" class="empty">No registrations match your search.</td></tr>';
+        tb.innerHTML = '<tr><td colspan="5" class="empty">No registrations match your search.</td></tr>';
         $('pagenum').textContent = ''; $('prev').disabled = true; $('next').disabled = true; $('pageinfo').textContent = '';
         return;
       }
@@ -156,6 +161,7 @@
           + '<td class="name">' + esc(r[COL.lobbyist]) + '</td>'
           + '<td>' + esc(r[COL.employer]) + '</td>'
           + '<td>' + esc(loc) + '</td>'
+          + '<td class="muted">' + esc(r[COL.sector] || '') + '</td>'
           + '<td>' + esc(r[COL.years]) + (r[COL.n] > 1 ? ' <span class="pill">' + r[COL.n] + ' yrs</span>' : '') + '</td>'
           + '</tr>';
       }
@@ -169,11 +175,13 @@
     function apply() {
       var q = $('q').value.trim().toLowerCase();
       var y = $('year').value;
+      var sec = $('sector').value;
       var terms = q ? q.split(/\s+/) : [];
       view = DATA.filter(function (r) {
         if (y && !yearInRange(r[COL.years], y)) return false;
+        if (sec && (r[COL.sector]||'') !== sec) return false;
         if (terms.length) {
-          var hay = (r[COL.lobbyist] + ' ' + r[COL.employer] + ' ' + r[COL.city] + ' ' + r[COL.state]).toLowerCase();
+          var hay = (r[COL.lobbyist] + ' ' + r[COL.employer] + ' ' + r[COL.city] + ' ' + r[COL.state] + ' ' + (r[COL.sector]||'')).toLowerCase();
           for (var t = 0; t < terms.length; t++) if (hay.indexOf(terms[t]) === -1) return false;
         }
         return true;
@@ -189,11 +197,14 @@
       DATA = d.rows; YMIN = d.year_min; YMAX = d.year_max;
       var ys = $('year');
       if (YMIN && YMAX) for (var y = YMAX; y >= YMIN; y--) { var o = document.createElement('option'); o.value = y; o.textContent = y; ys.appendChild(o); }
+      var ss = $('sector');
+      (d.sectors || []).forEach(function (x) { var o = document.createElement('option'); o.value = x; o.textContent = x; ss.appendChild(o); });
       $('q').addEventListener('input', onInput);
       $('year').addEventListener('change', apply);
+      $('sector').addEventListener('change', apply);
       apply();
     }).catch(function () {
-      $('tbody').innerHTML = '<tr><td colspan="4" class="empty">Could not load the dataset. Please refresh, or email research@nmimpactlab.org.</td></tr>';
+      $('tbody').innerHTML = '<tr><td colspan="5" class="empty">Could not load the dataset. Please refresh, or email research@nmimpactlab.org.</td></tr>';
       $('count').textContent = '';
     });
 
@@ -228,10 +239,10 @@
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     }
-    var LOB_COLS = ['Lobbyist', 'Employer', 'Employer city', 'Employer state', 'Years registered', 'Years (count)'];
+    var LOB_COLS = ['Lobbyist', 'Employer', 'Employer city', 'Employer state', 'Years registered', 'Years (count)', 'Industry sector'];
     var LOB_SRC = 'New Mexico lobbyist-registration disclosures (public record), 2013-2020';
     var LOB_DICT = 'Lobbyist=registered lobbyist name; Employer=hiring employer/client; Employer city/state=employer location as filed; Years registered=span of registration years; Years (count)=number of registration years. Personal contact details (email, phone, home address) intentionally omitted.';
-    function lobRow(r) { return [r[COL.lobbyist], r[COL.employer], r[COL.city], r[COL.state], r[COL.years], r[COL.n]]; }
+    function lobRow(r) { return [r[COL.lobbyist], r[COL.employer], r[COL.city], r[COL.state], r[COL.years], r[COL.n], r[COL.sector]||'']; }
     $('dlResults').addEventListener('click', function () {
       saveCSV('nmimpactlab_lobbying_results_' + todayStr() + '.csv', LOB_COLS, view.map(lobRow), LOB_SRC, LOB_DICT);
     });
