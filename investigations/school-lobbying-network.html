@@ -51,6 +51,11 @@
     .panel .xw .cav { color: var(--text-soft); font-size: 0.76rem; margin-top: 5px; }
     .zoombtns { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 6px; }
     .zoombtns button { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 1.1rem; cursor: pointer; }
+    .txtsize { position: absolute; right: 12px; top: 12px; display: flex; align-items: center; gap: 7px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; opacity: 0.94; }
+    .txtsize label { font-size: 0.72rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em; }
+    .txtsize .a1 { font-size: 0.72rem; color: var(--text-soft); }
+    .txtsize .a2 { font-size: 1.05rem; color: var(--text-soft); }
+    .txtsize input[type=range] { width: 92px; accent-color: var(--accent, #2b6cb0); cursor: pointer; }
     .srcnote { margin-top: 18px; font-size: 0.82rem; color: var(--text-soft); }
   </style>
 </head>
@@ -100,6 +105,12 @@
       <div class="mapwrap">
         <svg id="net" role="img" aria-label="Public-education lobbying network map"></svg>
         <div class="maphint" id="hint">Search an entity, or click any dot to start tracing</div>
+        <div class="txtsize">
+          <label for="lblsize">Text</label>
+          <span class="a1">A</span>
+          <input type="range" id="lblsize" min="0" max="240" value="100" step="10" aria-label="Label text size (slide left to hide labels)">
+          <span class="a2">A</span>
+        </div>
         <div class="zoombtns">
           <button id="zin" aria-label="Zoom in">+</button>
           <button id="zout" aria-label="Zoom out">&minus;</button>
@@ -130,6 +141,7 @@
     var vb={x:-60,y:-60,w:1120,h:1120}, base=null;
     var NODES=[],EDGES=[],adj=[],nodeEls=[],labelEls=[],off={};
     var focus=null, expanded=new Set(), trail=[];
+    var labelScale=1;                        // user-adjustable label text size (0 = hidden)
 
     function $(id){return document.getElementById(id);}
     function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -140,7 +152,7 @@
       var px=svg.clientWidth||svg.getBoundingClientRect().width;
       if(!px||px<=0) return;              // not laid out yet; don't compute a bogus scale
       var k=vb.w/px;                        // user units per screen pixel
-      var fs=11*k;                          // ~11px on screen
+      var fs=11*k*labelScale;               // ~11px on screen, times the user's size setting
       for(var i=0;i<NODES.length;i++){
         var t=labelEls[i]; if(!t) continue;
         t.style.fontSize=fs+'px';
@@ -499,6 +511,7 @@
     $('zin').addEventListener('click',function(){zoom(0.8);});
     $('zout').addEventListener('click',function(){zoom(1.25);});
     $('zreset').addEventListener('click',function(){ if(focus){zoomToFit();} else if(base){vb=Object.assign({},base);setVB();} });
+    $('lblsize').addEventListener('input',function(){ labelScale=(+this.value)/100; rescale(); });
   </script>
 </body>
 </html>
