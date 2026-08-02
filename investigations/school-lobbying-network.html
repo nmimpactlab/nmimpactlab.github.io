@@ -51,11 +51,12 @@
     .panel .xw .cav { color: var(--text-soft); font-size: 0.76rem; margin-top: 5px; }
     .zoombtns { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 6px; }
     .zoombtns button { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 1.1rem; cursor: pointer; }
-    .txtsize { position: absolute; right: 12px; top: 12px; display: flex; align-items: center; gap: 7px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; opacity: 0.94; }
-    .txtsize label { font-size: 0.72rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em; }
-    .txtsize .a1 { font-size: 0.72rem; color: var(--text-soft); }
-    .txtsize .a2 { font-size: 1.05rem; color: var(--text-soft); }
-    .txtsize input[type=range] { width: 92px; accent-color: var(--accent, #2b6cb0); cursor: pointer; }
+    .viewctrls { position: absolute; right: 12px; top: 12px; display: flex; flex-direction: column; gap: 5px; background: var(--bg); border: 1px solid var(--border); border-radius: 9px; padding: 8px 11px; opacity: 0.95; font-size: 0.7rem; box-shadow: var(--shadow); }
+    .viewctrls .vc-row { display: flex; align-items: center; gap: 8px; }
+    .viewctrls label { width: 40px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.03em; }
+    .viewctrls input[type=range] { width: 104px; accent-color: var(--accent, #2b6cb0); cursor: pointer; }
+    .viewctrls .vc-yr { min-width: 30px; color: var(--text); font-variant-numeric: tabular-nums; text-align: right; }
+    .viewctrls .vc-sep { border-top: 1px solid var(--border); margin: 2px 0; }
     .srcnote { margin-top: 18px; font-size: 0.82rem; color: var(--text-soft); }
   </style>
 </head>
@@ -105,11 +106,13 @@
       <div class="mapwrap">
         <svg id="net" role="img" aria-label="Public-education lobbying network map"></svg>
         <div class="maphint" id="hint">Search an entity, or click any dot to start tracing</div>
-        <div class="txtsize">
-          <label for="lblsize">Text</label>
-          <span class="a1">A</span>
-          <input type="range" id="lblsize" min="0" max="240" value="100" step="10" aria-label="Label text size (slide left to hide labels)">
-          <span class="a2">A</span>
+        <div class="viewctrls">
+          <div class="vc-row"><label for="lblsize">Text</label><input type="range" id="lblsize" min="0" max="240" value="100" step="10" title="Label text size (0 hides labels)"></div>
+          <div class="vc-row"><label for="nodesize">Dots</label><input type="range" id="nodesize" min="30" max="260" value="100" step="10" title="Entity circle size"></div>
+          <div class="vc-row"><label for="spread">Spread</label><input type="range" id="spread" min="60" max="320" value="100" step="10" title="Push entities apart"></div>
+          <div class="vc-sep"></div>
+          <div class="vc-row"><label for="yfrom">From</label><input type="range" id="yfrom" title="Earliest year shown"><span class="vc-yr" id="yfromlab"></span></div>
+          <div class="vc-row"><label for="yto">To</label><input type="range" id="yto" title="Latest year shown"><span class="vc-yr" id="ytolab"></span></div>
         </div>
         <div class="zoombtns">
           <button id="zin" aria-label="Zoom in">+</button>
@@ -142,6 +145,9 @@
     var NODES=[],EDGES=[],adj=[],nodeEls=[],labelEls=[],off={};
     var focus=null, expanded=new Set(), trail=[];
     var labelScale=1;                        // user-adjustable label text size (0 = hidden)
+    var nodeScale=1, curSpread=1;            // user-adjustable dot size and node spread
+    var BASE_REST=0, BASE_REP=0;             // captured physics defaults (for the spread control)
+    var yrMin=0, yrMax=0, yFrom=0, yTo=0, nodeYr=null;   // year-range filter state
 
     function $(id){return document.getElementById(id);}
     function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -167,7 +173,7 @@
     }
     window.addEventListener('resize',rescale);
     function rad(n){var b=n.kind==='employer'?2.2:1.7,m=n.kind==='employer'?26:16,mn=n.kind==='employer'?4:2.5;
-      return Math.max(mn,Math.min(m,mn+Math.sqrt(n.deg)*b));}
+      return Math.max(mn,Math.min(m,mn+Math.sqrt(n.deg)*b))*nodeScale;}
 
 
     // ===== force-directed physics (ported from Amy's p5 sketch: Coulomb repulsion,
@@ -291,6 +297,15 @@
       $('stat').textContent=d.counts.employers+' education entities · '+d.counts.lobbyists+' lobbyists · '+d.counts.edges+' connections';
       adj=NODES.map(function(){return [];});
       EDGES.forEach(function(e,ei){adj[e[0]].push({n:e[1],e:ei}); adj[e[1]].push({n:e[0],e:ei});});
+      // base positions (spread control) + per-edge year range (year filter)
+      NODES.forEach(function(n){n.bx=n.x; n.by=n.y;});
+      var yset=[];
+      EDGES.forEach(function(e){var m=String(e[2]||'').match(/\d{4}/g)||[]; e._y0=m.length?+m[0]:0; e._y1=m.length?+m[m.length-1]:9999; if(m.length){yset.push(e._y0,e._y1);}});
+      yrMin=yset.length?Math.min.apply(null,yset):2013; yrMax=yset.length?Math.max.apply(null,yset):2026; yFrom=yrMin; yTo=yrMax;
+      ['yfrom','yto'].forEach(function(id){var s=$(id); s.min=yrMin; s.max=yrMax; s.step=1;});
+      $('yfrom').value=yrMin; $('yto').value=yrMax; $('yfromlab').textContent=yrMin; $('ytolab').textContent=yrMax;
+      recomputeYear();
+      BASE_REST=PHYS.restLength; BASE_REP=PHYS.repulsion;
       var lg=$('legend');
       Object.keys(COLORS).forEach(function(cat){
         var el=document.createElement('span'); el.className='lg'; el.dataset.cat=cat;
@@ -332,7 +347,13 @@
     }
 
     function catOff(i){var n=NODES[i]; return n.kind==='employer'&&off[n.cat];}
-    function visible(i){return (!focus||focus.has(i))&&!catOff(i);}
+    function edgeYr(e){return e._y1>=yFrom && e._y0<=yTo;}   // edge's year range overlaps the filter
+    function recomputeYear(){
+      nodeYr=new Array(NODES.length);
+      for(var i=0;i<NODES.length;i++) nodeYr[i]=false;
+      for(var j=0;j<EDGES.length;j++){var e=EDGES[j]; if(edgeYr(e)){nodeYr[e[0]]=true; nodeYr[e[1]]=true;}}
+    }
+    function visible(i){return (!focus||focus.has(i))&&!catOff(i)&&(!nodeYr||nodeYr[i]);}
     function applyVis(){
       NODES.forEach(function(n,i){
         var v=visible(i);
@@ -341,7 +362,7 @@
         labelEls[i].style.display=showLab?'':'none';
       });
       EDGES.forEach(function(e){
-        e.el.style.display=(visible(e[0])&&visible(e[1]))?'':'none';
+        e.el.style.display=(edgeYr(e)&&visible(e[0])&&visible(e[1]))?'':'none';
         e.el.setAttribute('stroke-opacity',focus?0.5:0.22);
       });
     }
@@ -512,6 +533,35 @@
     $('zout').addEventListener('click',function(){zoom(1.25);});
     $('zreset').addEventListener('click',function(){ if(focus){zoomToFit();} else if(base){vb=Object.assign({},base);setVB();} });
     $('lblsize').addEventListener('input',function(){ labelScale=(+this.value)/100; rescale(); });
+    $('nodesize').addEventListener('input',function(){
+      nodeScale=(+this.value)/100;
+      for(var i=0;i<NODES.length;i++){ if(nodeEls[i]) nodeEls[i].setAttribute('r',rad(NODES[i])); }
+      rescale();
+    });
+    $('spread').addEventListener('input',function(){ applySpread((+this.value)/100); });
+    function applySpread(newS){
+      var f=newS/(curSpread||1); curSpread=newS;
+      var set=focus?Array.from(focus):null, cx=0,cy=0,ct=0,i;
+      if(set){ set.forEach(function(i){cx+=NODES[i].x;cy+=NODES[i].y;ct++;}); }
+      else { for(i=0;i<NODES.length;i++){cx+=NODES[i].x;cy+=NODES[i].y;ct++;} }
+      cx/=(ct||1); cy/=(ct||1);
+      for(i=0;i<NODES.length;i++){
+        NODES[i].x=cx+(NODES[i].x-cx)*f; NODES[i].y=cy+(NODES[i].y-cy)*f;
+        if(nodeEls[i]){ nodeEls[i].setAttribute('cx',NODES[i].x); nodeEls[i].setAttribute('cy',NODES[i].y); }
+      }
+      for(var j=0;j<EDGES.length;j++){ var e=EDGES[j],A=NODES[e[0]],B=NODES[e[1]];
+        if(e.el){ e.el.setAttribute('x1',A.x); e.el.setAttribute('y1',A.y); e.el.setAttribute('x2',B.x); e.el.setAttribute('y2',B.y); } }
+      if(BASE_REST){ PHYS.restLength=BASE_REST*newS; PHYS.repulsion=BASE_REP*newS*newS; }
+      rescale();
+    }
+    function yearChanged(which){
+      yFrom=+$('yfrom').value; yTo=+$('yto').value;
+      if(yFrom>yTo){ if(which==='yfrom'){ yTo=yFrom; $('yto').value=yTo; } else { yFrom=yTo; $('yfrom').value=yFrom; } }
+      $('yfromlab').textContent=yFrom; $('ytolab').textContent=yTo;
+      recomputeYear(); applyVis(); rescale();
+    }
+    $('yfrom').addEventListener('input',function(){ yearChanged('yfrom'); });
+    $('yto').addEventListener('input',function(){ yearChanged('yto'); });
   </script>
 </body>
 </html>
