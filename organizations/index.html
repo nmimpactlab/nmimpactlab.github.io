@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Organizations across New Mexico public records — New Mexico Impact Lab</title>
+  <meta name="description" content="Search New Mexico organizations that appear in more than one independent public-record system: the IRS nonprofit registry, lobbyist registrations and campaign finance.">
+  <link rel="canonical" href="https://nmimpactlab.org/organizations/">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    .tool { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+    .tool h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 6px; }
+    .tool .sub { color: var(--text-soft); margin: 0 0 22px; }
+    .controls { display: grid; gap: 12px; grid-template-columns: 3fr 1fr 1fr 1fr; align-items: end; margin-bottom: 8px; }
+    @media (max-width: 760px) { .controls { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 460px) { .controls { grid-template-columns: 1fr; } }
+    .field label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-soft); margin-bottom: 4px; }
+    .field input, .field select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.95rem; }
+    .field input:focus, .field select:focus { outline: 2px solid var(--ring); outline-offset: 1px; }
+    .resultbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin: 10px 0 12px; color: var(--text-soft); font-size: 0.9rem; }
+    .tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+    table.org { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    table.org th, table.org td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    table.org th { background: var(--bg-soft); position: sticky; top: 0; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); }
+    table.org tr:last-child td { border-bottom: 0; }
+    table.org td.name { font-weight: 600; }
+    table.org tr.r { cursor: pointer; }
+    table.org tr.r:hover { background: var(--bg-soft); }
+    table.org td.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .pill { display: inline-block; font-size: 0.7rem; padding: 2px 7px; border-radius: 20px; background: var(--bg-soft); color: var(--text-soft); white-space: nowrap; margin-right: 3px; }
+    .pill.irs { background: #e8f0fe; color: #1a4480; }
+    .pill.lob { background: #eaf6ec; color: #14532d; }
+    .pill.cf  { background: #fdf0e6; color: #7c2d12; }
+    .pill.edu { background: #f3e8ff; color: #4c1d95; }
+    @media (prefers-color-scheme: dark) {
+      .pill.irs { background: #1e3a5f; color: #cfe2ff; }
+      .pill.lob { background: #14361f; color: #cdebd6; }
+      .pill.cf  { background: #4a2410; color: #ffddc4; }
+      .pill.edu { background: #3b2255; color: #e8d7ff; }
+    }
+    .tier { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em; }
+    .tier.v { color: #14532d; } .tier.p { color: #7c5800; }
+    @media (prefers-color-scheme: dark) { .tier.v { color: #7ddb9e; } .tier.p { color: #f0c14b; } }
+    tr.detail td { background: var(--bg-soft); font-size: 0.88rem; }
+    .detail dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
+    .detail dt { font-weight: 700; color: var(--text-soft); font-size: 0.8rem; }
+    .detail dd { margin: 0; }
+    .afflist { display: flex; flex-wrap: wrap; gap: 6px; }
+    .afflist span { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: 0.82rem; }
+    .pager { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 18px; }
+    .pager button { padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); cursor: pointer; font-size: 0.9rem; }
+    .pager button:disabled { opacity: 0.4; cursor: default; }
+    .empty { padding: 40px; text-align: center; color: var(--text-soft); }
+    .srcnote { margin-top: 22px; font-size: 0.82rem; color: var(--text-soft); }
+    .privacy { background: var(--bg-soft); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 6px; margin: 0 0 20px; font-size: 0.9rem; color: var(--text-soft); }
+    .dltools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 0 0 14px; }
+    .dltools button { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); cursor: pointer; font-size: 0.85rem; }
+    .dltools button:hover { background: var(--bg-soft); }
+    .dltools .dlnote { font-size: 0.8rem; color: var(--text-soft); }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="/"><span class="mark">NM</span> Impact Lab</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+      <div class="nav-links">
+        <a href="/investigations/">Investigations</a>
+        <a href="/articles/">Articles</a>
+        <a href="/data/">Data</a>
+        <a href="/methodology.html">Methodology</a>
+        <a href="/about.html">About</a>
+        <a href="/support.html">Support</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div class="tool">
+      <p><a href="/data/">&larr; Data</a></p>
+      <h1>Organizations across New Mexico public records</h1>
+      <p class="sub">New Mexico organizations that appear in more than one <strong>independent</strong> public-record system &mdash; the IRS nonprofit registry, state lobbyist registrations, and state campaign finance. Click any row for how the match was established.</p>
+
+      <div class="privacy">
+        <strong>How matches are made, and what we do not publish.</strong> Confirming that two records describe the same organization requires identifying details in the underlying filings &mdash; registered addresses, contact points, and the names of officers. <strong>Those details are used only to check the match and are never published here.</strong> What you see is the conclusion and the reason for it. Only organizations appear in this tool; individuals do not.
+      </div>
+
+      <div class="controls">
+        <div class="field">
+          <label for="q">Search organization</label>
+          <input type="search" id="q" placeholder="e.g. Presbyterian, or a school foundation" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="sys">Appears in</label>
+          <select id="sys">
+            <option value="">Any two systems</option>
+            <option value="irs">IRS nonprofit registry</option>
+            <option value="lobbying">Lobbyist registrations</option>
+            <option value="campaign_finance">Campaign finance</option>
+            <option value="ALL3">All three</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="tier">Confidence</label>
+          <select id="tier">
+            <option value="">Any</option>
+            <option value="Verified">Verified</option>
+            <option value="Probable">Probable</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="edu">Sector</label>
+          <select id="edu">
+            <option value="">All sectors</option>
+            <option value="1">Education only</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="resultbar">
+        <span id="count" aria-live="polite">Loading&hellip;</span>
+        <span id="pageinfo"></span>
+      </div>
+
+      <div class="dltools">
+        <button id="dlResults" type="button">&#8681; Download results (CSV)</button>
+        <button id="dlAll" type="button">&#8681; Download full dataset (CSV)</button>
+        <span class="dlnote">Exports carry a provenance and verification notice.</span>
+      </div>
+
+      <div class="tablewrap">
+        <table class="org" aria-label="Organizations appearing in multiple New Mexico public-record systems">
+          <thead>
+            <tr>
+              <th>Organization</th>
+              <th>City</th>
+              <th>Appears in</th>
+              <th>Confidence</th>
+              <th class="num">Reported revenue</th>
+              <th class="num">Linked orgs</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="pager">
+        <button id="prev" disabled>&larr; Previous</button>
+        <span id="pagenum" style="color:var(--text-soft);font-size:0.9rem;"></span>
+        <button id="next" disabled>Next &rarr;</button>
+      </div>
+
+      <p class="srcnote">Sources: the IRS Exempt Organizations Business Master File (New Mexico extract), New Mexico lobbyist registration disclosures, and New Mexico campaign finance reports &mdash; all public records, compiled with the Lab's custom-built data tools and provided as a research aid.
+      <strong>Reported revenue</strong> is the figure in the organization's most recent IRS record; most small nonprofits file a form that carries no financial figures at all, so a blank or zero does not mean an organization is inactive. <strong>Linked organizations</strong> share a registered contact point, which frequently means nothing more than a shared accountant, attorney or registered agent &mdash; it is not evidence of common control. The official record governs; verify against the source and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="disclaimer"><span class="dh">Verify before you rely</span>The data and analysis here are compiled from public records using the New Mexico Impact Lab's own custom-built data tools, and are provided as-is, as a research and finding aid. The original official record always governs: before using any figure, record, or finding in an official, legal, journalistic, or financial capacity, <strong>confirm it against the source document.</strong> This site is not an official record.</div>
+      <div class="footer-bottom">&copy; <span id="year2">2026</span> New Mexico Impact Lab. Built on public records.</div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var b = document.querySelector('.nav-toggle'), l = document.querySelector('.nav-links');
+      if (b && l) b.addEventListener('click', function () { var o = l.classList.toggle('open'); b.setAttribute('aria-expanded', o ? 'true' : 'false'); });
+      var yy = document.getElementById('year2'); if (yy) yy.textContent = new Date().getFullYear();
+    })();
+
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var ROWS = [], view = [], page = 0, PER = 50, open = -1;
+      var SYS = { irs: ['IRS nonprofit registry', 'irs'], lobbying: ['Lobbyist registrations', 'lob'], campaign_finance: ['Campaign finance', 'cf'] };
+      var NTEE = { A: 'Arts & culture', B: 'Education', C: 'Environment', D: 'Animals', E: 'Health', F: 'Mental health',
+        G: 'Disease & medical', H: 'Medical research', I: 'Crime & legal', J: 'Employment', K: 'Food & agriculture',
+        L: 'Housing', M: 'Public safety', N: 'Recreation & sports', O: 'Youth development', P: 'Human services',
+        Q: 'International', R: 'Civil rights', S: 'Community improvement', T: 'Philanthropy & grantmaking',
+        U: 'Science', V: 'Social science', W: 'Public benefit', X: 'Religion', Y: 'Mutual benefit', Z: 'Unclassified' };
+      var SUB = { '3': '501(c)(3) charitable', '4': '501(c)(4) social welfare', '5': '501(c)(5) labor or agricultural',
+        '6': '501(c)(6) business league', '7': '501(c)(7) social club', '8': '501(c)(8) fraternal',
+        '9': '501(c)(9) employee benefit', '10': '501(c)(10) fraternal', '12': '501(c)(12) cooperative',
+        '13': '501(c)(13) cemetery', '19': '501(c)(19) veterans' };
+
+      // match at word starts so "APS" finds "APS Education Foundation" and not "Chaps Entertainment"
+      var reCache = {};
+      function matches(name, q) {
+        var re = reCache[q];
+        if (re === undefined) {
+          try { re = new RegExp('(^|[^A-Za-z0-9])' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'); }
+          catch (e) { re = null; }
+          reCache[q] = re;
+        }
+        return re ? re.test(name) : name.toLowerCase().indexOf(q) >= 0;
+      }
+
+      function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+      function money(n) { return n ? '$' + Number(n).toLocaleString() : '—'; }
+
+      function apply() {
+        var q = $('q').value.trim().toLowerCase(), sys = $('sys').value, tier = $('tier').value, edu = $('edu').value;
+        view = ROWS.filter(function (r) {
+          if (q && !matches(r.name, q)) return false;
+          if (sys === 'ALL3') { if (r.families.length < 3) return false; }
+          else if (sys && r.families.indexOf(sys) < 0) return false;
+          if (tier && r.tier !== tier) return false;
+          if (edu && !r.edu) return false;
+          return true;
+        });
+        page = 0; open = -1; render();
+      }
+
+      function render() {
+        var tb = $('tbody'); tb.innerHTML = '';
+        $('count').textContent = view.length.toLocaleString() + (view.length === 1 ? ' organization' : ' organizations');
+        if (!view.length) {
+          tb.innerHTML = '<tr><td colspan="6" class="empty">No organizations match those filters.</td></tr>';
+          $('pageinfo').textContent = ''; $('pagenum').textContent = '';
+          $('prev').disabled = $('next').disabled = true; return;
+        }
+        var pages = Math.ceil(view.length / PER);
+        if (page >= pages) page = pages - 1;
+        var slice = view.slice(page * PER, page * PER + PER);
+        slice.forEach(function (r, i) {
+          var idx = page * PER + i;
+          var tr = document.createElement('tr');
+          tr.className = 'r';
+          tr.innerHTML = '<td class="name">' + esc(r.name) + (r.edu ? ' <span class="pill edu">education</span>' : '') + '</td>'
+            + '<td>' + esc(r.city || '—') + '</td>'
+            + '<td>' + r.families.map(function (f) { return '<span class="pill ' + SYS[f][1] + '">' + SYS[f][0] + '</span>'; }).join('') + '</td>'
+            + '<td><span class="tier ' + (r.tier === 'Verified' ? 'v' : 'p') + '">' + r.tier.toUpperCase() + '</span></td>'
+            + '<td class="num">' + money(r.revenue) + '</td>'
+            + '<td class="num">' + (r.nAffiliations || '—') + '</td>';
+          tr.addEventListener('click', function () { open = (open === idx ? -1 : idx); render(); });
+          tb.appendChild(tr);
+          if (open === idx) {
+            var d = document.createElement('tr'); d.className = 'detail';
+            var td = document.createElement('td'); td.colSpan = 6;
+            var h = '<dl>';
+            h += '<dt>Why we say it is the same organization</dt><dd>' + esc(r.basis) + '</dd>';
+            if (r.ein) h += '<dt>IRS EIN</dt><dd>' + esc(r.ein) + '</dd>';
+            if (r.subsection && SUB[r.subsection]) h += '<dt>Tax status</dt><dd>' + esc(SUB[r.subsection]) + '</dd>';
+            if (r.ntee) h += '<dt>IRS sector</dt><dd>' + esc(NTEE[r.ntee.charAt(0)] || 'Unclassified') + ' <span class="pill">' + esc(r.ntee) + '</span></dd>';
+            h += '<dt>Reported revenue</dt><dd>' + money(r.revenue) + (r.revenue ? '' : ' <span style="color:var(--text-soft)">&mdash; no figure in the IRS record; small nonprofits file a form that reports none</span>') + '</dd>';
+            if (r.affiliations && r.affiliations.length) {
+              h += '<dt>Shares a registered contact point with</dt><dd><div class="afflist">'
+                + r.affiliations.map(function (a) { return '<span>' + esc(a) + '</span>'; }).join('')
+                + '</div><div style="margin-top:6px;color:var(--text-soft);font-size:0.82rem;">A shared contact point often means a shared accountant, attorney or registered agent. It is not evidence of common control.'
+                + (r.nAffiliations > r.affiliations.length ? ' Showing ' + r.affiliations.length + ' of ' + r.nAffiliations + '.' : '') + '</div></dd>';
+            }
+            h += '</dl>';
+            td.innerHTML = h; d.appendChild(td); tb.appendChild(d);
+          }
+        });
+        $('pageinfo').textContent = 'Showing ' + (page * PER + 1).toLocaleString() + '–' + Math.min((page + 1) * PER, view.length).toLocaleString();
+        $('pagenum').textContent = 'Page ' + (page + 1) + ' of ' + pages;
+        $('prev').disabled = page === 0; $('next').disabled = page >= pages - 1;
+      }
+
+      function csv(rows, fname) {
+        var head = [
+          '# New Mexico Impact Lab - organizations appearing in two or more independent public-record systems',
+          '# Sources: IRS Exempt Organizations Business Master File (NM extract); NM lobbyist registrations; NM campaign finance',
+          '# Matches are confirmed using identifying details in the underlying records. Those personal details are NOT published.',
+          '# "linked_organizations" share a registered contact point, which is often only a shared accountant, attorney or',
+          '# registered agent - it is NOT evidence of common control.',
+          '# "reported_revenue" is from the most recent IRS record; most small nonprofits file a form carrying no figures,',
+          '# so a blank or zero does not mean the organization is inactive.',
+          '# VERIFY BEFORE YOU RELY: the official record governs. Confirm against the source document before any official use.',
+          '# Generated ' + new Date().toISOString().slice(0, 10) + ' from https://nmimpactlab.org/organizations/'
+        ].join('\n') + '\n';
+        var cols = ['organization', 'city', 'appears_in', 'confidence', 'basis', 'ein', 'tax_status', 'irs_sector', 'reported_revenue', 'education', 'n_linked_organizations', 'linked_organizations'];
+        var out = [cols.join(',')];
+        rows.forEach(function (r) {
+          out.push([r.name, r.city, r.families.map(function (f) { return SYS[f][0]; }).join('; '), r.tier, r.basis,
+            r.ein, (SUB[r.subsection] || ''), (r.ntee ? (NTEE[r.ntee.charAt(0)] || '') + ' (' + r.ntee + ')' : ''),
+            r.revenue || '', r.edu ? 'yes' : 'no', r.nAffiliations || 0, (r.affiliations || []).join('; ')]
+            .map(function (v) { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(','));
+        });
+        var blob = new Blob(['﻿' + head + out.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = fname; a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+      }
+
+      ['q', 'sys', 'tier', 'edu'].forEach(function (id) {
+        $(id).addEventListener(id === 'q' ? 'input' : 'change', apply);
+      });
+      $('prev').addEventListener('click', function () { if (page > 0) { page--; open = -1; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
+      $('next').addEventListener('click', function () { page++; open = -1; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+      $('dlResults').addEventListener('click', function () { csv(view, 'nm-organizations-filtered.csv'); });
+      $('dlAll').addEventListener('click', function () { csv(ROWS, 'nm-organizations-all.csv'); });
+
+      // deep link, e.g. /organizations/?q=Presbyterian (used by the lobbying-network map)
+      try {
+        var qp = new URLSearchParams(location.search).get('q');
+        if (qp) $('q').value = qp;
+      } catch (e) { /* older browsers: just show everything */ }
+
+      fetch('/assets/data/entity-crosswalk.json')
+        .then(function (r) { return r.json(); })
+        .then(function (d) { ROWS = d.rows || []; apply(); })
+        .catch(function () { $('count').textContent = 'Could not load the dataset.'; });
+    })();
+  </script>
+</body>
+</html>

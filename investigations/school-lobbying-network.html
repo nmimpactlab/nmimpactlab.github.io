@@ -45,6 +45,10 @@
     .panel li { margin: 3px 0; }
     .panel a.nlink { cursor: pointer; }
     .panel .yrs { color: var(--text-soft); font-size: 0.8rem; }
+    .panel .xw { margin: 8px 0 2px; padding: 8px 10px; background: var(--bg-soft); border-radius: 8px; font-size: 0.82rem; }
+    .panel .xw b { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); margin-bottom: 3px; }
+    .panel .xw .row { display: flex; justify-content: space-between; gap: 8px; margin: 2px 0; }
+    .panel .xw .cav { color: var(--text-soft); font-size: 0.76rem; margin-top: 5px; }
     .zoombtns { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 6px; }
     .zoombtns button { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 1.1rem; cursor: pointer; }
     .srcnote { margin-top: 18px; font-size: 0.82rem; color: var(--text-soft); }
@@ -264,6 +268,12 @@
       startSim(0.5);
     }
 
+    var XW={};
+    fetch('/assets/data/school-network-enrich.json')
+      .then(function(r){return r.ok?r.json():{rows:{}};})
+      .then(function(d){XW=d.rows||{};})
+      .catch(function(){XW={};});
+
     fetch('/assets/data/school-network.json').then(function(r){return r.json();}).then(function(d){
       NODES=d.nodes; EDGES=d.edges;
       $('stat').textContent=d.counts.employers+' education entities · '+d.counts.lobbyists+' lobbyists · '+d.counts.edges+' connections';
@@ -392,6 +402,18 @@
         html+='<li><a class="nlink" data-i="'+a.n+'">'+esc(NODES[a.n].label)+'</a>'+(yrs?' <span class="yrs">('+esc(yrs)+')</span>':'')+'</li>';
       });
       html+='</ul>';
+      var x=XW[i];
+      if(x){
+        var SYSN={irs:'IRS nonprofit registry',lobbying:'Lobbyist registrations',campaign_finance:'Campaign finance'};
+        html+='<div class="xw"><b>Also found in other public records</b>';
+        html+='<div class="row"><span>Appears in</span><span style="text-align:right">'+(x.src||[]).map(function(f){return esc(SYSN[f]||f);}).join('<br>')+'</span></div>';
+        if(x.ein) html+='<div class="row"><span>IRS EIN</span><span>'+esc(x.ein)+'</span></div>';
+        html+='<div class="row"><span>Reported revenue</span><span>'+(x.rev?('$'+Number(x.rev).toLocaleString()):'none reported')+'</span></div>';
+        html+='<div class="row"><span>Match confidence</span><span>'+esc(x.tier)+'</span></div>';
+        if(!x.rev) html+='<div class="cav">Most small nonprofits file a return that carries no financial figures, so this does not mean the organization is inactive.</div>';
+        html+='<div class="cav"><a href="/organizations/?q='+encodeURIComponent(n.label)+'">Open in the organizations tool &rarr;</a></div>';
+        html+='</div>';
+      }
       panel.innerHTML=html; panel.classList.add('show');
       panel.querySelector('.close').addEventListener('click',function(){panel.classList.remove('show');pinned=false;if(!focus)clearHi();});
       panel.querySelectorAll('.nlink').forEach(function(a){

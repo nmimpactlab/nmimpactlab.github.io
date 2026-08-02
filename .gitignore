@@ -1,0 +1,6 @@
+
+# Raw source data containing personal information - NEVER publish.
+# The IRS EO BMF carries officer names (ICO) and street addresses, many residential.
+NM Registered NonProfits*.csv
+*INTERNAL*
+*_raw_*.csv
