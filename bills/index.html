@@ -12,7 +12,7 @@
     .tool h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 6px; }
     .tool .sub { color: var(--text-soft); margin: 0 0 22px; }
     .controls {
-      display: grid; gap: 12px; grid-template-columns: 2fr 1fr 1fr auto;
+      display: grid; gap: 12px; grid-template-columns: 2fr 1fr 1fr 1.2fr auto;
       align-items: end; margin-bottom: 16px;
     }
     @media (max-width: 720px) { .controls { grid-template-columns: 1fr 1fr; } }
@@ -44,6 +44,9 @@
     .detail .sponsors { font-size: 0.9rem; color: var(--text); margin: 0 0 10px; }
     .detail .novotes { color: var(--text-soft); font-size: 0.9rem; }
     .detail .actionpath { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 10px; font-size: 0.9rem; }
+    .detail .fulltext { display: inline-block; margin: 0 0 10px; font-weight: 600; font-size: 0.92rem; }
+    .detail .topicchips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+    .detail .tchip { font-size: 0.78rem; padding: 2px 9px; border-radius: 20px; background: var(--bg); border: 1px solid var(--border); color: var(--text-soft); }
     .detail .step { display: inline-flex; align-items: baseline; gap: 5px; padding: 3px 9px; border: 1px solid var(--border); border-radius: 20px; background: var(--bg); }
     .detail .stepstat { font-size: 0.75rem; color: var(--text-soft); }
     .detail .arrow { color: var(--text-soft); }
@@ -94,6 +97,10 @@
         <div class="field">
           <label for="chamber">Chamber</label>
           <select id="chamber"><option value="">All</option></select>
+        </div>
+        <div class="field">
+          <label for="topic">Topic</label>
+          <select id="topic"><option value="">All topics</option></select>
         </div>
         <div class="field">
           <label for="died">&nbsp;</label>
@@ -158,7 +165,17 @@
 
     var PAGE = 100;
     var DATA = [], view = [], page = 0;
-    var COL = { bill:0, year:1, session:2, chamber:3, title:4, status:5, committee:6, votecount:7, sponsors:8, votes:9, actions:10 };
+    var COL = { bill:0, year:1, session:2, chamber:3, title:4, status:5, committee:6, votecount:7, sponsors:8, votes:9, actions:10, topics:11 };
+    var LEGTYPE = { HB:['H','B'], SB:['S','B'], HR:['H','R'], SR:['S','R'], HM:['H','M'], SM:['S','M'],
+                    HJR:['H','JR'], SJR:['S','JR'], HJM:['H','JM'], SJM:['S','JM'], HCR:['H','CR'], SCR:['S','CR'] };
+    // Full-text page on nmlegis.gov. Only regular sessions use the simple 2-digit year code.
+    function fullTextUrl(r){
+      var pfx = r[COL.chamber], lt = LEGTYPE[pfx];
+      if (!lt || !/regular session/i.test(r[COL.session] || '')) return '';
+      var num = String(r[COL.bill]).match(/(\d+)/);
+      if (!num) return '';
+      return 'https://www.nmlegis.gov/Legislation/Legislation?chamber=' + lt[0] + '&legType=' + lt[1] + '&legNo=' + num[1] + '&year=' + String(r[COL.year]).slice(-2);
+    }
     var $ = function (id) { return document.getElementById(id); };
 
     function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
@@ -180,7 +197,7 @@
         var r = slice[i];
         var nv = r[COL.votecount];
         var votes = nv ? '<span class="pill votepill">' + nv + ' &#9662;</span>' : '';
-        var expandable = nv > 0;
+        var expandable = true;   // every bill opens to show full-text link, topics, sponsors, committee path
         html += '<tr class="billrow' + (expandable ? ' expandable' : '') + '" data-vi="' + (start + i) + '">'
           + '<td class="caret">' + (expandable ? '&#9656;' : '') + '</td>'
           + '<td class="billid">' + esc(r[COL.bill]) + '</td>'
@@ -215,6 +232,10 @@
       var vs = r[COL.votes] || [];
       var acts = r[COL.actions] || [];
       var html = '<div class="detail">';
+      var ft = fullTextUrl(r);
+      if (ft) html += '<a class="fulltext" href="' + ft + '" target="_blank" rel="noopener">&#128196; Read the full bill text &amp; history on nmlegis.gov &#8599;</a>';
+      var tp = r[COL.topics] || '';
+      if (tp) html += '<div class="topicchips">' + tp.split('|').map(function (t) { return '<span class="tchip">' + esc(t) + '</span>'; }).join('') + '</div>';
       if (r[COL.sponsors]) html += '<h4>Sponsors</h4><div class="sponsors">' + esc(r[COL.sponsors]) + '</div>';
       html += '<h4>Committee path</h4>';
       if (acts.length) {
@@ -254,11 +275,13 @@
       var q = $('q').value.trim().toLowerCase();
       var yr = $('year').value;
       var ch = $('chamber').value;
+      var tp = $('topic').value;
       var diedOnly = $('died').checked;
       var terms = q ? q.split(/\s+/) : [];
       view = DATA.filter(function (r) {
         if (yr && String(r[COL.year]) !== yr) return false;
         if (ch && r[COL.chamber] !== ch) return false;
+        if (tp && ('|' + (r[COL.topics] || '') + '|').indexOf('|' + tp + '|') === -1) return false;
         if (diedOnly && !/died/i.test(r[COL.status])) return false;
         if (terms.length) {
           var hay = (r[COL.bill] + ' ' + r[COL.title] + ' ' + r[COL.sponsors] + ' ' + r[COL.status]).toLowerCase();
@@ -282,9 +305,14 @@
       // chamber dropdown (distinct)
       var chs = {}; DATA.forEach(function (r) { if (r[COL.chamber]) chs[r[COL.chamber]] = 1; });
       var cs = $('chamber'); Object.keys(chs).sort().forEach(function (c) { var o = document.createElement('option'); o.value = c; o.textContent = c; cs.appendChild(o); });
+      // topic dropdown (from the tagger's list, falling back to whatever appears in the data)
+      var tl = d.topics_list;
+      if (!tl) { var seen = {}; DATA.forEach(function (r) { (r[COL.topics] || '').split('|').forEach(function (t) { if (t) seen[t] = 1; }); }); tl = Object.keys(seen).sort(); }
+      var ts = $('topic'); tl.forEach(function (t) { var o = document.createElement('option'); o.value = t; o.textContent = t; ts.appendChild(o); });
       $('q').addEventListener('input', onInput);
       $('year').addEventListener('change', apply);
       $('chamber').addEventListener('change', apply);
+      $('topic').addEventListener('change', apply);
       $('died').addEventListener('change', apply);
       apply();
     }).catch(function (e) {
@@ -323,12 +351,13 @@
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     }
-    var BILLS_COLS = ['Bill', 'Year', 'Session', 'Chamber', 'Title', 'Status', 'Committee path', 'Floor votes', 'Sponsors', 'Roll-call vote sheet URLs'];
+    var BILLS_COLS = ['Bill', 'Year', 'Session', 'Chamber', 'Title', 'Status', 'Committee path', 'Floor votes', 'Sponsors', 'Topics', 'Full text URL', 'Roll-call vote sheet URLs'];
     var BILLS_SRC = 'New Mexico Legislature public bill records (nmlegis.gov), 1996-2026';
-    var BILLS_DICT = 'Bill=bill number; Year=year of session; Session=legislative session; Chamber=bill type/chamber; Title=official title; Status=final status as recorded; Committee path=committees traversed; Floor votes=count of recorded roll-call votes; Sponsors=listed sponsors (semicolon-separated); Roll-call vote sheet URLs=links to official PDF vote sheets on nmlegis.gov (space-separated)';
+    var BILLS_DICT = 'Bill=bill number; Year=year of session; Session=legislative session; Chamber=bill type/chamber; Title=official title; Status=final status as recorded; Committee path=committees traversed; Floor votes=count of recorded roll-call votes; Sponsors=listed sponsors (semicolon-separated); Topics=subject tags derived from the title (semicolon-separated, a finding aid not an official classification); Full text URL=link to the bill page on nmlegis.gov (regular sessions only); Roll-call vote sheet URLs=links to official PDF vote sheets on nmlegis.gov (space-separated)';
     function billRow(r) {
       var v = (r[COL.votes] || []).map(function (x) { return x[2]; }).filter(Boolean).join(' ');
-      return [r[COL.bill], r[COL.year], r[COL.session], r[COL.chamber], r[COL.title], r[COL.status], r[COL.committee], r[COL.votecount], r[COL.sponsors], v];
+      var tp = (r[COL.topics] || '').split('|').filter(Boolean).join('; ');
+      return [r[COL.bill], r[COL.year], r[COL.session], r[COL.chamber], r[COL.title], r[COL.status], r[COL.committee], r[COL.votecount], r[COL.sponsors], tp, fullTextUrl(r), v];
     }
     $('dlResults').addEventListener('click', function () {
       saveCSV('nmimpactlab_bills_results_' + todayStr() + '.csv', BILLS_COLS, view.map(billRow), BILLS_SRC, BILLS_DICT);
