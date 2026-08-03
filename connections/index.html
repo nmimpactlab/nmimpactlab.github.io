@@ -52,6 +52,12 @@
     .egbtns { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 0; }
     .egbtns button { font-size: 0.8rem; padding: 5px 10px; border: 1px dashed var(--border); border-radius: 20px; background: none; color: var(--text-soft); cursor: pointer; }
     .egbtns button:hover { color: var(--text); border-style: solid; }
+    .gtools { position: absolute; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 5px; background: var(--bg); border: 1px solid var(--border); border-radius: 9px; padding: 7px 10px; opacity: 0.95; font-size: 0.68rem; z-index: 5; box-shadow: var(--shadow); }
+    .gtools .gr { display: flex; align-items: center; gap: 7px; }
+    .gtools label { width: 38px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.03em; }
+    .gtools input[type=range] { width: 90px; accent-color: var(--accent, #2b6cb0); cursor: pointer; }
+    #cx circle.nd { cursor: pointer; }
+    .ghint { position: absolute; left: 10px; bottom: 8px; font-size: 0.72rem; color: var(--text-soft); background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 4px 9px; opacity: 0.92; }
   </style>
 </head>
 <body>
@@ -94,6 +100,12 @@
         <p class="summary" id="summary"></p>
         <div class="graphwrap" id="graphwrap" hidden>
           <svg id="cx" role="img" aria-label="Connection diagram"></svg>
+          <div class="gtools">
+            <div class="gr"><label for="gtext">Text</label><input type="range" id="gtext" min="0" max="240" value="100" step="10" title="Label text size (0 hides labels)"></div>
+            <div class="gr"><label for="gdots">Dots</label><input type="range" id="gdots" min="40" max="240" value="100" step="10" title="Node circle size"></div>
+            <div class="gr"><label for="gspread">Spread</label><input type="range" id="gspread" min="60" max="260" value="100" step="10" title="Spread nodes apart"></div>
+          </div>
+          <div class="ghint">Click any dot to add it and expand its connections.</div>
         </div>
         <div class="legend" id="legend" hidden></div>
         <div class="paths" id="paths"></div>
@@ -124,6 +136,7 @@
       var $ = function (id) { return document.getElementById(id); };
       var SVGNS = 'http://www.w3.org/2000/svg';
       var NODES = [], ADJ = [], ETYPE = {}, sel = [], curConn = null;
+      var gLabelScale = 1, gNodeScale = 1, gSpread = 1;   // graph-tool state (text / dots / spread)
       var EDGECOLOR = { represents: '#b45309', donated_to: '#7c2d12', affiliated: '#2b6cb0' };
       var lc = function (s) { return (s || '').toLowerCase(); };
       function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];}); }
@@ -312,7 +325,7 @@
         // graph
         if (c.subNodes.length >= 2 && c.subEdges.length){
           $('graphwrap').hidden = false; $('legend').hidden = false;
-          drawGraph(c);
+          drawGraph(c, true);
           drawLegend(c);
         } else { $('graphwrap').hidden = true; $('legend').hidden = true; }
 
@@ -358,54 +371,65 @@
       }
 
       // small pinned force layout of the connection subgraph
-      function drawGraph(c){
-        var svg = $('cx'); while (svg.firstChild) svg.removeChild(svg.firstChild);
+      // compute node positions with a pinned force layout (Spread scales the spacing)
+      function layoutGraph(c){
         var ids = c.subNodes, P = {};
         var selSet = {}; sel.forEach(function(s){ selSet[s] = true; });
         var selNodes = ids.filter(function(i){ return selSet[i]; });
-        var R = 180;
+        var R = 180 * (0.7 + 0.3 * gSpread);
         ids.forEach(function(id, k){ var ang = k / ids.length * 6.2832; P[id] = { x: Math.cos(ang)*40, y: Math.sin(ang)*40, vx:0, vy:0, pin:false }; });
-        // pin selected entities: 2 => left/right, more => on a circle
         if (selNodes.length === 2){ P[selNodes[0]] = {x:-R,y:0,pin:true}; P[selNodes[1]] = {x:R,y:0,pin:true}; }
         else selNodes.forEach(function(id, k){ var ang = -1.5708 + k/selNodes.length*6.2832; P[id] = {x:Math.cos(ang)*R, y:Math.sin(ang)*R, pin:true}; });
         var E = c.subEdges.filter(function(e){ return P[e.u] && P[e.v]; });
-        // relax
+        var REP = 12000 * gSpread, REST = 120 * gSpread;
         for (var it = 0; it < 240; it++){
           ids.forEach(function(i){ P[i].fx = 0; P[i].fy = 0; });
           for (var a = 0; a < ids.length; a++){ for (var b = a+1; b < ids.length; b++){
             var A = P[ids[a]], B = P[ids[b]], dx = B.x-A.x, dy = B.y-A.y, d2 = dx*dx+dy*dy+0.01, d = Math.sqrt(d2);
-            var f = Math.min(12000/d2, 40), fx = f*dx/d, fy = f*dy/d; A.fx -= fx; A.fy -= fy; B.fx += fx; B.fy += fy;
+            var f = Math.min(REP/d2, 40), fx = f*dx/d, fy = f*dy/d; A.fx -= fx; A.fy -= fy; B.fx += fx; B.fy += fy;
           }}
           E.forEach(function(e){ var A = P[e.u], B = P[e.v], dx = B.x-A.x, dy = B.y-A.y, d = Math.sqrt(dx*dx+dy*dy)+0.01;
-            var f = 0.02*(d-120), fx = f*dx/d, fy = f*dy/d; A.fx += fx; A.fy += fy; B.fx -= fx; B.fy -= fy; });
+            var f = 0.02*(d-REST), fx = f*dx/d, fy = f*dy/d; A.fx += fx; A.fy += fy; B.fx -= fx; B.fy -= fy; });
           ids.forEach(function(i){ var p = P[i]; if (p.pin) return;
             p.vx = (p.vx + p.fx)*0.82; p.vy = (p.vy + p.fy)*0.82;
             var vm = Math.sqrt(p.vx*p.vx+p.vy*p.vy); if (vm>18){ p.vx=p.vx/vm*18; p.vy=p.vy/vm*18; }
             p.x += p.vx; p.y += p.vy; });
         }
-        // fit
+        return P;
+      }
+      // relayout only when the graph/spread changes; text & dot size just re-render from cached positions
+      function drawGraph(c, relayout){
+        var svg = $('cx'); while (svg.firstChild) svg.removeChild(svg.firstChild);
+        var ids = c.subNodes;
+        if (relayout || !c._pos) c._pos = layoutGraph(c);
+        var P = c._pos, selSet = {}; sel.forEach(function(s){ selSet[s] = true; });
+        var E = c.subEdges.filter(function(e){ return P[e.u] && P[e.v]; });
         var xs = ids.map(function(i){return P[i].x;}), ys = ids.map(function(i){return P[i].y;});
         var mnx=Math.min.apply(null,xs),mxx=Math.max.apply(null,xs),mny=Math.min.apply(null,ys),mxy=Math.max.apply(null,ys);
         var pad = 70, W = (mxx-mnx)+pad*2, H = (mxy-mny)+pad*2, side = Math.max(W,H,200);
         svg.setAttribute('viewBox', (((mnx+mxx)/2)-side*0.9) + ' ' + (((mny+mxy)/2)-side/2) + ' ' + (side*1.8) + ' ' + side);
         var k = side / 460;
-        // edges
         E.forEach(function(e){ var A=P[e.u], B=P[e.v];
           var ln=document.createElementNS(SVGNS,'line'); ln.setAttribute('x1',A.x);ln.setAttribute('y1',A.y);ln.setAttribute('x2',B.x);ln.setAttribute('y2',B.y);
           ln.setAttribute('stroke',EDGECOLOR[e.t]||'#888'); ln.setAttribute('stroke-width',1.5*k); ln.setAttribute('stroke-opacity','0.7'); svg.appendChild(ln);
         });
-        // nodes + labels
         ids.forEach(function(i){ var p=P[i], n=NODES[i], isSel=selSet[i];
-          var c1=document.createElementNS(SVGNS,'circle'); c1.setAttribute('cx',p.x);c1.setAttribute('cy',p.y);
-          c1.setAttribute('r',(isSel?9:5.5)*k); c1.setAttribute('fill',kdot(n.kind));
-          c1.setAttribute('stroke',isSel?'var(--text)':'var(--bg)'); c1.setAttribute('stroke-width',(isSel?2:1)*k); svg.appendChild(c1);
-          var t=document.createElementNS(SVGNS,'text'); t.setAttribute('x',p.x); t.setAttribute('y',p.y-(isSel?12:9)*k);
-          t.setAttribute('text-anchor','middle'); t.setAttribute('font-size',(isSel?13:11)*k);
+          var c1=document.createElementNS(SVGNS,'circle'); c1.setAttribute('class','nd'); c1.setAttribute('cx',p.x);c1.setAttribute('cy',p.y);
+          c1.setAttribute('r',(isSel?9:5.5)*k*gNodeScale); c1.setAttribute('fill',kdot(n.kind));
+          c1.setAttribute('stroke',isSel?'var(--text)':'var(--bg)'); c1.setAttribute('stroke-width',(isSel?2:1)*k);
+          c1.addEventListener('click', function(){ if (!isSel) addEntity(i); });   // click-through: expand this node's connections
+          svg.appendChild(c1);
+          var t=document.createElementNS(SVGNS,'text'); t.setAttribute('x',p.x); t.setAttribute('y',p.y-(isSel?12:9)*k*gNodeScale);
+          t.setAttribute('text-anchor','middle'); t.setAttribute('font-size',(isSel?13:11)*k*gLabelScale);
           t.setAttribute('fill','var(--text)'); t.setAttribute('font-weight',isSel?'700':'400');
           t.setAttribute('paint-order','stroke'); t.setAttribute('stroke','var(--bg)'); t.setAttribute('stroke-width',3*k);
+          if (gLabelScale === 0) t.setAttribute('display','none');
           var lab=n.label.length>30?n.label.slice(0,28)+'…':n.label; t.textContent=lab; svg.appendChild(t);
         });
       }
+      $('gtext').addEventListener('input', function(){ gLabelScale=(+this.value)/100; if (curConn) drawGraph(curConn, false); });
+      $('gdots').addEventListener('input', function(){ gNodeScale=(+this.value)/100; if (curConn) drawGraph(curConn, false); });
+      $('gspread').addEventListener('input', function(){ gSpread=(+this.value)/100; if (curConn) drawGraph(curConn, true); });
 
       // ---------- CSV ----------
       $('dl').addEventListener('click', function(){
