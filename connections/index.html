@@ -105,7 +105,7 @@
             <div class="gr"><label for="gdots">Dots</label><input type="range" id="gdots" min="40" max="240" value="100" step="10" title="Node circle size"></div>
             <div class="gr"><label for="gspread">Spread</label><input type="range" id="gspread" min="60" max="260" value="100" step="10" title="Spread nodes apart"></div>
           </div>
-          <div class="ghint">Click any dot to add it and expand its connections.</div>
+          <div class="ghint">Click a dot to expand its connections &middot; drag to reposition it.</div>
         </div>
         <div class="legend" id="legend" hidden></div>
         <div class="paths" id="paths"></div>
@@ -409,23 +409,51 @@
         var pad = 70, W = (mxx-mnx)+pad*2, H = (mxy-mny)+pad*2, side = Math.max(W,H,200);
         svg.setAttribute('viewBox', (((mnx+mxx)/2)-side*0.9) + ' ' + (((mny+mxy)/2)-side/2) + ' ' + (side*1.8) + ' ' + side);
         var k = side / 460;
+        c._k = k; c._nEl = {}; c._lEl = {}; c._eEls = [];
         E.forEach(function(e){ var A=P[e.u], B=P[e.v];
           var ln=document.createElementNS(SVGNS,'line'); ln.setAttribute('x1',A.x);ln.setAttribute('y1',A.y);ln.setAttribute('x2',B.x);ln.setAttribute('y2',B.y);
           ln.setAttribute('stroke',EDGECOLOR[e.t]||'#888'); ln.setAttribute('stroke-width',1.5*k); ln.setAttribute('stroke-opacity','0.7'); svg.appendChild(ln);
+          c._eEls.push({ el: ln, u: e.u, v: e.v });
         });
         ids.forEach(function(i){ var p=P[i], n=NODES[i], isSel=selSet[i];
           var c1=document.createElementNS(SVGNS,'circle'); c1.setAttribute('class','nd'); c1.setAttribute('cx',p.x);c1.setAttribute('cy',p.y);
           c1.setAttribute('r',(isSel?9:5.5)*k*gNodeScale); c1.setAttribute('fill',kdot(n.kind));
           c1.setAttribute('stroke',isSel?'var(--text)':'var(--bg)'); c1.setAttribute('stroke-width',(isSel?2:1)*k);
-          c1.addEventListener('click', function(){ if (!isSel) addEntity(i); });   // click-through: expand this node's connections
-          svg.appendChild(c1);
-          var t=document.createElementNS(SVGNS,'text'); t.setAttribute('x',p.x); t.setAttribute('y',p.y-(isSel?12:9)*k*gNodeScale);
+          c1.addEventListener('pointerdown', function(ev){ startDrag(i, ev, isSel); });   // tap = expand, drag = reposition
+          svg.appendChild(c1); c._nEl[i] = c1;
+          var off=(isSel?12:9)*k*gNodeScale;
+          var t=document.createElementNS(SVGNS,'text'); t.setAttribute('x',p.x); t.setAttribute('y',p.y-off);
           t.setAttribute('text-anchor','middle'); t.setAttribute('font-size',(isSel?13:11)*k*gLabelScale);
           t.setAttribute('fill','var(--text)'); t.setAttribute('font-weight',isSel?'700':'400');
           t.setAttribute('paint-order','stroke'); t.setAttribute('stroke','var(--bg)'); t.setAttribute('stroke-width',3*k);
           if (gLabelScale === 0) t.setAttribute('display','none');
-          var lab=n.label.length>30?n.label.slice(0,28)+'…':n.label; t.textContent=lab; svg.appendChild(t);
+          t._off = off;
+          var lab=n.label.length>30?n.label.slice(0,28)+'…':n.label; t.textContent=lab; svg.appendChild(t); c._lEl[i] = t;
         });
+      }
+      // drag a node to reposition it; a tap (no movement) on a connector adds & expands it
+      function startDrag(i, ev, isSel){
+        if (!curConn || !curConn._pos) return;
+        ev.preventDefault();
+        var svg = $('cx'), rect = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+        var sx = vb.width/rect.width, sy = vb.height/rect.height;
+        var P = curConn._pos, ox = P[i].x, oy = P[i].y, sX = ev.clientX, sY = ev.clientY, moved = false;
+        function mv(e){
+          var ddx = e.clientX - sX, ddy = e.clientY - sY;
+          if (!moved && Math.abs(ddx) + Math.abs(ddy) > 3) moved = true;
+          P[i].x = ox + ddx*sx; P[i].y = oy + ddy*sy;
+          var el = curConn._nEl[i]; if (el){ el.setAttribute('cx', P[i].x); el.setAttribute('cy', P[i].y); }
+          var lb = curConn._lEl[i]; if (lb){ lb.setAttribute('x', P[i].x); lb.setAttribute('y', P[i].y - (lb._off||0)); }
+          curConn._eEls.forEach(function(ed){
+            if (ed.u === i){ ed.el.setAttribute('x1', P[i].x); ed.el.setAttribute('y1', P[i].y); }
+            if (ed.v === i){ ed.el.setAttribute('x2', P[i].x); ed.el.setAttribute('y2', P[i].y); }
+          });
+        }
+        function up(){
+          document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up);
+          if (!moved && !isSel) addEntity(i);
+        }
+        document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up);
       }
       $('gtext').addEventListener('input', function(){ gLabelScale=(+this.value)/100; if (curConn) drawGraph(curConn, false); });
       $('gdots').addEventListener('input', function(){ gNodeScale=(+this.value)/100; if (curConn) drawGraph(curConn, false); });
