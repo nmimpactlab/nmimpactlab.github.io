@@ -181,10 +181,28 @@
     var PHYS={repulsion:9000, springK:0.02, restLength:85, centerPull:0.0006, damping:0.85,
               maxF:35, maxV:25, cool:0.985, minAlpha:0.02};
     var sim={raf:null, drag:null, moved:false, alpha:0};
+    var relaxAll=false;                      // whole-map force relaxation (for the Spread control)
 
     function focusList(){
       if(!focus) return [];
       var a=[]; focus.forEach(function(i){ if(!catOff(i)) a.push(i); }); return a;
+    }
+    // which nodes the physics acts on: the focused trace, or (when spreading) every visible node
+    function simNodes(){
+      if(focus) return focusList();
+      if(!relaxAll) return [];
+      var a=[]; for(var i=0;i<NODES.length;i++){ if(visible(i)) a.push(i); } return a;
+    }
+    // fit the view to the focused set, or to all visible nodes on the whole map
+    function fitVisible(){
+      var xs=[],ys=[],i;
+      if(focus&&focus.size){ focus.forEach(function(i){ if(!catOff(i)){xs.push(NODES[i].x);ys.push(NODES[i].y);} }); }
+      else { for(i=0;i<NODES.length;i++){ if(visible(i)){xs.push(NODES[i].x);ys.push(NODES[i].y);} } }
+      if(!xs.length) return;
+      var mnx=Math.min.apply(null,xs),mxx=Math.max.apply(null,xs),mny=Math.min.apply(null,ys),mxy=Math.max.apply(null,ys);
+      var w=Math.max(mxx-mnx,60),h=Math.max(mxy-mny,60),pad=Math.max(w,h)*0.14,side=Math.max(w,h)+pad*2;
+      vb={x:(mnx+mxx)/2-side/2,y:(mny+mxy)/2-side/2,w:side,h:side}; setVB();
+      if(!focus) base=Object.assign({},vb);
     }
     function toUser(ev){
       var r=svg.getBoundingClientRect();
@@ -206,7 +224,7 @@
       }
     }
     function simStep(){
-      var ns=focusList(); if(ns.length<2) return 0;
+      var ns=simNodes(); if(ns.length<2) return 0;
       var i,j,a,b,k;
       for(k=0;k<ns.length;k++){var n=NODES[ns[k]]; n._fx=0; n._fy=0; if(n._vx===undefined){n._vx=0;n._vy=0;}}
       // repulsion
@@ -253,7 +271,7 @@
       if(sim.drag){ sim.alpha=Math.max(sim.alpha,0.35); }
       else { sim.alpha*=PHYS.cool; }
       if(sim.drag || sim.alpha>PHYS.minAlpha){ sim.raf=requestAnimationFrame(simLoop); }
-      else { sim.raf=null; if(!userMoved) zoomToFit(); else rescale(); }   // reframe the settled layout
+      else { sim.raf=null; relaxAll=false; if(!userMoved) fitVisible(); else rescale(); }   // reframe the settled layout
     }
     function startSim(heat){
       sim.alpha=Math.max(sim.alpha, heat===undefined?1:heat);
@@ -538,21 +556,42 @@
       for(var i=0;i<NODES.length;i++){ if(nodeEls[i]) nodeEls[i].setAttribute('r',rad(NODES[i])); }
       rescale();
     });
-    $('spread').addEventListener('input',function(){ applySpread((+this.value)/100); });
-    function applySpread(newS){
-      var f=newS/(curSpread||1); curSpread=newS;
-      var set=focus?Array.from(focus):null, cx=0,cy=0,ct=0,i;
-      if(set){ set.forEach(function(i){cx+=NODES[i].x;cy+=NODES[i].y;ct++;}); }
-      else { for(i=0;i<NODES.length;i++){cx+=NODES[i].x;cy+=NODES[i].y;ct++;} }
-      cx/=(ct||1); cy/=(ct||1);
-      for(i=0;i<NODES.length;i++){
-        NODES[i].x=cx+(NODES[i].x-cx)*f; NODES[i].y=cy+(NODES[i].y-cy)*f;
-        if(nodeEls[i]){ nodeEls[i].setAttribute('cx',NODES[i].x); nodeEls[i].setAttribute('cy',NODES[i].y); }
+    $('spread').addEventListener('input',function(){ spreadRelax((+this.value)/100); });
+    // Real spread: change the force-layout spacing and re-relax, so crowded clusters
+    // decompress (unlike a uniform scale, which only looks like zoom). Works on a focused
+    // trace (physics already runs there) and on the whole map (relaxAll turns physics on
+    // for the visible nodes, then it re-fits and stops).
+    function spreadRelax(newS){
+      curSpread=newS;
+      if(focus){                              // focused trace: natural physics handles small sets well
+        if(BASE_REST){ PHYS.restLength=BASE_REST*newS; PHYS.repulsion=BASE_REP*Math.sqrt(newS); }
+        userMoved=false; startSim(0.7); return;
       }
-      for(var j=0;j<EDGES.length;j++){ var e=EDGES[j],A=NODES[e[0]],B=NODES[e[1]];
-        if(e.el){ e.el.setAttribute('x1',A.x); e.el.setAttribute('y1',A.y); e.el.setAttribute('x2',B.x); e.el.setAttribute('y2',B.y); } }
-      if(BASE_REST){ PHYS.restLength=BASE_REST*newS; PHYS.repulsion=BASE_REP*newS*newS; }
-      rescale();
+      // whole map: start from the pristine precomputed layout and apply bounded, short-range
+      // repulsion so crowded areas decompress. spread=1 => base layout untouched; higher =>
+      // more declutter. Cannot explode (force + step capped, only nearby pairs interact).
+      for(var i=0;i<NODES.length;i++){ NODES[i].x=NODES[i].bx; NODES[i].y=NODES[i].by; }
+      var iters=Math.round((newS-1)*10);
+      if(iters>0){
+        var vis=[]; for(i=0;i<NODES.length;i++){ if(visible(i)) vis.push(i); }
+        var NEAR=120, NEAR2=NEAR*NEAR, STEP=3;
+        for(var t=0;t<iters;t++){
+          for(var a=0;a<vis.length;a++){ var A=NODES[vis[a]]; A._dx=0; A._dy=0; }
+          for(a=0;a<vis.length;a++){ var A=NODES[vis[a]];
+            for(var b=a+1;b<vis.length;b++){ var B=NODES[vis[b]];
+              var dx=B.x-A.x, dy=B.y-A.y, d2=dx*dx+dy*dy;
+              if(d2>NEAR2||d2<0.01) continue;
+              var d=Math.sqrt(d2), f=Math.min(320/d2,3.5), fx=f*dx/d, fy=f*dy/d;
+              A._dx-=fx; A._dy-=fy; B._dx+=fx; B._dy+=fy;
+            }
+          }
+          for(a=0;a<vis.length;a++){ var A=NODES[vis[a]];
+            A.x+=Math.max(-STEP,Math.min(STEP,A._dx)); A.y+=Math.max(-STEP,Math.min(STEP,A._dy)); }
+        }
+        for(i=0;i<vis.length;i++) syncNode(vis[i]);
+        syncEdges();
+      }
+      fitVisible(); rescale();
     }
     function yearChanged(which){
       yFrom=+$('yfrom').value; yTo=+$('yto').value;
