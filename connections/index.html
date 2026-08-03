@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connection search — how New Mexico entities link up — New Mexico Impact Lab</title>
+  <meta name="description" content="Search across New Mexico public records for the connections between two or more people or organizations — shared lobbyists, shared campaign donors and recipients, and shared registered contacts.">
+  <link rel="canonical" href="https://nmimpactlab.org/connections/">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    .tool { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+    .tool h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 6px; }
+    .tool .sub { color: var(--text-soft); margin: 0 0 20px; }
+    .privacy { background: var(--bg-soft); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 6px; margin: 0 0 20px; font-size: 0.9rem; color: var(--text-soft); }
+    .searchwrap { position: relative; }
+    .searchwrap input { width: 100%; padding: 11px 13px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.98rem; }
+    .searchwrap input:focus { outline: 2px solid var(--ring); outline-offset: 1px; }
+    .sugg { position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 20; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow); max-height: 320px; overflow-y: auto; display: none; }
+    .sugg.show { display: block; }
+    .sugg button { display: block; width: 100%; text-align: left; padding: 8px 12px; border: 0; background: none; color: var(--text); cursor: pointer; font-size: 0.9rem; border-bottom: 1px solid var(--border); }
+    .sugg button:last-child { border-bottom: 0; }
+    .sugg button:hover, .sugg button.hi { background: var(--bg-soft); }
+    .sugg .k { font-size: 0.74rem; color: var(--text-soft); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; min-height: 8px; }
+    .chip { display: inline-flex; align-items: center; gap: 8px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 6px 5px 12px; font-size: 0.9rem; }
+    .chip .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .chip button { border: 0; background: none; color: var(--text-soft); cursor: pointer; font-size: 1.05rem; line-height: 1; padding: 0 4px; }
+    .chip button:hover { color: var(--text); }
+    .hint { color: var(--text-soft); font-size: 0.85rem; margin: 2px 0 0; }
+    .result { margin-top: 22px; }
+    .summary { font-size: 1.02rem; line-height: 1.5; margin: 0 0 14px; }
+    .summary strong { color: var(--text); }
+    .none { color: var(--text-soft); }
+    .graphwrap { position: relative; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-soft); overflow: hidden; }
+    svg#cx { width: 100%; height: 460px; display: block; touch-action: none; }
+    .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.8rem; color: var(--text-soft); margin: 10px 2px 0; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend i { width: 22px; height: 0; border-top-width: 2px; border-top-style: solid; display: inline-block; }
+    .paths { margin-top: 18px; }
+    .paths h3 { font-size: 1rem; margin: 0 0 8px; }
+    .pathitem { border: 1px solid var(--border); border-radius: 8px; padding: 10px 13px; margin-bottom: 8px; font-size: 0.9rem; }
+    .pathitem .via { color: var(--text-soft); }
+    .chain { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin-top: 4px; }
+    .chain .n { font-weight: 600; }
+    .chain .rel { color: var(--text-soft); font-size: 0.82rem; font-style: italic; }
+    .chain .arr { color: var(--text-soft); }
+    .dltools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 16px 0 0; }
+    .dltools button { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); cursor: pointer; font-size: 0.85rem; }
+    .dltools button:hover { background: var(--bg-soft); }
+    .dltools button:disabled { opacity: 0.4; cursor: default; }
+    .srcnote { margin-top: 22px; font-size: 0.82rem; color: var(--text-soft); }
+    .egbtns { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 0; }
+    .egbtns button { font-size: 0.8rem; padding: 5px 10px; border: 1px dashed var(--border); border-radius: 20px; background: none; color: var(--text-soft); cursor: pointer; }
+    .egbtns button:hover { color: var(--text); border-style: solid; }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="/"><span class="mark">NM</span> Impact Lab</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+      <div class="nav-links">
+        <a href="/investigations/">Investigations</a>
+        <a href="/articles/">Articles</a>
+        <a href="/data/">Data</a>
+        <a href="/methodology.html">Methodology</a>
+        <a href="/about.html">About</a>
+        <a href="/support.html">Support</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div class="tool">
+      <p><a href="/data/">&larr; Data</a></p>
+      <h1>Connection search</h1>
+      <p class="sub">Pick two or more New Mexico people or organizations and see how they connect across the public record &mdash; a shared lobbyist, a shared campaign donor or recipient committee, or a shared registered contact point.</p>
+
+      <div class="privacy">
+        <strong>What a connection means.</strong> Links here come only from public disclosures: a registered lobbyist and the organizations they represent, an organizational campaign donor and the committees it funds, and organizations that share a registered contact point. Individuals other than registered lobbyists are not included. <strong>A shared lobbyist, donor, or registered agent shows a relationship &mdash; not coordination or wrongdoing.</strong> Verify against the source before drawing any conclusion.
+      </div>
+
+      <div class="searchwrap">
+        <input type="search" id="q" placeholder="Search a person or organization&hellip; e.g. Presbyterian, Zia Strategies, AARP" autocomplete="off" aria-label="Search for an entity to add">
+        <div class="sugg" id="sugg"></div>
+      </div>
+      <div class="egbtns" id="egbtns"></div>
+      <div class="chips" id="chips"></div>
+      <p class="hint" id="hint">Add at least two entities to trace the connections between them.</p>
+
+      <div class="result" id="result" hidden>
+        <p class="summary" id="summary"></p>
+        <div class="graphwrap" id="graphwrap" hidden>
+          <svg id="cx" role="img" aria-label="Connection diagram"></svg>
+        </div>
+        <div class="legend" id="legend" hidden></div>
+        <div class="paths" id="paths"></div>
+        <div class="dltools">
+          <button id="dl" type="button" disabled>&#8681; Download connections (CSV)</button>
+        </div>
+      </div>
+
+      <p class="srcnote">Sources: New Mexico lobbyist registration disclosures, New Mexico campaign finance reports, and the IRS Exempt Organizations Business Master File (New Mexico) &mdash; all public records, compiled with the Lab's custom-built data tools and provided as a research aid. Campaign-finance links use organizational donors only; individual donors are not included. The official record governs &mdash; verify against the source and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="disclaimer"><span class="dh">Verify before you rely</span>The data and analysis here are compiled from public records using the New Mexico Impact Lab's own custom-built data tools, and are provided as-is, as a research and finding aid. The original official record always governs: before using any figure, record, or finding in an official, legal, journalistic, or financial capacity, <strong>confirm it against the source document.</strong> This site is not an official record.</div>
+      <div class="footer-bottom">&copy; <span id="year2">2026</span> New Mexico Impact Lab. Built on public records.</div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var b = document.querySelector('.nav-toggle'), l = document.querySelector('.nav-links');
+      if (b && l) b.addEventListener('click', function () { var o = l.classList.toggle('open'); b.setAttribute('aria-expanded', o ? 'true' : 'false'); });
+      var yy = document.getElementById('year2'); if (yy) yy.textContent = new Date().getFullYear();
+    })();
+
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var SVGNS = 'http://www.w3.org/2000/svg';
+      var NODES = [], ADJ = [], ETYPE = {}, sel = [], curConn = null;
+      var EDGECOLOR = { represents: '#b45309', donated_to: '#7c2d12', affiliated: '#2b6cb0' };
+      var lc = function (s) { return (s || '').toLowerCase(); };
+      function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];}); }
+      function kdot(kind){ return kind==='lobbyist'?'#b45309':'#2b6cb0'; }
+
+      // ---------- load ----------
+      fetch('/assets/data/connections-graph.json').then(function(r){return r.json();}).then(function(g){
+        NODES = g.nodes; ETYPE = g.edgeTypes || {};
+        ADJ = NODES.map(function(){ return []; });
+        g.edges.forEach(function(e){ ADJ[e[0]].push({to:e[1],t:e[2]}); ADJ[e[1]].push({to:e[0],t:e[2]}); });
+        $('hint').textContent = 'Loaded ' + NODES.length.toLocaleString() + ' entities and ' + g.edges.length.toLocaleString() + ' connections. Add at least two to begin.';
+        buildExamples();
+      }).catch(function(){ $('hint').textContent = 'Could not load the connection data.'; });
+
+      // ---------- typeahead ----------
+      var hiIdx = -1, matches = [];
+      function search(qs) {
+        var q = lc(qs).trim();
+        if (q.length < 2) return [];
+        var starts = [], contains = [];
+        for (var i = 0; i < NODES.length; i++) {
+          var L = lc(NODES[i].label);
+          if (L === q) starts.unshift(i);
+          else if (L.indexOf(q) === 0) starts.push(i);
+          else if (L.indexOf(q) > 0) contains.push(i);
+          if (starts.length > 60) break;
+        }
+        var all = starts.concat(contains);
+        all.sort(function(a,b){ return NODES[b].deg - NODES[a].deg; });
+        return all.filter(function(i){ return sel.indexOf(i) < 0; }).slice(0, 12);
+      }
+      function roleWord(n){
+        if (n.kind === 'lobbyist') return 'lobbyist';
+        var r = n.roles || [];
+        if (r.indexOf('recipient') >= 0 && r.indexOf('donor') < 0) return 'campaign recipient';
+        if (r.indexOf('donor') >= 0) return 'organization';
+        if (r.indexOf('employer') >= 0) return 'lobbying employer';
+        return 'organization';
+      }
+      function renderSugg() {
+        var s = $('sugg');
+        if (!matches.length) { s.classList.remove('show'); s.innerHTML = ''; return; }
+        s.innerHTML = matches.map(function(i, k){
+          var n = NODES[i];
+          return '<button data-i="' + i + '" class="' + (k===hiIdx?'hi':'') + '">' + esc(n.label)
+            + ' <span class="k">&middot; ' + esc(roleWord(n)) + ' &middot; ' + n.deg + ' link' + (n.deg===1?'':'s') + '</span></button>';
+        }).join('');
+        s.classList.add('show');
+      }
+      $('q').addEventListener('input', function(){ matches = search(this.value); hiIdx = matches.length?0:-1; renderSugg(); });
+      $('q').addEventListener('keydown', function(e){
+        if (!matches.length) return;
+        if (e.key === 'ArrowDown'){ hiIdx = (hiIdx+1)%matches.length; renderSugg(); e.preventDefault(); }
+        else if (e.key === 'ArrowUp'){ hiIdx = (hiIdx-1+matches.length)%matches.length; renderSugg(); e.preventDefault(); }
+        else if (e.key === 'Enter'){ if (hiIdx>=0){ addEntity(matches[hiIdx]); e.preventDefault(); } }
+        else if (e.key === 'Escape'){ matches=[]; renderSugg(); }
+      });
+      $('sugg').addEventListener('click', function(e){ var btn = e.target.closest('button'); if (btn) addEntity(+btn.dataset.i); });
+      document.addEventListener('click', function(e){ if (!e.target.closest('.searchwrap')) $('sugg').classList.remove('show'); });
+
+      // ---------- chips ----------
+      function addEntity(i){
+        if (sel.indexOf(i) < 0) sel.push(i);
+        $('q').value = ''; matches = []; renderSugg(); renderChips(); recompute();
+        $('q').focus();
+      }
+      function removeEntity(i){ sel = sel.filter(function(x){ return x !== i; }); renderChips(); recompute(); }
+      function renderChips(){
+        $('chips').innerHTML = sel.map(function(i){
+          var n = NODES[i];
+          return '<span class="chip"><span class="dot" style="background:' + kdot(n.kind) + '"></span>'
+            + esc(n.label) + '<button data-i="' + i + '" aria-label="Remove">&times;</button></span>';
+        }).join('');
+      }
+      $('chips').addEventListener('click', function(e){ var btn = e.target.closest('button'); if (btn) removeEntity(+btn.dataset.i); });
+
+      function buildExamples(){
+        // pick a few real, well-connected pairs as one-click demos
+        var wanted = [['Exxon Mobil Corporation','ConocoPhillips'],
+                      ['Molina Healthcare','Presbyterian Health Plan, Inc.'],
+                      ['Center for Civic Action','Center for Civic Policy']];
+        var idx = {}; NODES.forEach(function(n,i){ if (idx[n.label]===undefined) idx[n.label]=i; });
+        var html = '';
+        wanted.forEach(function(pair){
+          if (idx[pair[0]]!==undefined && idx[pair[1]]!==undefined)
+            html += '<button data-a="' + idx[pair[0]] + '" data-b="' + idx[pair[1]] + '">' + esc(pair[0]) + ' &harr; ' + esc(pair[1]) + '</button>';
+        });
+        if (html){ $('egbtns').innerHTML = '<span style="color:var(--text-soft);font-size:0.8rem;align-self:center">Try:</span>' + html; }
+      }
+      $('egbtns').addEventListener('click', function(e){ var btn=e.target.closest('button'); if(!btn)return; sel=[+btn.dataset.a,+btn.dataset.b]; renderChips(); recompute(); });
+
+      // ---------- graph search ----------
+      function bfs(src){
+        var d = new Array(NODES.length); d[src] = 0;
+        var q = [src];
+        for (var h = 0; h < q.length; h++){
+          var u = q[h], au = ADJ[u];
+          for (var k = 0; k < au.length; k++){ var v = au[k].to; if (d[v] === undefined){ d[v] = d[u] + 1; q.push(v); } }
+        }
+        return d;
+      }
+      function edgeType(u, v){ var au = ADJ[u]; for (var k=0;k<au.length;k++) if (au[k].to===v) return au[k].t; return ''; }
+      // one shortest path a->b using precomputed dist-from-a
+      function onePath(da, a, b){
+        if (da[b] === undefined) return null;
+        var path = [b], cur = b;
+        while (cur !== a){
+          var au = ADJ[cur], nxt = -1;
+          for (var k=0;k<au.length;k++){ if (da[au[k].to] === da[cur]-1){ nxt = au[k].to; break; } }
+          if (nxt < 0) return null;
+          path.push(nxt); cur = nxt;
+        }
+        return path.reverse();
+      }
+
+      function recompute(){
+        curConn = null;
+        $('dl').disabled = true;
+        if (sel.length < 2){
+          $('result').hidden = true;
+          $('hint').textContent = sel.length === 1
+            ? 'Add one more entity to trace a connection.'
+            : 'Add at least two entities to trace the connections between them.';
+          return;
+        }
+        $('hint').textContent = '';
+        $('result').hidden = false;
+
+        var pairs = [], subNodes = {}, subEdges = {}, disconnected = [];
+        sel.forEach(function(id){ subNodes[id] = true; });
+        for (var i = 0; i < sel.length; i++){
+          var da = bfs(sel[i]);
+          for (var j = i+1; j < sel.length; j++){
+            var a = sel[i], b = sel[j], D = da[b];
+            if (D === undefined){ disconnected.push([a,b]); continue; }
+            var db = bfs(b);
+            // every node on a shortest path: da[v]+db[v]==D
+            var onPath = [];
+            for (var v = 0; v < NODES.length; v++){
+              if (da[v] !== undefined && db[v] !== undefined && da[v] + db[v] === D){ onPath.push(v); }
+            }
+            // cap intermediaries for rendering sanity
+            var CAP = 26;
+            if (onPath.length > CAP){
+              onPath.sort(function(x,y){ return (sel.indexOf(y)>=0?1e9:NODES[y].deg) - (sel.indexOf(x)>=0?1e9:NODES[x].deg); });
+              onPath = onPath.slice(0, CAP);
+            }
+            var onSet = {}; onPath.forEach(function(v){ subNodes[v]=true; onSet[v]=true; });
+            // subgraph edges: between on-path nodes whose dist-from-a differ by 1
+            onPath.forEach(function(u){
+              ADJ[u].forEach(function(e){
+                if (onSet[e.to] && Math.abs((da[u]) - (da[e.to])) === 1){
+                  var key = u < e.to ? u+'-'+e.to : e.to+'-'+u;
+                  subEdges[key] = { u: Math.min(u,e.to), v: Math.max(u,e.to), t: e.t };
+                }
+              });
+            });
+            pairs.push({ a: a, b: b, D: D, path: onePath(da, a, b), intermediaries: onPath.filter(function(v){ return sel.indexOf(v)<0; }) });
+          }
+        }
+        curConn = { pairs: pairs, subNodes: Object.keys(subNodes).map(Number), subEdges: Object.keys(subEdges).map(function(k){return subEdges[k];}), disconnected: disconnected };
+        renderResult();
+      }
+
+      // ---------- render ----------
+      function relPhrase(t){ return ETYPE[t] || t; }
+      function renderResult(){
+        var c = curConn;
+        // summary
+        var sm = '';
+        c.pairs.forEach(function(p){
+          var an = esc(NODES[p.a].label), bn = esc(NODES[p.b].label);
+          if (p.D === 1) sm += '<div><strong>' + an + '</strong> is directly connected to <strong>' + bn + '</strong>.</div>';
+          else if (p.D === 2){
+            var m = p.intermediaries.length;
+            sm += '<div><strong>' + an + '</strong> and <strong>' + bn + '</strong> connect through ' + m + ' shared ' + sharedWord(p) + (m===1?'':'s') + '.</div>';
+          } else {
+            sm += '<div><strong>' + an + '</strong> and <strong>' + bn + '</strong> are ' + p.D + ' steps apart.</div>';
+          }
+        });
+        c.disconnected.forEach(function(d){
+          sm += '<div class="none"><strong>' + esc(NODES[d[0]].label) + '</strong> and <strong>' + esc(NODES[d[1]].label) + '</strong> have no connection in this data.</div>';
+        });
+        $('summary').innerHTML = sm;
+
+        // graph
+        if (c.subNodes.length >= 2 && c.subEdges.length){
+          $('graphwrap').hidden = false; $('legend').hidden = false;
+          drawGraph(c);
+          drawLegend(c);
+        } else { $('graphwrap').hidden = true; $('legend').hidden = true; }
+
+        // textual paths
+        var ph = '';
+        c.pairs.forEach(function(p){
+          if (!p.path) return;
+          ph += '<div class="pathitem"><div class="via">Shortest link (' + p.D + ' step' + (p.D===1?'':'s') + '):</div><div class="chain">';
+          for (var k = 0; k < p.path.length; k++){
+            var n = NODES[p.path[k]];
+            ph += '<span class="n">' + esc(n.label) + '</span>';
+            if (k < p.path.length - 1){
+              var t = edgeType(p.path[k], p.path[k+1]);
+              ph += '<span class="arr">&mdash;</span><span class="rel">' + esc(relPhrase(t)) + '</span><span class="arr">&rarr;</span>';
+            }
+          }
+          ph += '</div>';
+          if (p.D === 2 && p.intermediaries.length > 1){
+            ph += '<div class="via" style="margin-top:6px">All shared connectors: ' + p.intermediaries.map(function(v){return esc(NODES[v].label);}).join(', ') + '</div>';
+          }
+          ph += '</div>';
+        });
+        $('paths').innerHTML = ph ? ('<h3>How they connect</h3>' + ph) : '';
+        $('dl').disabled = !(c.pairs.length && c.pairs.some(function(p){return p.path;}));
+      }
+      function sharedWord(p){
+        // describe the kind of the intermediaries (mostly lobbyists or committees)
+        var lob = 0, rec = 0, other = 0;
+        p.intermediaries.forEach(function(v){ var n = NODES[v];
+          if (n.kind === 'lobbyist') lob++;
+          else if ((n.roles||[]).indexOf('recipient') >= 0) rec++;
+          else other++;
+        });
+        if (lob >= rec && lob >= other) return 'lobbyist';
+        if (rec >= other) return 'campaign recipient';
+        return 'connection';
+      }
+      function drawLegend(c){
+        var types = {}; c.subEdges.forEach(function(e){ types[e.t] = true; });
+        $('legend').innerHTML = Object.keys(types).map(function(t){
+          return '<span><i style="border-top-color:' + (EDGECOLOR[t]||'#888') + '"></i>' + esc(relPhrase(t)) + '</span>';
+        }).join('') + '<span><i style="border-top-color:transparent"></i><span style="width:10px;height:10px;border-radius:50%;background:#b45309;display:inline-block"></span>&nbsp;lobbyist / person</span><span><span style="width:10px;height:10px;border-radius:50%;background:#2b6cb0;display:inline-block"></span>&nbsp;organization</span>';
+      }
+
+      // small pinned force layout of the connection subgraph
+      function drawGraph(c){
+        var svg = $('cx'); while (svg.firstChild) svg.removeChild(svg.firstChild);
+        var ids = c.subNodes, P = {};
+        var selSet = {}; sel.forEach(function(s){ selSet[s] = true; });
+        var selNodes = ids.filter(function(i){ return selSet[i]; });
+        var R = 180;
+        ids.forEach(function(id, k){ var ang = k / ids.length * 6.2832; P[id] = { x: Math.cos(ang)*40, y: Math.sin(ang)*40, vx:0, vy:0, pin:false }; });
+        // pin selected entities: 2 => left/right, more => on a circle
+        if (selNodes.length === 2){ P[selNodes[0]] = {x:-R,y:0,pin:true}; P[selNodes[1]] = {x:R,y:0,pin:true}; }
+        else selNodes.forEach(function(id, k){ var ang = -1.5708 + k/selNodes.length*6.2832; P[id] = {x:Math.cos(ang)*R, y:Math.sin(ang)*R, pin:true}; });
+        var E = c.subEdges.filter(function(e){ return P[e.u] && P[e.v]; });
+        // relax
+        for (var it = 0; it < 240; it++){
+          ids.forEach(function(i){ P[i].fx = 0; P[i].fy = 0; });
+          for (var a = 0; a < ids.length; a++){ for (var b = a+1; b < ids.length; b++){
+            var A = P[ids[a]], B = P[ids[b]], dx = B.x-A.x, dy = B.y-A.y, d2 = dx*dx+dy*dy+0.01, d = Math.sqrt(d2);
+            var f = Math.min(12000/d2, 40), fx = f*dx/d, fy = f*dy/d; A.fx -= fx; A.fy -= fy; B.fx += fx; B.fy += fy;
+          }}
+          E.forEach(function(e){ var A = P[e.u], B = P[e.v], dx = B.x-A.x, dy = B.y-A.y, d = Math.sqrt(dx*dx+dy*dy)+0.01;
+            var f = 0.02*(d-120), fx = f*dx/d, fy = f*dy/d; A.fx += fx; A.fy += fy; B.fx -= fx; B.fy -= fy; });
+          ids.forEach(function(i){ var p = P[i]; if (p.pin) return;
+            p.vx = (p.vx + p.fx)*0.82; p.vy = (p.vy + p.fy)*0.82;
+            var vm = Math.sqrt(p.vx*p.vx+p.vy*p.vy); if (vm>18){ p.vx=p.vx/vm*18; p.vy=p.vy/vm*18; }
+            p.x += p.vx; p.y += p.vy; });
+        }
+        // fit
+        var xs = ids.map(function(i){return P[i].x;}), ys = ids.map(function(i){return P[i].y;});
+        var mnx=Math.min.apply(null,xs),mxx=Math.max.apply(null,xs),mny=Math.min.apply(null,ys),mxy=Math.max.apply(null,ys);
+        var pad = 70, W = (mxx-mnx)+pad*2, H = (mxy-mny)+pad*2, side = Math.max(W,H,200);
+        svg.setAttribute('viewBox', (((mnx+mxx)/2)-side*0.9) + ' ' + (((mny+mxy)/2)-side/2) + ' ' + (side*1.8) + ' ' + side);
+        var k = side / 460;
+        // edges
+        E.forEach(function(e){ var A=P[e.u], B=P[e.v];
+          var ln=document.createElementNS(SVGNS,'line'); ln.setAttribute('x1',A.x);ln.setAttribute('y1',A.y);ln.setAttribute('x2',B.x);ln.setAttribute('y2',B.y);
+          ln.setAttribute('stroke',EDGECOLOR[e.t]||'#888'); ln.setAttribute('stroke-width',1.5*k); ln.setAttribute('stroke-opacity','0.7'); svg.appendChild(ln);
+        });
+        // nodes + labels
+        ids.forEach(function(i){ var p=P[i], n=NODES[i], isSel=selSet[i];
+          var c1=document.createElementNS(SVGNS,'circle'); c1.setAttribute('cx',p.x);c1.setAttribute('cy',p.y);
+          c1.setAttribute('r',(isSel?9:5.5)*k); c1.setAttribute('fill',kdot(n.kind));
+          c1.setAttribute('stroke',isSel?'var(--text)':'var(--bg)'); c1.setAttribute('stroke-width',(isSel?2:1)*k); svg.appendChild(c1);
+          var t=document.createElementNS(SVGNS,'text'); t.setAttribute('x',p.x); t.setAttribute('y',p.y-(isSel?12:9)*k);
+          t.setAttribute('text-anchor','middle'); t.setAttribute('font-size',(isSel?13:11)*k);
+          t.setAttribute('fill','var(--text)'); t.setAttribute('font-weight',isSel?'700':'400');
+          t.setAttribute('paint-order','stroke'); t.setAttribute('stroke','var(--bg)'); t.setAttribute('stroke-width',3*k);
+          var lab=n.label.length>30?n.label.slice(0,28)+'…':n.label; t.textContent=lab; svg.appendChild(t);
+        });
+      }
+
+      // ---------- CSV ----------
+      $('dl').addEventListener('click', function(){
+        if (!curConn) return;
+        var head = [
+          '# New Mexico Impact Lab - connection search',
+          '# Entities: ' + sel.map(function(i){return NODES[i].label;}).join(' | '),
+          '# Links are from public disclosures (lobbyist registrations, campaign finance, IRS nonprofit registry).',
+          '# A shared lobbyist, donor, or registered contact shows a relationship, NOT coordination or wrongdoing.',
+          '# VERIFY BEFORE YOU RELY: confirm against the official record before any official use.',
+          '# Generated ' + new Date().toISOString().slice(0,10) + ' from https://nmimpactlab.org/connections/'
+        ].join('\n') + '\n';
+        var rows = [['from_entity','to_entity','steps_apart','path_step_from','relationship','path_step_to']];
+        curConn.pairs.forEach(function(p){
+          if (!p.path) return;
+          for (var k = 0; k < p.path.length - 1; k++){
+            rows.push([NODES[p.a].label, NODES[p.b].label, p.D, NODES[p.path[k]].label, relPhrase(edgeType(p.path[k],p.path[k+1])), NODES[p.path[k+1]].label]);
+          }
+        });
+        curConn.disconnected.forEach(function(d){ rows.push([NODES[d[0]].label, NODES[d[1]].label, 'no connection', '', '', '']); });
+        var csv = head + rows.map(function(r){ return r.map(function(v){ v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }).join(','); }).join('\n');
+        var blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
+        var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'nm-connections.csv'; a.click();
+        setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+      });
+
+      // deep link: /connections/?a=Name&b=Name
+      try {
+        var sp = new URLSearchParams(location.search), qa = sp.get('a'), qb = sp.get('b');
+        if (qa || qb){
+          var wait = setInterval(function(){
+            if (!NODES.length) return; clearInterval(wait);
+            var byName = {}; NODES.forEach(function(n,i){ if (byName[lc(n.label)]===undefined) byName[lc(n.label)]=i; });
+            [qa,qb].forEach(function(nm){ if (nm && byName[lc(nm)]!==undefined && sel.indexOf(byName[lc(nm)])<0) sel.push(byName[lc(nm)]); });
+            if (sel.length){ renderChips(); recompute(); }
+          }, 100);
+        }
+      } catch(e){}
+    })();
+  </script>
+</body>
+</html>
