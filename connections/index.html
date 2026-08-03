@@ -58,6 +58,9 @@
     .gtools input[type=range] { width: 90px; accent-color: var(--accent, #2b6cb0); cursor: pointer; }
     #cx circle.nd { cursor: pointer; }
     .ghint { position: absolute; left: 10px; bottom: 8px; font-size: 0.72rem; color: var(--text-soft); background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 4px 9px; opacity: 0.92; }
+    .czoom { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 6px; z-index: 5; }
+    .czoom button { width: 32px; height: 32px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 1.05rem; cursor: pointer; }
+    .czoom button.rs { font-size: 0.72rem; }
   </style>
 </head>
 <body>
@@ -106,11 +109,18 @@
             <div class="gr"><label for="gspread">Spread</label><input type="range" id="gspread" min="60" max="260" value="100" step="10" title="Spread nodes apart"></div>
           </div>
           <div class="ghint">Click a dot to expand its connections &middot; drag to reposition it.</div>
+          <div class="czoom">
+            <button id="czin" type="button" aria-label="Zoom in">+</button>
+            <button id="czout" type="button" aria-label="Zoom out">&minus;</button>
+            <button id="czreset" class="rs" type="button" aria-label="Reset view">reset</button>
+          </div>
         </div>
         <div class="legend" id="legend" hidden></div>
         <div class="paths" id="paths"></div>
         <div class="dltools">
           <button id="dl" type="button" disabled>&#8681; Download connections (CSV)</button>
+          <button id="dlpng" type="button" disabled>&#8681; Save image (PNG)</button>
+          <button id="dlsvg" type="button" disabled>&#8681; Save SVG</button>
         </div>
       </div>
 
@@ -137,6 +147,8 @@
       var SVGNS = 'http://www.w3.org/2000/svg';
       var NODES = [], ADJ = [], ETYPE = {}, sel = [], curConn = null;
       var gLabelScale = 1, gNodeScale = 1, gSpread = 1;   // graph-tool state (text / dots / spread)
+      var cvb = null;                                     // current diagram viewBox (zoom / pan)
+      var savedPos = {};                                  // persistent node positions (keyed by node id) so add/remove/drag placements stick
       var EDGECOLOR = { represents: '#b45309', donated_to: '#7c2d12', affiliated: '#2b6cb0' };
       var lc = function (s) { return (s || '').toLowerCase(); };
       function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];}); }
@@ -254,7 +266,7 @@
 
       function recompute(){
         curConn = null;
-        $('dl').disabled = true;
+        $('dl').disabled = true; $('dlpng').disabled = true; $('dlsvg').disabled = true;
         if (sel.length < 2){
           $('result').hidden = true;
           $('hint').textContent = sel.length === 1
@@ -327,6 +339,7 @@
           $('graphwrap').hidden = false; $('legend').hidden = false;
           drawGraph(c, true);
           drawLegend(c);
+          $('dlpng').disabled = false; $('dlsvg').disabled = false;
         } else { $('graphwrap').hidden = true; $('legend').hidden = true; }
 
         // textual paths
@@ -372,14 +385,24 @@
 
       // small pinned force layout of the connection subgraph
       // compute node positions with a pinned force layout (Spread scales the spacing)
-      function layoutGraph(c){
+      function layoutGraph(c, preserve){
         var ids = c.subNodes, P = {};
         var selSet = {}; sel.forEach(function(s){ selSet[s] = true; });
         var selNodes = ids.filter(function(i){ return selSet[i]; });
         var R = 180 * (0.7 + 0.3 * gSpread);
-        ids.forEach(function(id, k){ var ang = k / ids.length * 6.2832; P[id] = { x: Math.cos(ang)*40, y: Math.sin(ang)*40, vx:0, vy:0, pin:false }; });
-        if (selNodes.length === 2){ P[selNodes[0]] = {x:-R,y:0,pin:true}; P[selNodes[1]] = {x:R,y:0,pin:true}; }
-        else selNodes.forEach(function(id, k){ var ang = -1.5708 + k/selNodes.length*6.2832; P[id] = {x:Math.cos(ang)*R, y:Math.sin(ang)*R, pin:true}; });
+        // seed known nodes from where they already are; brand-new nodes start near the centre
+        ids.forEach(function(id, k){
+          if (savedPos[id]){ P[id] = { x: savedPos[id].x, y: savedPos[id].y, vx:0, vy:0, pin:false, known:true }; }
+          else { var ang = k / ids.length * 6.2832; P[id] = { x: Math.cos(ang)*40, y: Math.sin(ang)*40, vx:0, vy:0, pin:false, known:false }; }
+        });
+        // selected entities anchor the layout; a never-placed one gets a default frame slot
+        if (selNodes.length === 2){
+          selNodes.forEach(function(id, idx){ if (!P[id].known){ P[id].x = idx===0?-R:R; P[id].y = 0; } P[id].pin = true; });
+        } else {
+          selNodes.forEach(function(id, k){ if (!P[id].known){ var ang = -1.5708 + k/selNodes.length*6.2832; P[id].x = Math.cos(ang)*R; P[id].y = Math.sin(ang)*R; } P[id].pin = true; });
+        }
+        // preserve (adding/removing an entity): keep every already-placed node exactly where the user left it
+        if (preserve) ids.forEach(function(id){ if (P[id].known) P[id].pin = true; });
         var E = c.subEdges.filter(function(e){ return P[e.u] && P[e.v]; });
         var REP = 12000 * gSpread, REST = 120 * gSpread;
         for (var it = 0; it < 240; it++){
@@ -395,20 +418,22 @@
             var vm = Math.sqrt(p.vx*p.vx+p.vy*p.vy); if (vm>18){ p.vx=p.vx/vm*18; p.vy=p.vy/vm*18; }
             p.x += p.vx; p.y += p.vy; });
         }
+        ids.forEach(function(id){ savedPos[id] = { x: P[id].x, y: P[id].y }; });   // remember placements
         return P;
       }
       // relayout only when the graph/spread changes; text & dot size just re-render from cached positions
-      function drawGraph(c, relayout){
+      function drawGraph(c, relayout, preserve){
         var svg = $('cx'); while (svg.firstChild) svg.removeChild(svg.firstChild);
-        var ids = c.subNodes;
-        if (relayout || !c._pos) c._pos = layoutGraph(c);
+        var ids = c.subNodes, pres = preserve !== false;
+        if (relayout || !c._pos) c._pos = layoutGraph(c, pres);
         var P = c._pos, selSet = {}; sel.forEach(function(s){ selSet[s] = true; });
         var E = c.subEdges.filter(function(e){ return P[e.u] && P[e.v]; });
-        var xs = ids.map(function(i){return P[i].x;}), ys = ids.map(function(i){return P[i].y;});
-        var mnx=Math.min.apply(null,xs),mxx=Math.max.apply(null,xs),mny=Math.min.apply(null,ys),mxy=Math.max.apply(null,ys);
-        var pad = 70, W = (mxx-mnx)+pad*2, H = (mxy-mny)+pad*2, side = Math.max(W,H,200);
-        svg.setAttribute('viewBox', (((mnx+mxx)/2)-side*0.9) + ' ' + (((mny+mxy)/2)-side/2) + ' ' + (side*1.8) + ' ' + side);
-        var k = side / 460;
+        var fb = fitBox(P, ids);
+        // refit the view only for a brand-new diagram or an explicit re-layout (spread); an
+        // add/remove keeps the current zoom/pan so placed entities do not visibly move
+        if (!cvb || (relayout && !pres)) cvb = { x: fb.x, y: fb.y, w: fb.w, h: fb.h };
+        applyVB();
+        var k = fb.side / 460;
         c._k = k; c._nEl = {}; c._lEl = {}; c._eEls = [];
         E.forEach(function(e){ var A=P[e.u], B=P[e.v];
           var ln=document.createElementNS(SVGNS,'line'); ln.setAttribute('x1',A.x);ln.setAttribute('y1',A.y);ln.setAttribute('x2',B.x);ln.setAttribute('y2',B.y);
@@ -434,7 +459,7 @@
       // drag a node to reposition it; a tap (no movement) on a connector adds & expands it
       function startDrag(i, ev, isSel){
         if (!curConn || !curConn._pos) return;
-        ev.preventDefault();
+        ev.preventDefault(); ev.stopPropagation();
         var svg = $('cx'), rect = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
         var sx = vb.width/rect.width, sy = vb.height/rect.height;
         var P = curConn._pos, ox = P[i].x, oy = P[i].y, sX = ev.clientX, sY = ev.clientY, moved = false;
@@ -451,13 +476,81 @@
         }
         function up(){
           document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up);
+          savedPos[i] = { x: P[i].x, y: P[i].y };          // remember where the user dropped it
           if (!moved && !isSel) addEntity(i);
         }
         document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up);
       }
       $('gtext').addEventListener('input', function(){ gLabelScale=(+this.value)/100; if (curConn) drawGraph(curConn, false); });
       $('gdots').addEventListener('input', function(){ gNodeScale=(+this.value)/100; if (curConn) drawGraph(curConn, false); });
-      $('gspread').addEventListener('input', function(){ gSpread=(+this.value)/100; if (curConn) drawGraph(curConn, true); });
+      $('gspread').addEventListener('input', function(){ gSpread=(+this.value)/100; if (curConn) drawGraph(curConn, true, false); });
+
+      // ---------- zoom / pan / reset ----------
+      function fitBox(P, ids){
+        var xs = ids.map(function(i){return P[i].x;}), ys = ids.map(function(i){return P[i].y;});
+        var mnx=Math.min.apply(null,xs),mxx=Math.max.apply(null,xs),mny=Math.min.apply(null,ys),mxy=Math.max.apply(null,ys);
+        var pad=70, W=(mxx-mnx)+pad*2, H=(mxy-mny)+pad*2, side=Math.max(W,H,200);
+        return { x:((mnx+mxx)/2)-side*0.9, y:((mny+mxy)/2)-side/2, w:side*1.8, h:side, side:side };
+      }
+      function applyVB(){ if (cvb) $('cx').setAttribute('viewBox', cvb.x+' '+cvb.y+' '+cvb.w+' '+cvb.h); }
+      function czoom(f){ if (!cvb) return; var cx=cvb.x+cvb.w/2, cy=cvb.y+cvb.h/2; cvb.w*=f; cvb.h*=f; cvb.x=cx-cvb.w/2; cvb.y=cy-cvb.h/2; applyVB(); }
+      function creset(){ if (!curConn || !curConn._pos) return; var fb=fitBox(curConn._pos, curConn.subNodes); cvb={x:fb.x,y:fb.y,w:fb.w,h:fb.h}; applyVB(); }
+      $('czin').addEventListener('click', function(){ czoom(0.8); });
+      $('czout').addEventListener('click', function(){ czoom(1.25); });
+      $('czreset').addEventListener('click', creset);
+      $('cx').addEventListener('wheel', function(e){ if (!cvb) return; e.preventDefault(); czoom(e.deltaY<0?0.9:1.1); }, { passive:false });
+      var cpan = null;
+      $('cx').addEventListener('pointerdown', function(e){ if (e.target.tagName==='circle' || !cvb) return; cpan={x:e.clientX,y:e.clientY,vx:cvb.x,vy:cvb.y}; });
+      $('cx').addEventListener('pointermove', function(e){
+        if (!cpan || !cvb) return; var rect=$('cx').getBoundingClientRect();
+        cvb.x = cpan.vx - (e.clientX-cpan.x)*(cvb.w/rect.width);
+        cvb.y = cpan.vy - (e.clientY-cpan.y)*(cvb.h/rect.height); applyVB();
+      });
+      window.addEventListener('pointerup', function(){ cpan=null; });
+
+      // ---------- image / SVG export ----------
+      function buildStandaloneSVG(){
+        var src = $('cx'); if (!src.getAttribute('viewBox')) return null;
+        var svg = src.cloneNode(true);
+        var cs = getComputedStyle(document.documentElement);
+        var bg = (cs.getPropertyValue('--bg')||'#ffffff').trim(), text = (cs.getPropertyValue('--text')||'#111111').trim();
+        [svg].concat([].slice.call(svg.querySelectorAll('*'))).forEach(function(el){
+          ['fill','stroke'].forEach(function(a){
+            var v = el.getAttribute(a);
+            if (v === 'var(--text)') el.setAttribute(a, text);
+            else if (v === 'var(--bg)') el.setAttribute(a, bg);
+          });
+        });
+        var vb = svg.getAttribute('viewBox').split(/\s+/).map(Number);
+        var rect = document.createElementNS(SVGNS,'rect');
+        rect.setAttribute('x',vb[0]); rect.setAttribute('y',vb[1]); rect.setAttribute('width',vb[2]); rect.setAttribute('height',vb[3]); rect.setAttribute('fill',bg);
+        svg.insertBefore(rect, svg.firstChild);
+        svg.setAttribute('xmlns', SVGNS);
+        svg.setAttribute('font-family', 'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif');
+        var W = 1400, H = Math.round(W * vb[3] / vb[2]);
+        svg.setAttribute('width', W); svg.setAttribute('height', H);
+        return { svg: svg, w: W, h: H };
+      }
+      function dlBlob(blob, name){ var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},1000); }
+      function fnameStub(){ return (sel.map(function(i){return NODES[i].label;}).join('-').replace(/[^a-z0-9]+/gi,'-').slice(0,60) || 'connection').toLowerCase(); }
+      $('dlsvg').addEventListener('click', function(){
+        var b = buildStandaloneSVG(); if (!b) return;
+        var s = '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(b.svg);
+        dlBlob(new Blob([s], {type:'image/svg+xml;charset=utf-8'}), 'nm-'+fnameStub()+'.svg');
+      });
+      $('dlpng').addEventListener('click', function(){
+        var b = buildStandaloneSVG(); if (!b) return;
+        var s = new XMLSerializer().serializeToString(b.svg);
+        var img = new Image();
+        img.onload = function(){
+          var scale = 2, canvas = document.createElement('canvas');
+          canvas.width = b.w*scale; canvas.height = b.h*scale;
+          var ctx = canvas.getContext('2d'); ctx.scale(scale, scale); ctx.drawImage(img, 0, 0, b.w, b.h);
+          canvas.toBlob(function(blob){ if (blob) dlBlob(blob, 'nm-'+fnameStub()+'.png'); });
+        };
+        img.onerror = function(){ alert('Could not render the image. Try Save SVG instead.'); };
+        img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s);
+      });
 
       // ---------- CSV ----------
       $('dl').addEventListener('click', function(){
