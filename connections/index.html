@@ -56,6 +56,8 @@
     .gtools .gr { display: flex; align-items: center; gap: 7px; }
     .gtools label { width: 38px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.03em; }
     .gtools input[type=range] { width: 90px; accent-color: var(--accent, #2b6cb0); cursor: pointer; }
+    .gtools .gsep { border-top: 1px solid var(--border); margin: 2px 0; }
+    .gtools .gyr { min-width: 26px; color: var(--text); font-variant-numeric: tabular-nums; text-align: right; }
     #cx circle.nd { cursor: pointer; }
     .ghint { position: absolute; left: 10px; bottom: 8px; font-size: 0.72rem; color: var(--text-soft); background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 4px 9px; opacity: 0.92; }
     .czoom { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 6px; z-index: 5; }
@@ -107,6 +109,9 @@
             <div class="gr"><label for="gtext">Text</label><input type="range" id="gtext" min="0" max="240" value="100" step="10" title="Label text size (0 hides labels)"></div>
             <div class="gr"><label for="gdots">Dots</label><input type="range" id="gdots" min="40" max="240" value="100" step="10" title="Node circle size"></div>
             <div class="gr"><label for="gspread">Spread</label><input type="range" id="gspread" min="60" max="260" value="100" step="10" title="Spread nodes apart"></div>
+            <div class="gsep"></div>
+            <div class="gr"><label for="gyfrom">From</label><input type="range" id="gyfrom" title="Earliest year (filters lobbying links; donations & shared contacts have no dates)"><span class="gyr" id="gyfromlab"></span></div>
+            <div class="gr"><label for="gyto">To</label><input type="range" id="gyto" title="Latest year (filters lobbying links; donations & shared contacts have no dates)"><span class="gyr" id="gytolab"></span></div>
           </div>
           <div class="ghint">Click a dot to expand its connections &middot; drag to reposition it.</div>
           <div class="czoom">
@@ -149,16 +154,27 @@
       var gLabelScale = 1, gNodeScale = 1, gSpread = 1;   // graph-tool state (text / dots / spread)
       var cvb = null;                                     // current diagram viewBox (zoom / pan)
       var savedPos = {};                                  // persistent node positions (keyed by node id) so add/remove/drag placements stick
+      var yrMin = 0, yrMax = 0, yFrom = 0, yTo = 0;       // year-filter state (applies to dated lobbying links)
       var EDGECOLOR = { represents: '#b45309', donated_to: '#7c2d12', affiliated: '#2b6cb0' };
       var lc = function (s) { return (s || '').toLowerCase(); };
       function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];}); }
       function kdot(kind){ return kind==='lobbyist'?'#b45309':'#2b6cb0'; }
 
       // ---------- load ----------
-      fetch('/assets/data/connections-graph.json').then(function(r){return r.json();}).then(function(g){
+      fetch('/assets/data/connections-graph.json?v=2').then(function(r){return r.json();}).then(function(g){
         NODES = g.nodes; ETYPE = g.edgeTypes || {};
         ADJ = NODES.map(function(){ return []; });
-        g.edges.forEach(function(e){ ADJ[e[0]].push({to:e[1],t:e[2]}); ADJ[e[1]].push({to:e[0],t:e[2]}); });
+        var ys = [];
+        g.edges.forEach(function(e){
+          var yr = e[3] ? e[3].split('-') : null, y0 = yr?+yr[0]:0, y1 = yr?+yr[1]:0;
+          if (y0){ ys.push(y0); ys.push(y1); }
+          ADJ[e[0]].push({to:e[1], t:e[2], y0:y0, y1:y1});
+          ADJ[e[1]].push({to:e[0], t:e[2], y0:y0, y1:y1});
+        });
+        yrMin = ys.length?Math.min.apply(null,ys):2013; yrMax = ys.length?Math.max.apply(null,ys):2026;
+        yFrom = yrMin; yTo = yrMax;
+        ['gyfrom','gyto'].forEach(function(id){ var s=$(id); s.min=yrMin; s.max=yrMax; s.step=1; });
+        $('gyfrom').value=yrMin; $('gyto').value=yrMax; $('gyfromlab').textContent=yrMin; $('gytolab').textContent=yrMax;
         $('hint').textContent = 'Loaded ' + NODES.length.toLocaleString() + ' entities and ' + g.edges.length.toLocaleString() + ' connections. Add at least two to begin.';
         buildExamples();
       }).catch(function(){ $('hint').textContent = 'Could not load the connection data.'; });
@@ -302,7 +318,7 @@
               ADJ[u].forEach(function(e){
                 if (onSet[e.to] && Math.abs((da[u]) - (da[e.to])) === 1){
                   var key = u < e.to ? u+'-'+e.to : e.to+'-'+u;
-                  subEdges[key] = { u: Math.min(u,e.to), v: Math.max(u,e.to), t: e.t };
+                  subEdges[key] = { u: Math.min(u,e.to), v: Math.max(u,e.to), t: e.t, y0: e.y0, y1: e.y1 };
                 }
               });
             });
@@ -429,18 +445,20 @@
         var P = c._pos, selSet = {}; sel.forEach(function(s){ selSet[s] = true; });
         var E = c.subEdges.filter(function(e){ return P[e.u] && P[e.v]; });
         var fb = fitBox(P, ids);
+        var k = fb.side / 460;
         // refit the view only for a brand-new diagram or an explicit re-layout (spread); an
         // add/remove keeps the current zoom/pan so placed entities do not visibly move
-        if (!cvb || (relayout && !pres)) cvb = { x: fb.x, y: fb.y, w: fb.w, h: fb.h };
-        applyVB();
-        var k = fb.side / 460;
+        var needFit = (!cvb || (relayout && !pres));
         c._k = k; c._nEl = {}; c._lEl = {}; c._eEls = [];
-        E.forEach(function(e){ var A=P[e.u], B=P[e.v];
+        var yOK = function(e){ return !e.y0 || (e.y1 >= yFrom && e.y0 <= yTo); };   // undated links always show
+        var nodeHasEdge = {};
+        E.forEach(function(e){ if (yOK(e)){ nodeHasEdge[e.u]=1; nodeHasEdge[e.v]=1; } });
+        E.forEach(function(e){ if (!yOK(e)) return; var A=P[e.u], B=P[e.v];
           var ln=document.createElementNS(SVGNS,'line'); ln.setAttribute('x1',A.x);ln.setAttribute('y1',A.y);ln.setAttribute('x2',B.x);ln.setAttribute('y2',B.y);
           ln.setAttribute('stroke',EDGECOLOR[e.t]||'#888'); ln.setAttribute('stroke-width',1.5*k); ln.setAttribute('stroke-opacity','0.7'); svg.appendChild(ln);
           c._eEls.push({ el: ln, u: e.u, v: e.v });
         });
-        ids.forEach(function(i){ var p=P[i], n=NODES[i], isSel=selSet[i];
+        ids.forEach(function(i){ if (!selSet[i] && !nodeHasEdge[i]) return; var p=P[i], n=NODES[i], isSel=selSet[i];
           var c1=document.createElementNS(SVGNS,'circle'); c1.setAttribute('class','nd'); c1.setAttribute('cx',p.x);c1.setAttribute('cy',p.y);
           c1.setAttribute('r',(isSel?9:5.5)*k*gNodeScale); c1.setAttribute('fill',kdot(n.kind));
           c1.setAttribute('stroke',isSel?'var(--text)':'var(--bg)'); c1.setAttribute('stroke-width',(isSel?2:1)*k);
@@ -455,6 +473,15 @@
           t._off = off;
           var lab=n.label.length>30?n.label.slice(0,28)+'…':n.label; t.textContent=lab; svg.appendChild(t); c._lEl[i] = t;
         });
+        // fit to the ACTUAL rendered content (labels included) so nothing is cropped
+        if (needFit){
+          var box = null; try { box = svg.getBBox(); } catch(e){}
+          if (box && box.width > 0){
+            var pd = Math.max(box.width, box.height) * 0.06 + 18;
+            cvb = { x: box.x - pd, y: box.y - pd, w: box.width + pd*2, h: box.height + pd*2 };
+          } else { cvb = { x: fb.x, y: fb.y, w: fb.w, h: fb.h }; }
+        }
+        applyVB();
       }
       // drag a node to reposition it; a tap (no movement) on a connector adds & expands it
       function startDrag(i, ev, isSel){
@@ -484,6 +511,14 @@
       $('gtext').addEventListener('input', function(){ gLabelScale=(+this.value)/100; if (curConn) drawGraph(curConn, false); });
       $('gdots').addEventListener('input', function(){ gNodeScale=(+this.value)/100; if (curConn) drawGraph(curConn, false); });
       $('gspread').addEventListener('input', function(){ gSpread=(+this.value)/100; if (curConn) drawGraph(curConn, true, false); });
+      function yearChanged(which){
+        yFrom=+$('gyfrom').value; yTo=+$('gyto').value;
+        if (yFrom > yTo){ if (which==='from'){ yTo=yFrom; $('gyto').value=yTo; } else { yFrom=yTo; $('gyfrom').value=yFrom; } }
+        $('gyfromlab').textContent=yFrom; $('gytolab').textContent=yTo;
+        if (curConn) drawGraph(curConn, false);
+      }
+      $('gyfrom').addEventListener('input', function(){ yearChanged('from'); });
+      $('gyto').addEventListener('input', function(){ yearChanged('to'); });
 
       // ---------- zoom / pan / reset ----------
       function fitBox(P, ids){
@@ -494,7 +529,7 @@
       }
       function applyVB(){ if (cvb) $('cx').setAttribute('viewBox', cvb.x+' '+cvb.y+' '+cvb.w+' '+cvb.h); }
       function czoom(f){ if (!cvb) return; var cx=cvb.x+cvb.w/2, cy=cvb.y+cvb.h/2; cvb.w*=f; cvb.h*=f; cvb.x=cx-cvb.w/2; cvb.y=cy-cvb.h/2; applyVB(); }
-      function creset(){ if (!curConn || !curConn._pos) return; var fb=fitBox(curConn._pos, curConn.subNodes); cvb={x:fb.x,y:fb.y,w:fb.w,h:fb.h}; applyVB(); }
+      function creset(){ if (!curConn) return; cvb = null; drawGraph(curConn, false); }   // re-fit to labelled content
       $('czin').addEventListener('click', function(){ czoom(0.8); });
       $('czout').addEventListener('click', function(){ czoom(1.25); });
       $('czreset').addEventListener('click', creset);
