@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New Mexico influence network — New Mexico Impact Lab</title>
+  <meta name="description" content="A statewide map of how New Mexico's lobbyists, the industries they represent, campaign donors, candidate and PAC committees, and nonprofits connect. Search an entity, follow its connections, and export what you find.">
+  <link rel="canonical" href="https://nmimpactlab.org/investigations/influence-network.html">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    .maptool { max-width: 1280px; margin: 0 auto; padding: 24px 16px 60px; }
+    .maptool h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); margin: 0 0 6px; }
+    .maptool .sub { color: var(--text-soft); margin: 0 0 10px; max-width: 760px; }
+    .coverage { display: inline-block; border: 1px solid var(--accent-2); border-radius: 8px; padding: 8px 12px; margin: 0 0 16px; font-size: 0.88rem; color: var(--text); background: var(--bg); max-width: 760px; }
+    .coverage strong { color: var(--accent-2); }
+    .mapcontrols { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+    .searchwrap { position: relative; }
+    .searchwrap input { padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.92rem; min-width: 290px; }
+    .results { position: absolute; z-index: 30; top: 100%; left: 0; right: 0; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow); max-height: 280px; overflow: auto; display: none; }
+    .results.show { display: block; }
+    .results button { display: block; width: 100%; text-align: left; padding: 8px 12px; border: 0; background: none; color: var(--text); font-size: 0.88rem; cursor: pointer; }
+    .results button:hover { background: var(--bg-soft); }
+    .results .rk { color: var(--text-soft); font-size: 0.76rem; }
+    .trailbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-soft); font-size: 0.86rem; }
+    .trailbar.hide { display: none; }
+    .chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; background: var(--bg); border: 1px solid var(--border); }
+    .chip .n { font-weight: 600; }
+    .trailbar .arrow { color: var(--text-soft); }
+    .trailbar button { padding: 5px 10px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg); color: var(--text); cursor: pointer; font-size: 0.8rem; }
+    .legend { display: flex; gap: 6px 14px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; font-size: 0.85rem; }
+    .legend .lg { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; padding: 2px 6px; border-radius: 20px; user-select: none; }
+    .legend .lg .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .legend .lg.off { opacity: 0.35; text-decoration: line-through; }
+    .mapwrap { position: relative; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-soft); }
+    #net { display: block; width: 100%; height: 72vh; min-height: 440px; touch-action: none; cursor: grab; }
+    #net:active { cursor: grabbing; }
+    .maphint { position: absolute; left: 12px; bottom: 10px; font-size: 0.78rem; color: var(--text-soft); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px; opacity: 0.92; }
+    .nodelabel { fill: var(--text); pointer-events: none; paint-order: stroke; stroke: var(--bg); }
+    .panel { position: absolute; top: 12px; right: 12px; width: 300px; max-width: 78%; max-height: 82%; overflow: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); padding: 14px 16px; display: none; font-size: 0.9rem; }
+    .panel.show { display: block; }
+    .panel h3 { margin: 0 4px 2px 0; font-size: 1.05rem; }
+    .panel .kind { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-soft); }
+    .panel .close { position: absolute; top: 8px; right: 10px; cursor: pointer; border: 0; background: none; font-size: 1.2rem; color: var(--text-soft); }
+    .panel ul { margin: 8px 0 0; padding-left: 16px; }
+    .panel li { margin: 3px 0; }
+    .panel a.nlink { cursor: pointer; }
+    .panel .yrs { color: var(--text-soft); font-size: 0.8rem; }
+    .panel .xw { margin: 8px 0 2px; padding: 8px 10px; background: var(--bg-soft); border-radius: 8px; font-size: 0.82rem; }
+    .panel .xw b { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); margin-bottom: 3px; }
+    .panel .xw .row { display: flex; justify-content: space-between; gap: 8px; margin: 2px 0; }
+    .panel .xw .cav { color: var(--text-soft); font-size: 0.76rem; margin-top: 5px; }
+    .zoombtns { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 6px; }
+    .zoombtns button { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 1.1rem; cursor: pointer; }
+    .viewctrls { position: absolute; right: 12px; top: 12px; display: flex; flex-direction: column; gap: 5px; background: var(--bg); border: 1px solid var(--border); border-radius: 9px; padding: 8px 11px; opacity: 0.95; font-size: 0.7rem; box-shadow: var(--shadow); }
+    .viewctrls .vc-row { display: flex; align-items: center; gap: 8px; }
+    .viewctrls label { width: 40px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.03em; }
+    .viewctrls input[type=range] { width: 104px; accent-color: var(--accent, #2b6cb0); cursor: pointer; }
+    .viewctrls .vc-yr { min-width: 30px; color: var(--text); font-variant-numeric: tabular-nums; text-align: right; }
+    .viewctrls .vc-sep { border-top: 1px solid var(--border); margin: 2px 0; }
+    .srcnote { margin-top: 18px; font-size: 0.82rem; color: var(--text-soft); }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="/"><span class="mark">NM</span> Impact Lab</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+      <div class="nav-links">
+        <a href="/investigations/">Investigations</a>
+        <a href="/articles/">Articles</a>
+        <a href="/data/">Data</a>
+        <a href="/methodology.html">Methodology</a>
+        <a href="/about.html">About</a>
+        <a href="/support.html">Support</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div class="maptool">
+      <p><a href="/data/">&larr; Data</a></p>
+      <h1>New Mexico's influence network</h1>
+      <p class="sub">How New Mexico's lobbyists, the industries they represent, campaign donors, candidate and PAC committees, and nonprofits connect &mdash; through shared lobbyists, shared donations, and shared registered contacts. <strong>Search an entity to isolate it and its direct connections</strong>, then click any connection to open up <em>its</em> connections, one step at a time. Export whatever you trace.</p>
+      <p class="coverage"><strong>Showing the connected core &mdash; entities with 2 or more links (~3,700 of ~9,100).</strong> Single-link entities and any pair of entities can be traced in the <a href="/connections/">connection search</a>. A shared lobbyist, donor, or registered contact shows a relationship, not coordination or wrongdoing. Use the legend to filter by type; use the year sliders (lobbying links only).</p>
+
+      <div class="mapcontrols">
+        <div class="searchwrap">
+          <input type="search" id="search" placeholder="Search a company, group, lobbyist, donor, or committee&hellip;" autocomplete="off" aria-label="Search the network">
+          <div class="results" id="results" role="listbox"></div>
+        </div>
+        <span id="stat" style="color:var(--text-soft);font-size:0.88rem;"></span>
+      </div>
+
+      <div class="trailbar hide" id="trailbar">
+        <span style="color:var(--text-soft)">Tracing:</span>
+        <span id="trail"></span>
+        <button id="expandAll" type="button">Expand all shown</button>
+        <button id="dlTrace" type="button">&#8681; Download traced (CSV)</button>
+        <button id="clearFocus" type="button">Show whole map</button>
+      </div>
+
+      <div class="legend" id="legend"></div>
+
+      <div class="mapwrap">
+        <svg id="net" role="img" aria-label="New Mexico influence network map"></svg>
+        <div class="maphint" id="hint">Search an entity, or click any dot to start tracing</div>
+        <div class="viewctrls">
+          <div class="vc-row"><label for="lblsize">Text</label><input type="range" id="lblsize" min="0" max="240" value="100" step="10" title="Label text size (0 hides labels)"></div>
+          <div class="vc-row"><label for="nodesize">Dots</label><input type="range" id="nodesize" min="30" max="260" value="100" step="10" title="Entity circle size"></div>
+          <div class="vc-row"><label for="spread">Spread</label><input type="range" id="spread" min="60" max="320" value="100" step="10" title="Push entities apart"></div>
+          <div class="vc-sep"></div>
+          <div class="vc-row"><label for="yfrom">From</label><input type="range" id="yfrom" title="Earliest year shown"><span class="vc-yr" id="yfromlab"></span></div>
+          <div class="vc-row"><label for="yto">To</label><input type="range" id="yto" title="Latest year shown"><span class="vc-yr" id="ytolab"></span></div>
+        </div>
+        <div class="zoombtns">
+          <button id="zin" aria-label="Zoom in">+</button>
+          <button id="zout" aria-label="Zoom out">&minus;</button>
+          <button id="zreset" aria-label="Reset view" style="font-size:0.8rem;">reset</button>
+        </div>
+        <div class="panel" id="panel"></div>
+      </div>
+
+      <p class="srcnote">Sources: New Mexico lobbyist registrations (2013&ndash;2026), New Mexico campaign finance (organizational donors only; individual donors are not included), and the IRS Exempt Organizations Business Master File (New Mexico) &mdash; all public records, compiled with the Lab's custom-built data tools and provided as a research aid. Links mean a shared lobbyist, a shared donation, or a shared registered contact point; a shared contact often just means a shared accountant, attorney, or registered agent. The official record governs &mdash; verify against the source before relying on any entry, and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="disclaimer"><span class="dh">Verify before you rely</span>The data and analysis here are compiled from public records using the New Mexico Impact Lab's own custom-built data tools, and are provided as-is, as a research and finding aid. The original official record always governs: before using any figure, record, or finding in an official, legal, journalistic, or financial capacity, <strong>confirm it against the source document.</strong> This site is not an official record.</div>
+      <div class="footer-bottom">&copy; <span id="year">2026</span> New Mexico Impact Lab. Built on public records.</div>
+    </div>
+  </footer>
+
+  <script>
+    (function(){var b=document.querySelector('.nav-toggle'),l=document.querySelector('.nav-links');if(b&&l){b.addEventListener('click',function(){var o=l.classList.toggle('open');b.setAttribute('aria-expanded',o?'true':'false');});}var y=document.getElementById('year');if(y){y.textContent=new Date().getFullYear();}})();
+
+    var SVGNS='http://www.w3.org/2000/svg';
+    var COLORS={'Lobbyist':'#9ca3af','Lobbying employer':'#2563eb','Campaign donor':'#ea580c',
+                'Campaign committee':'#db2777','Nonprofit / org':'#0d9488'};
+    var SECTORS=[], ETYPE={};
+    var svg=document.getElementById('net'), panel=document.getElementById('panel'),
+        resultsEl=document.getElementById('results'), trailbar=document.getElementById('trailbar');
+    var vb={x:-60,y:-60,w:1120,h:1120}, base=null;
+    var NODES=[],EDGES=[],adj=[],nodeEls=[],labelEls=[],off={};
+    var focus=null, expanded=new Set(), trail=[];
+    var labelScale=1;                        // user-adjustable label text size (0 = hidden)
+    var nodeScale=1, curSpread=1;            // user-adjustable dot size and node spread
+    var BASE_REST=0, BASE_REP=0;             // captured physics defaults (for the spread control)
+    var yrMin=0, yrMax=0, yFrom=0, yTo=0, nodeYr=null;   // year-range filter state
+
+    function $(id){return document.getElementById(id);}
+    function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+    function setVB(){svg.setAttribute('viewBox',vb.x+' '+vb.y+' '+vb.w+' '+vb.h); rescale();}
+    // keep labels/strokes a constant SIZE ON SCREEN regardless of zoom
+    function rescale(){
+      if(!NODES.length) return;
+      var px=svg.clientWidth||svg.getBoundingClientRect().width;
+      if(!px||px<=0) return;              // not laid out yet; don't compute a bogus scale
+      var k=vb.w/px;                        // user units per screen pixel
+      var fs=11*k*labelScale;               // ~11px on screen, times the user's size setting
+      for(var i=0;i<NODES.length;i++){
+        var t=labelEls[i]; if(!t || t.style.display==='none') continue;   // only ~visible labels
+        t.style.fontSize=fs+'px';
+        t.style.strokeWidth=(3*k)+'px';
+        t.setAttribute('x',NODES[i].x+rad(NODES[i])+2*k);
+        t.setAttribute('y',NODES[i].y+fs*0.34);
+      }
+      // node circles and edges use non-scaling-stroke (see draw), so no per-zoom stroke loops
+    }
+    window.addEventListener('resize',rescale);
+    function rad(n){var b=n.kind!=='lobbyist'?2.0:1.5,m=n.kind!=='lobbyist'?22:14,mn=n.kind!=='lobbyist'?3.5:2.5;
+      return Math.max(mn,Math.min(m,mn+Math.sqrt(n.deg)*b))*nodeScale;}
+
+
+    // ===== force-directed physics (ported from Amy's p5 sketch: Coulomb repulsion,
+    // Hooke springs, center pull, velocity damping; drag pins a node so others resettle)
+    var PHYS={repulsion:9000, springK:0.02, restLength:85, centerPull:0.0006, damping:0.85,
+              maxF:35, maxV:25, cool:0.985, minAlpha:0.02};
+    var sim={raf:null, drag:null, moved:false, alpha:0};
+    var relaxAll=false;                      // whole-map force relaxation (for the Spread control)
+
+    function focusList(){
+      if(!focus) return [];
+      var a=[]; focus.forEach(function(i){ if(!catOff(i)) a.push(i); }); return a;
+    }
+    // which nodes the physics acts on: the focused trace, or (when spreading) every visible node
+    function simNodes(){
+      if(focus) return focusList();
+      if(!relaxAll) return [];
+      var a=[]; for(var i=0;i<NODES.length;i++){ if(visible(i)) a.push(i); } return a;
+    }
+    // fit the view to the focused set, or to all visible nodes on the whole map
+    function fitVisible(){
+      var xs=[],ys=[],i;
+      if(focus&&focus.size){ focus.forEach(function(i){ if(!catOff(i)){xs.push(NODES[i].x);ys.push(NODES[i].y);} }); }
+      else { for(i=0;i<NODES.length;i++){ if(visible(i)){xs.push(NODES[i].x);ys.push(NODES[i].y);} } }
+      if(!xs.length) return;
+      var mnx=Math.min.apply(null,xs),mxx=Math.max.apply(null,xs),mny=Math.min.apply(null,ys),mxy=Math.max.apply(null,ys);
+      var w=Math.max(mxx-mnx,60),h=Math.max(mxy-mny,60),pad=Math.max(w,h)*0.14,side=Math.max(w,h)+pad*2;
+      vb={x:(mnx+mxx)/2-side/2,y:(mny+mxy)/2-side/2,w:side,h:side}; setVB();
+      if(!focus) base=Object.assign({},vb);
+    }
+    function toUser(ev){
+      var r=svg.getBoundingClientRect();
+      return {x:vb.x+(ev.clientX-r.left)/r.width*vb.w, y:vb.y+(ev.clientY-r.top)/r.height*vb.h};
+    }
+    function syncNode(i){
+      var n=NODES[i];
+      if(nodeEls[i]){nodeEls[i].setAttribute('cx',n.x); nodeEls[i].setAttribute('cy',n.y);}
+      var t=labelEls[i];
+      if(t){var fs=parseFloat(t.style.fontSize)||9;
+            t.setAttribute('x',n.x+rad(n)+2); t.setAttribute('y',n.y+fs*0.34);}
+    }
+    function syncEdges(){
+      for(var j=0;j<EDGES.length;j++){
+        var e=EDGES[j]; if(!e.el||e.el.style.display==='none') continue;
+        var a=NODES[e[0]],b=NODES[e[1]];
+        e.el.setAttribute('x1',a.x); e.el.setAttribute('y1',a.y);
+        e.el.setAttribute('x2',b.x); e.el.setAttribute('y2',b.y);
+      }
+    }
+    function simStep(){
+      var ns=simNodes(); if(ns.length<2) return 0;
+      var i,j,a,b,k;
+      for(k=0;k<ns.length;k++){var n=NODES[ns[k]]; n._fx=0; n._fy=0; if(n._vx===undefined){n._vx=0;n._vy=0;}}
+      // repulsion
+      for(i=0;i<ns.length;i++){
+        for(j=i+1;j<ns.length;j++){
+          a=NODES[ns[i]]; b=NODES[ns[j]];
+          var dx=b.x-a.x, dy=b.y-a.y, d2=dx*dx+dy*dy+0.01, d=Math.sqrt(d2);
+          var f=PHYS.repulsion/d2, fx=f*dx/d, fy=f*dy/d;
+          a._fx-=fx; a._fy-=fy; b._fx+=fx; b._fy+=fy;
+        }
+      }
+      // springs on visible edges
+      var inSet={}; for(k=0;k<ns.length;k++) inSet[ns[k]]=1;
+      for(j=0;j<EDGES.length;j++){
+        var e=EDGES[j]; if(!inSet[e[0]]||!inSet[e[1]]) continue;
+        a=NODES[e[0]]; b=NODES[e[1]];
+        var ex=b.x-a.x, ey=b.y-a.y, ed=Math.sqrt(ex*ex+ey*ey)+0.01;
+        var force=PHYS.springK*(ed-PHYS.restLength);
+        var sfx=force*ex/ed, sfy=force*ey/ed;
+        a._fx+=sfx; a._fy+=sfy; b._fx-=sfx; b._fy-=sfy;
+      }
+      // center pull toward current view centre
+      var cx=vb.x+vb.w/2, cy=vb.y+vb.h/2;
+      for(k=0;k<ns.length;k++){var m=NODES[ns[k]]; m._fx+=(cx-m.x)*PHYS.centerPull*vb.w*0.02; m._fy+=(cy-m.y)*PHYS.centerPull*vb.w*0.02;}
+      // integrate (clamped: raw Coulomb spikes to ~1e6 when nodes near-coincide)
+      var energy=0;
+      for(k=0;k<ns.length;k++){
+        var q=NODES[ns[k]];
+        if(sim.drag&&sim.drag.i===ns[k]){q._vx=0;q._vy=0; continue;}
+        var fm=Math.sqrt(q._fx*q._fx+q._fy*q._fy);
+        if(fm>PHYS.maxF){q._fx=q._fx/fm*PHYS.maxF; q._fy=q._fy/fm*PHYS.maxF;}
+        q._vx=(q._vx+q._fx*sim.alpha)*PHYS.damping; q._vy=(q._vy+q._fy*sim.alpha)*PHYS.damping;
+        var vm=Math.sqrt(q._vx*q._vx+q._vy*q._vy);
+        if(vm>PHYS.maxV){q._vx=q._vx/vm*PHYS.maxV; q._vy=q._vy/vm*PHYS.maxV;}
+        q.x+=q._vx; q.y+=q._vy;
+        energy+=q._vx*q._vx+q._vy*q._vy;
+        syncNode(ns[k]);
+      }
+      syncEdges();
+      return energy;
+    }
+    function simLoop(){
+      simStep();
+      if(sim.drag){ sim.alpha=Math.max(sim.alpha,0.35); }
+      else { sim.alpha*=PHYS.cool; }
+      if(sim.drag || sim.alpha>PHYS.minAlpha){ sim.raf=requestAnimationFrame(simLoop); }
+      else { sim.raf=null; relaxAll=false; if(!userMoved) fitVisible(); else rescale(); }   // reframe the settled layout
+    }
+    function startSim(heat){
+      sim.alpha=Math.max(sim.alpha, heat===undefined?1:heat);
+      if(!sim.raf) sim.raf=requestAnimationFrame(simLoop);
+    }
+    function stopSim(){ if(sim.raf){cancelAnimationFrame(sim.raf); sim.raf=null;} }
+
+    function onNodePointerDown(i,ev){
+      if(!focus) return;                       // physics/drag only while tracing
+      ev.stopPropagation();                    // don't start a background pan
+      sim.drag={i:i}; sim.moved=false;
+      NODES[i]._vx=0; NODES[i]._vy=0; sim.alpha=Math.max(sim.alpha,0.5);
+      document.addEventListener('pointermove',onDragMove);
+      document.addEventListener('pointerup',onDragUp);
+      startSim();
+    }
+    function onDragMove(ev){
+      if(!sim.drag) return;
+      var u=toUser(ev); var n=NODES[sim.drag.i];
+      if(Math.abs(u.x-n.x)+Math.abs(u.y-n.y)>0.5) sim.moved=true;
+      n.x=u.x; n.y=u.y; syncNode(sim.drag.i); syncEdges();
+      startSim(0.5);
+    }
+    function onDragUp(){
+      document.removeEventListener('pointermove',onDragMove);
+      document.removeEventListener('pointerup',onDragUp);
+      var i=sim.drag?sim.drag.i:null, moved=sim.moved;
+      sim.drag=null;
+      if(i!=null && !moved){ onNodeClick(i); }   // a tap = open connections
+      startSim(0.5);
+    }
+
+    var XW={};
+    fetch('/assets/data/influence-network.json').then(function(r){return r.json();}).then(function(d){
+      // Render the connected core (entities with 2+ links) and reindex so edges stay compact;
+      // the full ~9k-node graph is reachable in the connection search. Remap each edge to
+      // [i, j, years, type] so the map's e[2]=years convention keeps working.
+      var remap={}, coreI=[];
+      d.nodes.forEach(function(n,i){ if(n.core){ remap[i]=coreI.length; coreI.push(i); } });
+      NODES = coreI.map(function(i){ return d.nodes[i]; });
+      EDGES = d.edges.filter(function(e){ return remap[e[0]]!==undefined && remap[e[1]]!==undefined; })
+                     .map(function(e){ return [remap[e[0]], remap[e[1]], e[3], e[2]]; });
+      SECTORS = d.sectors || []; ETYPE = d.edgeTypes || {};
+      $('stat').textContent = NODES.length.toLocaleString()+' connected entities · '+EDGES.length.toLocaleString()+' links · '+d.counts.nodes.toLocaleString()+' total across the network';
+      adj=NODES.map(function(){return [];});
+      EDGES.forEach(function(e,ei){adj[e[0]].push({n:e[1],e:ei}); adj[e[1]].push({n:e[0],e:ei});});
+      // base positions (spread control) + per-edge year range (year filter)
+      NODES.forEach(function(n){n.bx=n.x; n.by=n.y;});
+      var yset=[];
+      EDGES.forEach(function(e){var m=String(e[2]||'').match(/\d{4}/g)||[]; e._y0=m.length?+m[0]:0; e._y1=m.length?+m[m.length-1]:9999; if(m.length){yset.push(e._y0,e._y1);}});
+      yrMin=yset.length?Math.min.apply(null,yset):2013; yrMax=yset.length?Math.max.apply(null,yset):2026; yFrom=yrMin; yTo=yrMax;
+      ['yfrom','yto'].forEach(function(id){var s=$(id); s.min=yrMin; s.max=yrMax; s.step=1;});
+      $('yfrom').value=yrMin; $('yto').value=yrMax; $('yfromlab').textContent=yrMin; $('ytolab').textContent=yrMax;
+      recomputeYear();
+      BASE_REST=PHYS.restLength; BASE_REP=PHYS.repulsion;
+      var lg=$('legend');
+      Object.keys(COLORS).forEach(function(cat){
+        var el=document.createElement('span'); el.className='lg'; el.dataset.cat=cat;
+        el.innerHTML='<span class="dot" style="background:'+COLORS[cat]+'"></span>'+cat;
+        el.addEventListener('click',function(){off[cat]=!off[cat]; el.classList.toggle('off',off[cat]); applyVis();});
+        lg.appendChild(el);
+      });
+      draw(); base=Object.assign({},vb); setVB(); applyVis(); requestAnimationFrame(rescale);
+    }).catch(function(){$('stat').textContent='Could not load the network data.';});
+
+    var gEdges,gNodes,gLabels;
+    function draw(){
+      gEdges=document.createElementNS(SVGNS,'g'); gEdges.setAttribute('stroke','#888'); gEdges.setAttribute('stroke-opacity','0.22');
+      EDGES.forEach(function(e){
+        var a=NODES[e[0]],b=NODES[e[1]];
+        var ln=document.createElementNS(SVGNS,'line');
+        ln.setAttribute('x1',a.x);ln.setAttribute('y1',a.y);ln.setAttribute('x2',b.x);ln.setAttribute('y2',b.y);
+        ln.setAttribute('stroke-width','0.9'); ln.setAttribute('vector-effect','non-scaling-stroke'); e.el=ln; gEdges.appendChild(ln);
+      });
+      svg.appendChild(gEdges);
+      gNodes=document.createElementNS(SVGNS,'g');
+      gLabels=document.createElementNS(SVGNS,'g');
+      NODES.forEach(function(n,i){
+        var c=document.createElementNS(SVGNS,'circle');
+        c.setAttribute('cx',n.x);c.setAttribute('cy',n.y);c.setAttribute('r',rad(n));
+        c.setAttribute('fill',COLORS[n.cat]||'#999');c.setAttribute('stroke','var(--bg)');c.setAttribute('stroke-width','1');c.setAttribute('vector-effect','non-scaling-stroke');
+        c.style.cursor='pointer'; nodeEls[i]=c; n._i=i;
+        c.addEventListener('mouseenter',function(){if(!drag&&!focus)hover(i);});
+        c.addEventListener('mouseleave',function(){if(!drag&&!focus&&!pinned)clearHi();});
+        c.addEventListener('pointerdown',function(ev){onNodePointerDown(i,ev);});
+        c.addEventListener('click',function(ev){ev.stopPropagation(); if(didDrag||focus)return; onNodeClick(i);});
+        gNodes.appendChild(c);
+        var t=document.createElementNS(SVGNS,'text'); t.setAttribute('class','nodelabel');
+        t.setAttribute('x',n.x+rad(n)+1.5); t.setAttribute('y',n.y+3);
+        t.textContent=n.label.length>34?n.label.slice(0,32)+'…':n.label;
+        labelEls[i]=t; gLabels.appendChild(t);
+      });
+      svg.appendChild(gNodes); svg.appendChild(gLabels);
+    }
+
+    function catOff(i){return !!off[NODES[i].cat];}
+    function edgeYr(e){return e._y1>=yFrom && e._y0<=yTo;}   // edge's year range overlaps the filter
+    function recomputeYear(){
+      nodeYr=new Array(NODES.length);
+      for(var i=0;i<NODES.length;i++) nodeYr[i]=false;
+      for(var j=0;j<EDGES.length;j++){var e=EDGES[j]; if(edgeYr(e)){nodeYr[e[0]]=true; nodeYr[e[1]]=true;}}
+    }
+    function visible(i){return (!focus||focus.has(i))&&!catOff(i)&&(!nodeYr||nodeYr[i]);}
+    function applyVis(){
+      NODES.forEach(function(n,i){
+        var v=visible(i);
+        nodeEls[i].style.display=v?'':'none';
+        var showLab=v&&(focus?true:n.deg>=12);
+        labelEls[i].style.display=showLab?'':'none';
+      });
+      EDGES.forEach(function(e){
+        e.el.style.display=(edgeYr(e)&&visible(e[0])&&visible(e[1]))?'':'none';
+        e.el.setAttribute('stroke-opacity',focus?0.5:0.22);
+      });
+    }
+
+    // ---- focus / tracing ----
+    function neighbors(i){return adj[i].map(function(a){return a.n;});}
+    function focusOn(i){
+      focus=new Set([i]); neighbors(i).forEach(function(j){focus.add(j);});
+      expanded=new Set([i]); trail=[i];
+      afterFocus();
+    }
+    function expandNode(i){
+      if(!focus) return focusOn(i);
+      neighbors(i).forEach(function(j){focus.add(j);});
+      if(!expanded.has(i)){expanded.add(i); trail.push(i);}
+      afterFocus();
+    }
+    function afterFocus(){
+      applyVis(); renderTrail(); userMoved=false; zoomToFit(); clearHi(); rescale(); startSim();
+      $('hint').textContent='Drag dots to rearrange · click one to open its connections · '+focus.size+' entities shown';
+    }
+    function clearFocus(){
+      focus=null; expanded=new Set(); trail=[];
+      stopSim(); sim.alpha=0; applyVis(); renderTrail(); if(base){vb=Object.assign({},base);setVB();}
+      panel.classList.remove('show'); pinned=false; clearHi();
+      $('hint').textContent='Search an entity, or click any dot to start tracing';
+    }
+    function zoomToFit(){
+      if(!focus||!focus.size) return;
+      var xs=[],ys=[];
+      focus.forEach(function(i){ if(!catOff(i)){xs.push(NODES[i].x); ys.push(NODES[i].y);} });
+      if(!xs.length) return;
+      var mnx=Math.min.apply(null,xs),mxx=Math.max.apply(null,xs),
+          mny=Math.min.apply(null,ys),mxy=Math.max.apply(null,ys);
+      var w=Math.max(mxx-mnx,60), h=Math.max(mxy-mny,60), pad=Math.max(w,h)*0.22;
+      var side=Math.max(w,h)+pad*2;
+      vb={x:(mnx+mxx)/2-side/2, y:(mny+mxy)/2-side/2, w:side, h:side};
+      setVB();
+    }
+    function renderTrail(){
+      trailbar.classList.toggle('hide',!focus);
+      if(!focus) return;
+      $('trail').innerHTML=trail.map(function(i,k){
+        var n=NODES[i];
+        return (k?'<span class="arrow">›</span> ':'')+'<span class="chip"><span class="dot" style="width:9px;height:9px;border-radius:50%;display:inline-block;background:'+(COLORS[n.cat]||'#999')+'"></span><span class="n">'+esc(n.label)+'</span></span>';
+      }).join(' ');
+    }
+
+    function onNodeClick(i){ if(!focus){focusOn(i);} else {expandNode(i);} showPanel(i); }
+
+    // ---- hover highlight (only when not focused) ----
+    var pinned=false;
+    function hover(i){
+      var s={}; s[i]=1; neighbors(i).forEach(function(j){s[j]=1;});
+      NODES.forEach(function(n,j){nodeEls[j].setAttribute('opacity',s[j]?1:0.12);});
+      EDGES.forEach(function(e){e.el.setAttribute('stroke-opacity',(e[0]===i||e[1]===i)?0.85:0.04);});
+    }
+    function clearHi(){
+      NODES.forEach(function(n,j){nodeEls[j].setAttribute('opacity',1);});
+      EDGES.forEach(function(e){e.el.setAttribute('stroke-opacity',focus?0.5:0.22);});
+    }
+
+    function showPanel(i){
+      pinned=true; var n=NODES[i];
+      var nb=adj[i].slice().sort(function(a,b){return NODES[b.n].deg-NODES[a.n].deg;});
+      var html='<button class="close" aria-label="Close">&times;</button><div class="kind">'+esc(n.cat)+(n.sector?' &middot; '+esc(n.sector):'')+'</div><h3>'+esc(n.label)+'</h3>'
+        +'<div style="color:var(--text-soft);font-size:0.85rem;margin-bottom:6px;">'+n.deg+' connection'+(n.deg===1?'':'s')+' &middot; click a name to open its connections</div><ul>';
+      nb.forEach(function(a){
+        var yrs=EDGES[a.e][2]||'';
+        html+='<li><a class="nlink" data-i="'+a.n+'">'+esc(NODES[a.n].label)+'</a>'+(yrs?' <span class="yrs">('+esc(yrs)+')</span>':'')+'</li>';
+      });
+      html+='</ul>';
+      var x=XW[i];
+      if(x){
+        var SYSN={irs:'IRS nonprofit registry',lobbying:'Lobbyist registrations',campaign_finance:'Campaign finance'};
+        html+='<div class="xw"><b>Also found in other public records</b>';
+        html+='<div class="row"><span>Appears in</span><span style="text-align:right">'+(x.src||[]).map(function(f){return esc(SYSN[f]||f);}).join('<br>')+'</span></div>';
+        if(x.ein) html+='<div class="row"><span>IRS EIN</span><span>'+esc(x.ein)+'</span></div>';
+        html+='<div class="row"><span>Reported revenue</span><span>'+(x.rev?('$'+Number(x.rev).toLocaleString()):'none reported')+'</span></div>';
+        html+='<div class="row"><span>Match confidence</span><span>'+esc(x.tier)+'</span></div>';
+        if(!x.rev) html+='<div class="cav">Most small nonprofits file a return that carries no financial figures, so this does not mean the organization is inactive.</div>';
+        html+='<div class="cav"><a href="/organizations/?q='+encodeURIComponent(n.label)+'">Open in the organizations tool &rarr;</a></div>';
+        html+='</div>';
+      }
+      panel.innerHTML=html; panel.classList.add('show');
+      panel.querySelector('.close').addEventListener('click',function(){panel.classList.remove('show');pinned=false;if(!focus)clearHi();});
+      panel.querySelectorAll('.nlink').forEach(function(a){
+        a.addEventListener('click',function(){var j=+a.dataset.i; if(focus)expandNode(j); else focusOn(j); showPanel(j);});
+      });
+    }
+
+    // ---- search -> pick an entity ----
+    $('search').addEventListener('input',function(){
+      var q=this.value.trim().toLowerCase();
+      if(!q){resultsEl.classList.remove('show'); resultsEl.innerHTML=''; return;}
+      var hits=[];
+      for(var i=0;i<NODES.length&&hits.length<14;i++){
+        if(NODES[i].label.toLowerCase().indexOf(q)>=0) hits.push(i);
+      }
+      hits.sort(function(a,b){return NODES[b].deg-NODES[a].deg;});
+      resultsEl.innerHTML=hits.length?hits.map(function(i){
+        var n=NODES[i];
+        return '<button type="button" data-i="'+i+'"><span class="dot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'+(COLORS[n.cat]||'#999')+';margin-right:6px"></span>'+esc(n.label)+' <span class="rk">· '+esc(n.cat)+' · '+n.deg+'</span></button>';
+      }).join(''):'<button type="button" disabled>No matches</button>';
+      resultsEl.classList.add('show');
+      resultsEl.querySelectorAll('button[data-i]').forEach(function(b){
+        b.addEventListener('click',function(){
+          var i=+b.dataset.i; resultsEl.classList.remove('show'); $('search').value=NODES[i].label;
+          focusOn(i); showPanel(i);
+        });
+      });
+    });
+    document.addEventListener('click',function(e){ if(!e.target.closest('.searchwrap')) resultsEl.classList.remove('show'); });
+
+    $('clearFocus').addEventListener('click',function(){ $('search').value=''; clearFocus(); });
+    $('expandAll').addEventListener('click',function(){
+      if(!focus) return;
+      Array.from(focus).forEach(function(i){ if(!expanded.has(i)){ neighbors(i).forEach(function(j){focus.add(j);}); expanded.add(i);} });
+      afterFocus();
+    });
+
+    // ---- CSV export of the traced subgraph ----
+    $('dlTrace').addEventListener('click',function(){
+      var rows=[];
+      EDGES.forEach(function(e){
+        if(focus&&(!focus.has(e[0])||!focus.has(e[1]))) return;
+        if(!visible(e[0])||!visible(e[1])) return;
+        var A=NODES[e[0]],B=NODES[e[1]];
+        rows.push([A.label,A.cat,B.label,B.cat,(ETYPE[e[3]]||e[3]||''),e[2]||'']);
+      });
+      if(!rows.length){alert('Nothing traced yet — search an entity first.');return;}
+      function c(v){v=(v==null?'':String(v));return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+      var prov=['# New Mexico Impact Lab | https://nmimpactlab.org',
+        '# NM influence network — traced connections',
+        '# Traced from: '+(trail.length?trail.map(function(i){return NODES[i].label;}).join(' > '):'(whole map)'),
+        '# Sources: NM lobbyist registrations, NM campaign finance, IRS nonprofit registry (all public)',
+        '# A shared lobbyist, donor, or registered contact shows a relationship, not coordination or wrongdoing.',
+        '# Downloaded: '+new Date().toISOString(),
+        "# Compiled with the Lab's custom-built data tools. Provided as-is, as a research aid.",
+        '# The official record governs: verify against the source before any official, legal, journalistic, or financial use. Not an official record.',''];
+      var lines=prov.concat([['Entity A','Type A','Entity B','Type B','Relationship','Years'].join(',')])
+                    .concat(rows.map(function(r){return r.map(c).join(',');}));
+      var blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});
+      var u=URL.createObjectURL(blob),a=document.createElement('a');
+      a.href=u;a.download='nm_influence_network_traced.csv';document.body.appendChild(a);a.click();
+      document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},1000);
+    });
+
+    // ---- pan / zoom ----
+    var drag=null,didDrag=false,userMoved=false;
+    svg.addEventListener('pointerdown',function(e){drag={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y};didDrag=false;});
+    svg.addEventListener('pointermove',function(e){
+      if(!drag)return;
+      if(Math.abs(e.clientX-drag.x)+Math.abs(e.clientY-drag.y)>3){didDrag=true;userMoved=true;}
+      var r=svg.getBoundingClientRect();
+      vb.x=drag.vx-(e.clientX-drag.x)*(vb.w/r.width); vb.y=drag.vy-(e.clientY-drag.y)*(vb.h/r.height); setVB();
+    });
+    svg.addEventListener('pointerup',function(){drag=null;});
+    svg.addEventListener('pointerleave',function(){drag=null;});
+    svg.addEventListener('click',function(){if(didDrag)return; if(pinned){panel.classList.remove('show');pinned=false;if(!focus)clearHi();}});
+    svg.addEventListener('wheel',function(e){ userMoved=true;
+      e.preventDefault(); var r=svg.getBoundingClientRect();
+      var mx=vb.x+(e.clientX-r.left)/r.width*vb.w, my=vb.y+(e.clientY-r.top)/r.height*vb.h;
+      var f=e.deltaY<0?0.85:1.176; vb.w*=f; vb.h*=f; vb.x=mx-(mx-vb.x)*f; vb.y=my-(my-vb.y)*f; setVB();
+    },{passive:false});
+    function zoom(f){var cx=vb.x+vb.w/2,cy=vb.y+vb.h/2; vb.w*=f;vb.h*=f; vb.x=cx-vb.w/2;vb.y=cy-vb.h/2; setVB();}
+    $('zin').addEventListener('click',function(){zoom(0.8);});
+    $('zout').addEventListener('click',function(){zoom(1.25);});
+    $('zreset').addEventListener('click',function(){ if(focus){zoomToFit();} else if(base){vb=Object.assign({},base);setVB();} });
+    $('lblsize').addEventListener('input',function(){ labelScale=(+this.value)/100; rescale(); });
+    $('nodesize').addEventListener('input',function(){
+      nodeScale=(+this.value)/100;
+      for(var i=0;i<NODES.length;i++){ if(nodeEls[i]) nodeEls[i].setAttribute('r',rad(NODES[i])); }
+      rescale();
+    });
+    $('spread').addEventListener('input',function(){ spreadRelax((+this.value)/100); });
+    // Real spread: change the force-layout spacing and re-relax, so crowded clusters
+    // decompress (unlike a uniform scale, which only looks like zoom). Works on a focused
+    // trace (physics already runs there) and on the whole map (relaxAll turns physics on
+    // for the visible nodes, then it re-fits and stops).
+    function spreadRelax(newS){
+      curSpread=newS;
+      if(focus){                              // focused trace: natural physics handles small sets well
+        if(BASE_REST){ PHYS.restLength=BASE_REST*newS; PHYS.repulsion=BASE_REP*Math.sqrt(newS); }
+        userMoved=false; startSim(0.7); return;
+      }
+      // whole map: start from the pristine precomputed layout and apply bounded, short-range
+      // repulsion so crowded areas decompress. spread=1 => base layout untouched; higher =>
+      // more declutter. Cannot explode (force + step capped, only nearby pairs interact).
+      for(var i=0;i<NODES.length;i++){ NODES[i].x=NODES[i].bx; NODES[i].y=NODES[i].by; }
+      var iters=Math.round((newS-1)*10);
+      if(iters>0){
+        var vis=[]; for(i=0;i<NODES.length;i++){ if(visible(i)) vis.push(i); }
+        var NEAR=120, NEAR2=NEAR*NEAR, STEP=3;
+        for(var t=0;t<iters;t++){
+          for(var a=0;a<vis.length;a++){ var A=NODES[vis[a]]; A._dx=0; A._dy=0; }
+          for(a=0;a<vis.length;a++){ var A=NODES[vis[a]];
+            for(var b=a+1;b<vis.length;b++){ var B=NODES[vis[b]];
+              var dx=B.x-A.x, dy=B.y-A.y, d2=dx*dx+dy*dy;
+              if(d2>NEAR2||d2<0.01) continue;
+              var d=Math.sqrt(d2), f=Math.min(320/d2,3.5), fx=f*dx/d, fy=f*dy/d;
+              A._dx-=fx; A._dy-=fy; B._dx+=fx; B._dy+=fy;
+            }
+          }
+          for(a=0;a<vis.length;a++){ var A=NODES[vis[a]];
+            A.x+=Math.max(-STEP,Math.min(STEP,A._dx)); A.y+=Math.max(-STEP,Math.min(STEP,A._dy)); }
+        }
+        for(i=0;i<vis.length;i++) syncNode(vis[i]);
+        syncEdges();
+      }
+      fitVisible(); rescale();
+    }
+    function yearChanged(which){
+      yFrom=+$('yfrom').value; yTo=+$('yto').value;
+      if(yFrom>yTo){ if(which==='yfrom'){ yTo=yFrom; $('yto').value=yTo; } else { yFrom=yTo; $('yfrom').value=yFrom; } }
+      $('yfromlab').textContent=yFrom; $('ytolab').textContent=yTo;
+      recomputeYear(); applyVis(); rescale();
+    }
+    $('yfrom').addEventListener('input',function(){ yearChanged('yfrom'); });
+    $('yto').addEventListener('input',function(){ yearChanged('yto'); });
+  </script>
+</body>
+</html>
