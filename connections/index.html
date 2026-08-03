@@ -27,6 +27,12 @@
     .chip button { border: 0; background: none; color: var(--text-soft); cursor: pointer; font-size: 1.05rem; line-height: 1; padding: 0 4px; }
     .chip button:hover { color: var(--text); }
     .hint { color: var(--text-soft); font-size: 0.85rem; margin: 2px 0 0; }
+    .xwrap { margin-top: 12px; }
+    .xwrap input { border-color: #c0392b55; }
+    .xchips { margin-top: 8px; }
+    .xchips .chip { border-color: #c0392b; }
+    .xchips .chip .dot { background: #c0392b; }
+    .xchips .chip::before { content: "\2298"; color: #c0392b; margin-right: 2px; font-weight: 700; }
     .result { margin-top: 22px; }
     .summary { font-size: 1.02rem; line-height: 1.5; margin: 0 0 14px; }
     .summary strong { color: var(--text); }
@@ -101,6 +107,12 @@
       <div class="chips" id="chips"></div>
       <p class="hint" id="hint">Add at least two entities to trace the connections between them.</p>
 
+      <div class="searchwrap xwrap">
+        <input type="search" id="qx" placeholder="Optional: exclude a red-herring hub &mdash; e.g. a big PAC many entities all fund &mdash; so paths route around it&hellip;" autocomplete="off" aria-label="Exclude an entity from connection paths">
+        <div class="sugg" id="suggx"></div>
+      </div>
+      <div class="chips xchips" id="xchips"></div>
+
       <div class="result" id="result" hidden>
         <p class="summary" id="summary"></p>
         <div class="graphwrap" id="graphwrap" hidden>
@@ -151,6 +163,8 @@
       var $ = function (id) { return document.getElementById(id); };
       var SVGNS = 'http://www.w3.org/2000/svg';
       var NODES = [], ADJ = [], ETYPE = {}, sel = [], curConn = null;
+      var excluded = [], EXSET = {};   // "NOT" nodes: red-herring hubs to route connections around
+      var xmatches = [], xhi = -1;
       var gLabelScale = 1, gNodeScale = 1, gSpread = 1;   // graph-tool state (text / dots / spread)
       var cvb = null;                                     // current diagram viewBox (zoom / pan)
       var savedPos = {};                                  // persistent node positions (keyed by node id) so add/remove/drag placements stick
@@ -194,7 +208,7 @@
         }
         var all = starts.concat(contains);
         all.sort(function(a,b){ return NODES[b].deg - NODES[a].deg; });
-        return all.filter(function(i){ return sel.indexOf(i) < 0; }).slice(0, 12);
+        return all.filter(function(i){ return sel.indexOf(i) < 0 && excluded.indexOf(i) < 0; }).slice(0, 12);
       }
       function roleWord(n){
         if (n.kind === 'lobbyist') return 'lobbyist';
@@ -241,6 +255,39 @@
       }
       $('chips').addEventListener('click', function(e){ var btn = e.target.closest('button'); if (btn) removeEntity(+btn.dataset.i); });
 
+      // ---------- excluded ("NOT") nodes ----------
+      function renderSuggX(){
+        var s = $('suggx');
+        if (!xmatches.length){ s.classList.remove('show'); s.innerHTML=''; return; }
+        s.innerHTML = xmatches.map(function(i,k){ var n = NODES[i];
+          return '<button data-i="'+i+'" class="'+(k===xhi?'hi':'')+'">'+esc(n.label)
+            + ' <span class="k">&middot; '+esc(roleWord(n))+' &middot; '+n.deg+' link'+(n.deg===1?'':'s')+'</span></button>';
+        }).join('');
+        s.classList.add('show');
+      }
+      $('qx').addEventListener('input', function(){ xmatches = search(this.value); xhi = xmatches.length?0:-1; renderSuggX(); });
+      $('qx').addEventListener('keydown', function(e){
+        if (!xmatches.length) return;
+        if (e.key==='ArrowDown'){ xhi=(xhi+1)%xmatches.length; renderSuggX(); e.preventDefault(); }
+        else if (e.key==='ArrowUp'){ xhi=(xhi-1+xmatches.length)%xmatches.length; renderSuggX(); e.preventDefault(); }
+        else if (e.key==='Enter'){ if (xhi>=0){ excludeEntity(xmatches[xhi]); e.preventDefault(); } }
+        else if (e.key==='Escape'){ xmatches=[]; renderSuggX(); }
+      });
+      $('suggx').addEventListener('click', function(e){ var btn=e.target.closest('button'); if (btn) excludeEntity(+btn.dataset.i); });
+      document.addEventListener('click', function(e){ if (!e.target.closest('.xwrap')) $('suggx').classList.remove('show'); });
+      function excludeEntity(i){
+        if (sel.indexOf(i)<0 && excluded.indexOf(i)<0) excluded.push(i);
+        $('qx').value=''; xmatches=[]; renderSuggX(); renderXChips(); recompute(); $('qx').focus();
+      }
+      function unexcludeEntity(i){ excluded = excluded.filter(function(x){ return x!==i; }); renderXChips(); recompute(); }
+      function renderXChips(){
+        $('xchips').innerHTML = excluded.map(function(i){ var n = NODES[i];
+          return '<span class="chip"><span class="dot"></span>'+esc(n.label)
+            + '<button data-i="'+i+'" aria-label="Stop excluding">&times;</button></span>';
+        }).join('');
+      }
+      $('xchips').addEventListener('click', function(e){ var btn=e.target.closest('button'); if (btn) unexcludeEntity(+btn.dataset.i); });
+
       function buildExamples(){
         // pick a few real, well-connected pairs as one-click demos
         var wanted = [['Exxon Mobil Corporation','ConocoPhillips'],
@@ -262,7 +309,7 @@
         var q = [src];
         for (var h = 0; h < q.length; h++){
           var u = q[h], au = ADJ[u];
-          for (var k = 0; k < au.length; k++){ var v = au[k].to; if (d[v] === undefined){ d[v] = d[u] + 1; q.push(v); } }
+          for (var k = 0; k < au.length; k++){ var v = au[k].to; if (EXSET[v]) continue; if (d[v] === undefined){ d[v] = d[u] + 1; q.push(v); } }
         }
         return d;
       }
@@ -282,6 +329,7 @@
 
       function recompute(){
         curConn = null;
+        EXSET = {}; excluded.forEach(function(i){ EXSET[i] = 1; });   // route BFS around excluded hubs
         $('dl').disabled = true; $('dlpng').disabled = true; $('dlsvg').disabled = true;
         if (sel.length < 2){
           $('result').hidden = true;
