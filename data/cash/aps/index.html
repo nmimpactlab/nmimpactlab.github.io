@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>APS Cash Disbursements — New Mexico Impact Lab</title>
   <meta name="description" content="Searchable register of Albuquerque Public Schools cash disbursements, July 2010 – June 2026, compiled from the district's published board documents.">
-  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="https://nmimpactlab.org/data/cash/aps/">
   <link rel="stylesheet" href="/assets/css/style.css">
   <style>
     .tool { max-width: 1160px; margin: 0 auto; padding: 28px 20px 60px; }
@@ -279,6 +279,10 @@
         + '<div class="stat"><div class="v">' + d.months_present + ' of ' + d.months_span + '</div><div class="k">Months, Jul 2010–Jun 2026</div></div>';
       var gs = $('grp');
       (d.groups || []).forEach(function (x) { var o = document.createElement('option'); o.value = x; o.textContent = x; gs.appendChild(o); });
+      try { // deep link: /data/cash/aps/?q=vendor prefills the search
+        var qp = new URLSearchParams(location.search).get('q');
+        if (qp) $('q').value = qp;
+      } catch (e) {}
       $('q').addEventListener('input', onInput);
       $('grp').addEventListener('change', apply);
       $('sort').addEventListener('change', apply);
