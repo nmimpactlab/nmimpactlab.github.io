@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>APS Cash Disbursements — New Mexico Impact Lab</title>
+  <meta name="description" content="Searchable register of Albuquerque Public Schools cash disbursements, July 2010 – June 2026, compiled from the district's published board documents.">
+  <link rel="canonical" href="https://nmimpactlab.org/data/cash/aps/">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    .tool { max-width: 1160px; margin: 0 auto; padding: 28px 20px 60px; }
+    .tool h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 6px; }
+    .tool .sub { color: var(--text-soft); margin: 0 0 18px; }
+    .stats { display: flex; gap: 14px; flex-wrap: wrap; margin: 0 0 20px; }
+    .stat { border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; background: var(--bg-soft); }
+    .stat .v { font-weight: 700; font-size: 1.15rem; }
+    .stat .k { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-soft); }
+    .controls { display: grid; gap: 12px; grid-template-columns: 3fr 1.4fr 1fr; align-items: end; margin-bottom: 8px; }
+    @media (max-width: 700px) { .controls { grid-template-columns: 1fr; } }
+    .field label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-soft); margin-bottom: 4px; }
+    .field input, .field select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.95rem; }
+    .field input:focus, .field select:focus { outline: 2px solid var(--ring); outline-offset: 1px; }
+    .resultbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin: 10px 0 12px; color: var(--text-soft); font-size: 0.9rem; }
+    .tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+    table.cash { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    table.cash th, table.cash td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    table.cash th { background: var(--bg-soft); position: sticky; top: 0; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); }
+    table.cash tr:last-child td { border-bottom: 0; }
+    table.cash td.name { font-weight: 600; cursor: pointer; }
+    table.cash td.num, table.cash th.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    tr.vrow { cursor: pointer; }
+    tr.vrow:hover td { background: var(--bg-soft); }
+    tr.detail > td { background: var(--bg-soft); padding: 14px 16px 18px; }
+    .dtable { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
+    .dtable th, .dtable td { padding: 6px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    .dtable td.num, .dtable th.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .dtable tr:last-child td { border-bottom: 0; }
+    .dbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; font-size: 0.85rem; color: var(--text-soft); }
+    .dbar button, .pager button, .dltools button { padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); cursor: pointer; font-size: 0.85rem; }
+    .dbar button:hover, .dltools button:hover { background: var(--bg-soft); }
+    .pill { display: inline-block; font-size: 0.72rem; padding: 2px 7px; border-radius: 20px; background: var(--bg-soft); color: var(--text-soft); white-space: nowrap; }
+    .pager { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 18px; }
+    .pager button:disabled { opacity: 0.4; cursor: default; }
+    .empty { padding: 40px; text-align: center; color: var(--text-soft); }
+    .srcnote { margin-top: 22px; font-size: 0.82rem; color: var(--text-soft); }
+    .privacy { background: var(--bg-soft); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 6px; margin: 0 0 20px; font-size: 0.9rem; color: var(--text-soft); }
+    .dltools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 0 0 14px; }
+    .dltools .dlnote { font-size: 0.8rem; color: var(--text-soft); }
+    .showmore { margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="/"><span class="mark">NM</span> Impact Lab</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+      <div class="nav-links">
+        <a href="/investigations/">Investigations</a>
+        <a href="/articles/">Articles</a>
+        <a href="/data/">Data</a>
+        <a href="/methodology.html">Methodology</a>
+        <a href="/about.html">About</a>
+        <a href="/support.html">Support</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div class="tool">
+      <h1>APS cash disbursements, 2010&ndash;2026</h1>
+      <p class="sub">Every cash disbursement Albuquerque Public Schools published in its board documents &mdash; <strong>July 2010 through June 2026</strong> &mdash; compiled into one searchable register. Search a vendor, then click the row to see each individual payment with a pointer to the source document.</p>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="privacy">This register shows payment facts as the district published them: payee, date, amount, check/voucher number, and (from July&nbsp;2025) the district's own expense coding. Remit city and address details are intentionally omitted. 185 of 192 months are present; the district never published registers for 7 months (May&ndash;Jul&nbsp;2019, Mar &amp; Jul&nbsp;2020, Apr &amp; Jul&nbsp;2021) &mdash; those are obtainable only by records request.</div>
+
+      <div class="controls">
+        <div class="field">
+          <label for="q">Search by vendor / payee</label>
+          <input type="search" id="q" placeholder="e.g. a company, law firm, or contractor name" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="grp">Category group</label>
+          <select id="grp"><option value="">All categories</option></select>
+        </div>
+        <div class="field">
+          <label for="sort">Sort by</label>
+          <select id="sort">
+            <option value="t">Total $</option>
+            <option value="n">Payments</option>
+            <option value="a">Name (A&ndash;Z)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="resultbar">
+        <span id="count" aria-live="polite">Loading&hellip;</span>
+        <span id="pageinfo"></span>
+      </div>
+
+      <div class="dltools">
+        <button id="dlResults" type="button">&#8681; Download vendor results (CSV)</button>
+        <button id="dlAll" type="button">&#8681; Download all 400k payments (CSV, ~90&nbsp;MB)</button>
+        <span class="dlnote">Each file includes its source and a verify-before-you-rely notice. Reuse with attribution.</span>
+      </div>
+
+      <div class="tablewrap">
+        <table class="cash" aria-label="APS cash disbursements by vendor">
+          <thead>
+            <tr>
+              <th scope="col">Vendor / payee</th>
+              <th scope="col">Category group</th>
+              <th scope="col" class="num">Payments</th>
+              <th scope="col" class="num">Total $</th>
+              <th scope="col">Years</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="5" class="empty">Loading&hellip;</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pager">
+        <button id="prev" disabled>&larr; Previous</button>
+        <span id="pagenum" style="color:var(--text-soft);font-size:0.9rem;"></span>
+        <button id="next" disabled>Next &rarr;</button>
+      </div>
+
+      <p class="srcnote">Source: Albuquerque Public Schools published board records (public record) &mdash; Lawson AP265 quarterly cash-payment registers from the district's finance quarterly-reports pages (2010&ndash;2018), monthly check registers in Finance Committee and Board of Education agenda packets (2018&ndash;2025), and monthly Detail Listing of Vouchers reports (July&nbsp;2025 onward). Compiled with the Lab's custom-built data tools and provided as a research aid; every payment row carries its source document and page. The official record governs &mdash; verify against the source and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="disclaimer"><span class="dh">Verify before you rely</span>The data and analysis here are compiled from public records using the New Mexico Impact Lab's own custom-built data tools, and are provided as-is, as a research and finding aid. The original official record always governs: before using any figure, record, or finding in an official, legal, journalistic, or financial capacity, <strong>confirm it against the source document.</strong> This site is not an official record.</div>
+      <div class="footer-bottom">&copy; <span id="year2">2026</span> New Mexico Impact Lab. Built on public records.</div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var b = document.querySelector('.nav-toggle'), l = document.querySelector('.nav-links');
+      if (b && l) b.addEventListener('click', function () { var o = l.classList.toggle('open'); b.setAttribute('aria-expanded', o ? 'true' : 'false'); });
+      var yy = document.getElementById('year2'); if (yy) yy.textContent = new Date().getFullYear();
+    })();
+
+    var PAGE = 50, DETAIL_FIRST = 200;
+    var META = null, DATA = [], view = [], page = 0;
+    var V = { name:0, group:1, total:2, n:3, y0:4, y1:5, shard:6 };
+    var T = { date:0, amt:1, rec:2, file:3, page:4, section:5, desc:6 };
+    var shardCache = {};
+    var openVendor = null;
+    var $ = function (id) { return document.getElementById(id); };
+    function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+    function money(v) { return v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+    function render() {
+      var tb = $('tbody');
+      openVendor = null;
+      if (!view.length) {
+        tb.innerHTML = '<tr><td colspan="5" class="empty">No vendors match your search.</td></tr>';
+        $('pagenum').textContent = ''; $('prev').disabled = true; $('next').disabled = true; $('pageinfo').textContent = '';
+        return;
+      }
+      var pages = Math.ceil(view.length / PAGE);
+      if (page >= pages) page = pages - 1;
+      if (page < 0) page = 0;
+      var start = page * PAGE, slice = view.slice(start, start + PAGE), html = '';
+      for (var i = 0; i < slice.length; i++) {
+        var r = slice[i];
+        html += '<tr class="vrow" data-i="' + (start + i) + '">'
+          + '<td class="name">' + esc(r[V.name]) + '</td>'
+          + '<td>' + (r[V.group] ? '<span class="pill">' + esc(r[V.group]) + '</span>' : '') + '</td>'
+          + '<td class="num">' + r[V.n].toLocaleString() + '</td>'
+          + '<td class="num">' + money(r[V.total]) + '</td>'
+          + '<td>' + esc(r[V.y0] === r[V.y1] ? r[V.y0] : r[V.y0] + '–' + r[V.y1]) + '</td>'
+          + '</tr>';
+      }
+      tb.innerHTML = html;
+      $('pagenum').textContent = 'Page ' + (page + 1) + ' of ' + pages.toLocaleString();
+      $('pageinfo').textContent = 'Showing ' + (start + 1).toLocaleString() + '–' + (start + slice.length).toLocaleString();
+      $('prev').disabled = page === 0;
+      $('next').disabled = page >= pages - 1;
+    }
+
+    function apply() {
+      var q = $('q').value.trim().toLowerCase();
+      var g = $('grp').value;
+      var terms = q ? q.split(/\s+/) : [];
+      view = DATA.filter(function (r) {
+        if (g && r[V.group] !== g) return false;
+        if (terms.length) {
+          var hay = r[V.name].toLowerCase();
+          for (var t = 0; t < terms.length; t++) if (hay.indexOf(terms[t]) === -1) return false;
+        }
+        return true;
+      });
+      var s = $('sort').value;
+      if (s === 'n') view.sort(function (a, b) { return b[V.n] - a[V.n]; });
+      else if (s === 'a') view.sort(function (a, b) { return a[V.name] < b[V.name] ? -1 : 1; });
+      else view.sort(function (a, b) { return b[V.total] - a[V.total]; });
+      page = 0;
+      var tot = 0; for (var i = 0; i < view.length; i++) tot += view[i][V.total];
+      $('count').textContent = view.length.toLocaleString() + ' of ' + DATA.length.toLocaleString() + ' vendors — $' + money(tot);
+      render();
+    }
+    var debounce;
+    function onInput() { clearTimeout(debounce); debounce = setTimeout(apply, 150); }
+
+    function getShard(n) {
+      if (shardCache[n]) return Promise.resolve(shardCache[n]);
+      var id = (n < 10 ? '0' : '') + n;
+      return fetch('/assets/data/apscash/txn-' + id + '.json').then(function (r) { return r.json(); })
+        .then(function (d) { shardCache[n] = d; return d; });
+    }
+
+    function detailRows(txns, limit) {
+      var rows = txns.slice().reverse(); // newest first
+      if (limit) rows = rows.slice(0, limit);
+      var html = '<table class="dtable"><thead><tr><th>Date</th><th class="num">Amount $</th><th>Record #</th><th>Schedule</th><th>Expense description</th><th>Source document</th></tr></thead><tbody>';
+      for (var i = 0; i < rows.length; i++) {
+        var t = rows[i];
+        html += '<tr><td>' + esc(t[T.date]) + '</td>'
+          + '<td class="num">' + money(t[T.amt]) + '</td>'
+          + '<td>' + esc(t[T.rec]) + '</td>'
+          + '<td>' + (t[T.section] ? '<span class="pill">' + esc(t[T.section]) + '</span>' : '') + '</td>'
+          + '<td>' + esc(t[T.desc]) + '</td>'
+          + '<td>' + esc(META.files[t[T.file]] || '') + (t[T.page] ? ', p.' + esc(t[T.page]) : '') + '</td></tr>';
+      }
+      return html + '</tbody></table>';
+    }
+
+    function toggleDetail(tr) {
+      var i = +tr.getAttribute('data-i');
+      var r = view[i];
+      var existing = tr.nextElementSibling;
+      if (existing && existing.classList.contains('detail')) { existing.remove(); openVendor = null; return; }
+      var old = document.querySelector('tr.detail'); if (old) old.remove();
+      openVendor = r[V.name];
+      var d = document.createElement('tr');
+      d.className = 'detail';
+      d.innerHTML = '<td colspan="5"><div class="dbar"><span>Loading ' + r[V.n].toLocaleString() + ' payments…</span></div></td>';
+      tr.parentNode.insertBefore(d, tr.nextSibling);
+      getShard(r[V.shard]).then(function (sh) {
+        if (openVendor !== r[V.name]) return;
+        var txns = sh[r[V.name]] || [];
+        var bar = '<div class="dbar"><span><strong>' + esc(r[V.name]) + '</strong> — ' + txns.length.toLocaleString()
+          + ' payments, $' + money(r[V.total]) + ' (' + esc(r[V.y0]) + '–' + esc(r[V.y1]) + '), newest first</span>'
+          + '<button type="button" class="dlvendor">&#8681; Download this vendor’s payments (CSV)</button></div>';
+        var truncated = txns.length > DETAIL_FIRST;
+        d.innerHTML = '<td colspan="5">' + bar + detailRows(txns, DETAIL_FIRST)
+          + (truncated ? '<div class="showmore"><button type="button" class="showall">Show all ' + txns.length.toLocaleString() + ' payments</button></div>' : '')
+          + '</td>';
+        d.querySelector('.dlvendor').addEventListener('click', function () { dlVendor(r, txns); });
+        var sa = d.querySelector('.showall');
+        if (sa) sa.addEventListener('click', function () {
+          d.querySelector('.dtable').outerHTML = detailRows(txns, 0);
+          d.querySelector('.showmore').remove();
+        });
+      }).catch(function () {
+        d.innerHTML = '<td colspan="5"><div class="dbar">Could not load payment detail. Please refresh.</div></td>';
+      });
+    }
+
+    $('tbody').addEventListener('click', function (e) {
+      var tr = e.target.closest('tr.vrow');
+      if (tr) toggleDetail(tr);
+    });
+
+    fetch('/assets/data/apscash/vendors.json').then(function (r) { return r.json(); }).then(function (d) {
+      META = d; DATA = d.vendors;
+      $('stats').innerHTML =
+        '<div class="stat"><div class="v">$' + (d.total / 1e9).toFixed(2) + 'B</div><div class="k">Total disbursed</div></div>'
+        + '<div class="stat"><div class="v">' + d.records.toLocaleString() + '</div><div class="k">Payment records</div></div>'
+        + '<div class="stat"><div class="v">' + DATA.length.toLocaleString() + '</div><div class="k">Vendors / payees</div></div>'
+        + '<div class="stat"><div class="v">' + d.months_present + ' of ' + d.months_span + '</div><div class="k">Months, Jul 2010–Jun 2026</div></div>';
+      var gs = $('grp');
+      (d.groups || []).forEach(function (x) { var o = document.createElement('option'); o.value = x; o.textContent = x; gs.appendChild(o); });
+      $('q').addEventListener('input', onInput);
+      $('grp').addEventListener('change', apply);
+      $('sort').addEventListener('change', apply);
+      apply();
+    }).catch(function () {
+      $('tbody').innerHTML = '<tr><td colspan="5" class="empty">Could not load the dataset. Please refresh, or email research@nmimpactlab.org.</td></tr>';
+      $('count').textContent = '';
+    });
+
+    $('prev').addEventListener('click', function () { page--; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    $('next').addEventListener('click', function () { page++; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+    // ---- CSV export (client-side, with provenance + verify notice) ----
+    function csvCell(v) { v = (v == null ? '' : String(v)); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    function todayStr() { var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+    var SRC = 'Albuquerque Public Schools published board records (public record): AP265 quarterly registers 2010-2018, board-packet check registers 2018-2025, voucher detail listings Jul 2025 onward';
+    function provenance(dict) {
+      var lines = [
+        '# New Mexico Impact Lab  |  https://nmimpactlab.org',
+        '# Source: ' + SRC,
+        '# Downloaded: ' + new Date().toISOString(),
+        "# Compiled from public records using the New Mexico Impact Lab's custom-built data tools. Provided as-is, as a research and finding aid.",
+        '# The original official record governs: verify every value against the source document (named on each row) before any official, legal, journalistic, or financial use. This is not an official record.',
+        '# Reuse welcome with attribution to the New Mexico Impact Lab (nmimpactlab.org).'
+      ];
+      if (dict) lines.push('# Column dictionary: ' + dict);
+      lines.push('');
+      return lines;
+    }
+    function saveCSV(filename, headerCols, dataRows, dict) {
+      if (!dataRows.length) { alert('No rows to download — adjust your search first.'); return; }
+      var lines = provenance(dict);
+      lines.push(headerCols.map(csvCell).join(','));
+      for (var i = 0; i < dataRows.length; i++) lines.push(dataRows[i].map(csvCell).join(','));
+      var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a'); a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    }
+    var TXN_COLS = ['Vendor', 'Date', 'Amount', 'Record number', 'Schedule', 'Expense description', 'Source document', 'Source page'];
+    var TXN_DICT = 'Vendor=payee as published (spelling variants folded); Record number=check / voucher / payment number by era; Schedule=sub-schedule for Jul-2025+ reports (blank = main register); Expense description=the district’s own expense coding (Jul 2025 onward only); Source document/page=the board document this row was read from. Remit city/address details intentionally omitted.';
+    function txnRow(vname, t) { return [vname, t[T.date], t[T.amt], t[T.rec], t[T.section], t[T.desc], META.files[t[T.file]] || '', t[T.page]]; }
+    function dlVendor(r, txns) {
+      saveCSV('nmimpactlab_apscash_' + r[V.name].replace(/[^A-Za-z0-9]+/g, '_').slice(0, 40) + '_' + todayStr() + '.csv',
+        TXN_COLS, txns.map(function (t) { return txnRow(r[V.name], t); }), TXN_DICT);
+    }
+    $('dlResults').addEventListener('click', function () {
+      var COLS = ['Vendor', 'Category group', 'Payments', 'Total', 'First year', 'Last year'];
+      saveCSV('nmimpactlab_apscash_vendors_' + todayStr() + '.csv', COLS,
+        view.map(function (r) { return [r[V.name], r[V.group], r[V.n], r[V.total], r[V.y0], r[V.y1]]; }),
+        'Vendor=payee as published (spelling variants folded); Category group=Lab rollup of the district’s expense vocabulary; Payments/Total=count and sum of that vendor’s rows; First/Last year=years the vendor appears.');
+    });
+    $('dlAll').addEventListener('click', function () {
+      if (!META) return;
+      var btn = $('dlAll'), orig = btn.textContent;
+      btn.disabled = true;
+      var rows = [], done = 0, N = META.nshard;
+      function step(i) {
+        if (i >= N) {
+          btn.textContent = orig; btn.disabled = false;
+          saveCSV('nmimpactlab_apscash_full_' + todayStr() + '.csv', TXN_COLS, rows, TXN_DICT);
+          return;
+        }
+        getShard(i).then(function (sh) {
+          for (var v in sh) for (var j = 0; j < sh[v].length; j++) rows.push(txnRow(v, sh[v][j]));
+          done++;
+          btn.textContent = 'Preparing… ' + Math.round(100 * done / N) + '%';
+          step(i + 1);
+        }).catch(function () { btn.textContent = orig; btn.disabled = false; alert('Download failed partway — please retry.'); });
+      }
+      step(0);
+    });
+  </script>
+</body>
+</html>
