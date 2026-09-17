@@ -4,3 +4,6 @@
 NM Registered NonProfits*.csv
 *INTERNAL*
 *_raw_*.csv
+
+# local Claude Code config - never publish
+.claude/
