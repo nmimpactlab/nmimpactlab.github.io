@@ -279,10 +279,6 @@
         + '<div class="stat"><div class="v">' + d.months_present + ' of ' + d.months_span + '</div><div class="k">Months, Jul 2010–Jun 2026</div></div>';
       var gs = $('grp');
       (d.groups || []).forEach(function (x) { var o = document.createElement('option'); o.value = x; o.textContent = x; gs.appendChild(o); });
-      try { // deep link: /data/cash/aps/?q=vendor prefills the search
-        var qp = new URLSearchParams(location.search).get('q');
-        if (qp) $('q').value = qp;
-      } catch (e) {}
       $('q').addEventListener('input', onInput);
       $('grp').addEventListener('change', apply);
       $('sort').addEventListener('change', apply);
