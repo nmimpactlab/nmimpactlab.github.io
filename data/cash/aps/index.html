@@ -112,13 +112,14 @@
             <tr>
               <th scope="col">Vendor / payee</th>
               <th scope="col">Category group</th>
+              <th scope="col">Sub-category</th>
               <th scope="col" class="num">Payments</th>
               <th scope="col" class="num">Total $</th>
               <th scope="col">Years</th>
             </tr>
           </thead>
           <tbody id="tbody">
-            <tr><td colspan="5" class="empty">Loading&hellip;</td></tr>
+            <tr><td colspan="6" class="empty">Loading&hellip;</td></tr>
           </tbody>
         </table>
       </div>
@@ -149,7 +150,7 @@
 
     var PAGE = 50, DETAIL_FIRST = 200;
     var META = null, DATA = [], view = [], page = 0;
-    var V = { name:0, group:1, total:2, n:3, y0:4, y1:5, shard:6 };
+    var V = { name:0, group:1, total:2, n:3, y0:4, y1:5, shard:6, sub:7 };
     var T = { date:0, amt:1, rec:2, file:3, page:4, section:5, desc:6 };
     var shardCache = {};
     var openVendor = null;
@@ -161,7 +162,7 @@
       var tb = $('tbody');
       openVendor = null;
       if (!view.length) {
-        tb.innerHTML = '<tr><td colspan="5" class="empty">No vendors match your search.</td></tr>';
+        tb.innerHTML = '<tr><td colspan="6" class="empty">No vendors match your search.</td></tr>';
         $('pagenum').textContent = ''; $('prev').disabled = true; $('next').disabled = true; $('pageinfo').textContent = '';
         return;
       }
@@ -174,6 +175,7 @@
         html += '<tr class="vrow" data-i="' + (start + i) + '">'
           + '<td class="name">' + esc(r[V.name]) + '</td>'
           + '<td>' + (r[V.group] ? '<span class="pill">' + esc(r[V.group]) + '</span>' : '') + '</td>'
+          + '<td>' + esc(r[V.sub] || '') + '</td>'
           + '<td class="num">' + r[V.n].toLocaleString() + '</td>'
           + '<td class="num">' + money(r[V.total]) + '</td>'
           + '<td>' + esc(r[V.y0] === r[V.y1] ? r[V.y0] : r[V.y0] + '–' + r[V.y1]) + '</td>'
@@ -193,7 +195,7 @@
       view = DATA.filter(function (r) {
         if (g && r[V.group] !== g) return false;
         if (terms.length) {
-          var hay = r[V.name].toLowerCase();
+          var hay = (r[V.name] + ' ' + (r[V.sub] || '')).toLowerCase();
           for (var t = 0; t < terms.length; t++) if (hay.indexOf(terms[t]) === -1) return false;
         }
         return true;
@@ -242,7 +244,7 @@
       openVendor = r[V.name];
       var d = document.createElement('tr');
       d.className = 'detail';
-      d.innerHTML = '<td colspan="5"><div class="dbar"><span>Loading ' + r[V.n].toLocaleString() + ' payments…</span></div></td>';
+      d.innerHTML = '<td colspan="6"><div class="dbar"><span>Loading ' + r[V.n].toLocaleString() + ' payments…</span></div></td>';
       tr.parentNode.insertBefore(d, tr.nextSibling);
       getShard(r[V.shard]).then(function (sh) {
         if (openVendor !== r[V.name]) return;
@@ -251,7 +253,7 @@
           + ' payments, $' + money(r[V.total]) + ' (' + esc(r[V.y0]) + '–' + esc(r[V.y1]) + '), newest first</span>'
           + '<button type="button" class="dlvendor">&#8681; Download this vendor’s payments (CSV)</button></div>';
         var truncated = txns.length > DETAIL_FIRST;
-        d.innerHTML = '<td colspan="5">' + bar + detailRows(txns, DETAIL_FIRST)
+        d.innerHTML = '<td colspan="6">' + bar + detailRows(txns, DETAIL_FIRST)
           + (truncated ? '<div class="showmore"><button type="button" class="showall">Show all ' + txns.length.toLocaleString() + ' payments</button></div>' : '')
           + '</td>';
         d.querySelector('.dlvendor').addEventListener('click', function () { dlVendor(r, txns); });
@@ -261,7 +263,7 @@
           d.querySelector('.showmore').remove();
         });
       }).catch(function () {
-        d.innerHTML = '<td colspan="5"><div class="dbar">Could not load payment detail. Please refresh.</div></td>';
+        d.innerHTML = '<td colspan="6"><div class="dbar">Could not load payment detail. Please refresh.</div></td>';
       });
     }
 
@@ -284,7 +286,7 @@
       $('sort').addEventListener('change', apply);
       apply();
     }).catch(function () {
-      $('tbody').innerHTML = '<tr><td colspan="5" class="empty">Could not load the dataset. Please refresh, or email research@nmimpactlab.org.</td></tr>';
+      $('tbody').innerHTML = '<tr><td colspan="6" class="empty">Could not load the dataset. Please refresh, or email research@nmimpactlab.org.</td></tr>';
       $('count').textContent = '';
     });
 
@@ -328,9 +330,9 @@
         TXN_COLS, txns.map(function (t) { return txnRow(r[V.name], t); }), TXN_DICT);
     }
     $('dlResults').addEventListener('click', function () {
-      var COLS = ['Vendor', 'Category group', 'Payments', 'Total', 'First year', 'Last year'];
+      var COLS = ['Vendor', 'Category group', 'Sub-category', 'Payments', 'Total', 'First year', 'Last year'];
       saveCSV('nmimpactlab_apscash_vendors_' + todayStr() + '.csv', COLS,
-        view.map(function (r) { return [r[V.name], r[V.group], r[V.n], r[V.total], r[V.y0], r[V.y1]]; }),
+        view.map(function (r) { return [r[V.name], r[V.group], r[V.sub] || '', r[V.n], r[V.total], r[V.y0], r[V.y1]]; }),
         'Vendor=payee as published (spelling variants folded); Category group=Lab rollup of the district’s expense vocabulary; Payments/Total=count and sum of that vendor’s rows; First/Last year=years the vendor appears.');
     });
     $('dlAll').addEventListener('click', function () {
