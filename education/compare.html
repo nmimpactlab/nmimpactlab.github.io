@@ -26,6 +26,8 @@
     .ltbar { display: flex; height: 20px; border-radius: 4px; overflow: hidden; }
     .ltbar div { display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10.5px; font-weight: 700; }
     .ltn { font-size: 0.8rem; color: var(--text-soft); text-align: right; font-variant-numeric: tabular-nums; }
+    .typelevel { border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin: 12px 0 2px; max-width: 640px; }
+    .tlh { display: block; font-weight: 700; font-size: 0.95rem; margin-bottom: 8px; }
     @media (max-width: 1080px){ .cols, .colhead { grid-template-columns: 1fr; } .colhead { position: static; } }
   </style>
 </head>
@@ -59,34 +61,39 @@
         <svg id="levelpie_emp" viewBox="0 0 900 470"></svg>
         <div class="analysis" id="an_level"><span class="lab">Analysis</span></div>
       </div>
+      <p class="intro" style="margin:10px 0 0">The sections below take each license type on its own &mdash; first its grouping, then its license level (<span style="color:#8fb8c9;font-weight:700">L1 novice</span> &middot; <span style="color:#3d8ca6;font-weight:700">L2 professional</span> &middot; <span style="color:#0b4f6c;font-weight:700">L3 master</span>), licensed vs. employed.</p>
 
-      <h2 class="sec">Teachers, by grade band</h2>
+      <h2 class="sec">Teachers &mdash; grade band, then level</h2>
       <div class="cols">
         <svg id="pie5_all" viewBox="0 0 900 470"></svg>
         <svg id="pie5_emp" viewBox="0 0 900 470"></svg>
         <div class="analysis" id="an_pie5"><span class="lab">Analysis</span></div>
       </div>
+      <div class="typelevel"><span class="tlh">Teacher license level</span><div id="lvl_teacher"></div></div>
 
-      <h2 class="sec">Support-provider specialties</h2>
+      <h2 class="sec">Support providers &mdash; specialty, then level</h2>
       <div class="cols">
         <svg id="pie2_all" viewBox="0 0 900 470"></svg>
         <svg id="pie2_emp" viewBox="0 0 900 470"></svg>
         <div class="analysis" id="an_pie2"><span class="lab">Analysis</span></div>
       </div>
+      <div class="typelevel"><span class="tlh">Support-provider license level</span><div id="lvl_support"></div></div>
 
-      <h2 class="sec">Administrators</h2>
-      <div class="cols">
-        <svg id="pie3_all" viewBox="0 0 900 470"></svg>
-        <svg id="pie3_emp" viewBox="0 0 900 470"></svg>
-        <div class="analysis" id="an_pie3"><span class="lab">Analysis</span></div>
-      </div>
-
-      <h2 class="sec">Instructional support providers</h2>
+      <h2 class="sec">Instructional support providers &mdash; specialty, then level</h2>
       <div class="cols">
         <svg id="pie4_all" viewBox="0 0 900 470"></svg>
         <svg id="pie4_emp" viewBox="0 0 900 470"></svg>
         <div class="analysis" id="an_pie4"><span class="lab">Analysis</span></div>
       </div>
+      <div class="typelevel"><span class="tlh">Instructional-support license level</span><div id="lvl_isp"></div></div>
+
+      <h2 class="sec">Administrators &mdash; combination, then level</h2>
+      <div class="cols">
+        <svg id="pie3_all" viewBox="0 0 900 470"></svg>
+        <svg id="pie3_emp" viewBox="0 0 900 470"></svg>
+        <div class="analysis" id="an_pie3"><span class="lab">Analysis</span></div>
+      </div>
+      <div class="typelevel"><span class="tlh">Administrator license level</span><div id="lvl_admin"></div></div>
 
       <h2 class="sec">Teacher endorsements, by subject</h2>
       <p class="intro" style="margin:2px 0 10px">Each bar counts endorsements, not teachers (a teacher may hold several), so bars aren&rsquo;t additive.</p>
@@ -100,14 +107,6 @@
       <p class="intro">Each license type, split into employed (<span style="color:#0b4f6c;font-weight:700">teal</span>) and not currently employed in NM public education (<span style="color:#c1440e;font-weight:700">clay</span>). Overall, <strong>42,118 of the 82,266 licensed (51%) are not employed</strong> in a New Mexico public school this year. Support-only licenses (substitutes, aides) account for most of the gap; teacher-plus-support holders are employed at the highest rate.</p>
       <svg id="empsplit" viewBox="0 0 980 300" role="img" aria-label="Employed versus not employed, by license type."></svg>
 
-      <h2 class="sec">License level, within each license type</h2>
-      <p class="intro">Each type&rsquo;s level mix (Level 1 novice &rarr; Level 3 master), licensed vs. employed. Administrators are Level 3 by definition; support providers carry the most Level 1.</p>
-      <div style="display:flex;gap:16px;font-size:0.82rem;color:var(--text-soft);margin:2px 0 12px">
-        <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#8fb8c9;vertical-align:middle"></i> Level 1</span>
-        <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#3d8ca6;vertical-align:middle"></i> Level 2</span>
-        <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#0b4f6c;vertical-align:middle"></i> Level 3</span>
-      </div>
-      <div id="leveltypes" class="ltgrid"></div>
     </div>
   </main>
 
@@ -219,10 +218,9 @@
       }
       return bar('All', allv)+bar('Employed', empv);
     }
-    var LT=[['Teacher','TEACHER'],['Support provider','SUPPORT PROVIDER'],['Instructional support','INSTRUCTIONAL SUPPORT PROVIDER'],['Administrator','ADMINISTRATOR']];
-    document.getElementById('leveltypes').innerHTML = LT.map(function(t){
-      return '<div class="ltcard"><h4>'+t[0]+'</h4>'+levelMini(null, FULL.levelmix[t[1]], EMP.levelmix[t[1]])+'</div>';
-    }).join('');
+    [['lvl_teacher','TEACHER'],['lvl_support','SUPPORT PROVIDER'],['lvl_isp','INSTRUCTIONAL SUPPORT PROVIDER'],['lvl_admin','ADMINISTRATOR']].forEach(function(t){
+      var el=document.getElementById(t[0]); if(el) el.innerHTML=levelMini(null, FULL.levelmix[t[1]], EMP.levelmix[t[1]]);
+    });
   </script>
 </body>
 </html>
