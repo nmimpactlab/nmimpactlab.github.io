@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Where New Mexico's educators work — New Mexico Impact Lab</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    .wrap3 { max-width: 1120px; margin: 0 auto; padding: 26px 20px 64px; }
+    h1 { font-size: clamp(1.5rem,3.4vw,2rem); margin: 0 0 4px; }
+    .sub { color: var(--text-soft); margin: 0 0 10px; font-size: 0.95rem; max-width: 66ch; }
+    .maprow { display: grid; grid-template-columns: 1fr 330px; gap: 28px; align-items: start; margin-top: 10px; }
+    #map { width: 100%; height: auto; display: block; }
+    #map path { stroke: var(--bg); stroke-width: 1; cursor: pointer; transition: opacity .1s; }
+    #map path:hover, #map path.on { stroke: var(--text); stroke-width: 1.6; }
+    .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 10px 2px; font-size: 0.8rem; color: var(--text-soft); }
+    .legend i { display: inline-block; width: 15px; height: 15px; border-radius: 3px; vertical-align: middle; margin-right: 4px; }
+    .panel { position: sticky; top: 14px; border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; background: var(--bg-soft); }
+    .panel h3 { margin: 0 0 2px; font-size: 1.15rem; } .panel .big { font-size: 1.9rem; font-weight: 800; }
+    .panel .meta { color: var(--text-soft); font-size: 0.85rem; margin: 0 0 10px; }
+    .panel table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .panel td { padding: 4px 0; border-bottom: 1px solid var(--border); }
+    .panel td.n { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-soft); }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 12px; margin-top: 24px; }
+    .card2 { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+    .card2 .v { font-size: 1.4rem; font-weight: 800; } .card2 .l { font-size: 0.82rem; color: var(--text-soft); }
+    .note { font-size: 0.82rem; color: var(--text-soft); margin-top: 14px; }
+    @media (max-width: 860px){ .maprow { grid-template-columns: 1fr; } .panel { position: static; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="/"><span class="mark">NM</span> Impact Lab</a>
+      <div class="nav-links"><a href="/articles/">Articles</a><a href="/education/">Education</a><a href="/data/">Data</a><a href="/methodology.html">Methodology</a></div>
+    </nav>
+  </header>
+  <main>
+    <div class="wrap3">
+      <h1>Where New Mexico&rsquo;s educators work</h1>
+      <p class="sub">The 40,148 employed educators from <a href="/education/breakdown-employed.html">Set 2</a>, placed by their employing district and rolled up to county. Hover a county to see the districts inside it. <a href="/education/breakdown.html">Set 1</a> &middot; <a href="/education/compare.html">Compare</a></p>
+      <p class="sub" style="background:var(--bg-soft);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;max-width:none">
+        <strong>Set 3 of 3 &mdash; geography.</strong> Each educator is placed in the county of their employing district; counties with more than one district show each district delineated. Charters, state special schools, and statewide programs are statewide and shown separately below the map, not inside a county.
+      </p>
+      <div class="legend" id="legend"></div>
+      <div class="maprow">
+        <div>
+          <svg id="map" role="img" aria-label="Map of New Mexico counties shaded by number of employed educators."></svg>
+        </div>
+        <div class="panel" id="panel"></div>
+      </div>
+      <div class="cards" id="cards"></div>
+      <p class="note" id="footnote"></p>
+    </div>
+  </main>
+
+  <script src="/assets/data/nm_map.js"></script>
+  <script>
+    var D=window.NMMAP, SVG=document.getElementById('map');
+    SVG.setAttribute('viewBox', D.viewBox);
+    function nf(n){return Number(n).toLocaleString('en-US');}
+    function sc(n){return n<5?'&lt;5':nf(n);}  // small-cell suppression
+    var BINS=[[1500,'#0b4f6c','1,500+'],[700,'#2d7f97','700–1,499'],[300,'#6aa5b8','300–699'],[100,'#a9cdd9','100–299'],[0,'#e3eef2','under 100']];
+    function col(n){ for(var i=0;i<BINS.length;i++){ if(n>=BINS[i][0]) return BINS[i][1]; } return '#e3eef2'; }
+
+    // legend
+    document.getElementById('legend').innerHTML = '<span style="font-weight:600;color:var(--text)">Employed educators:</span>' +
+      BINS.slice().reverse().map(function(b){return '<span><i style="background:'+b[1]+'"></i>'+b[2]+'</span>';}).join('');
+
+    // draw counties
+    var NS='http://www.w3.org/2000/svg';
+    var names=Object.keys(D.counties);
+    var ranked=names.slice().sort(function(a,b){return D.counties[b].staff-D.counties[a].staff;});
+    var rankOf={}; ranked.forEach(function(n,i){rankOf[n]=i+1;});
+    function centroid(path){ // rough: average of M/L coords in first ring
+      var nums=path.replace(/[MLZ]/g,' ').trim().split(/\s+/).map(Number), xs=0,ys=0,c=0;
+      for(var i=0;i+1<nums.length;i+=2){xs+=nums[i];ys+=nums[i+1];c++;}
+      return [xs/c, ys/c];
+    }
+    names.forEach(function(name){
+      var c=D.counties[name], p=document.createElementNS(NS,'path');
+      p.setAttribute('d',c.path); p.setAttribute('fill',col(c.staff)); p.setAttribute('data-n',name);
+      p.addEventListener('mouseenter',function(){ show(name); p.classList.add('on'); });
+      p.addEventListener('mouseleave',function(){ p.classList.remove('on'); });
+      SVG.appendChild(p);
+    });
+    // labels for the larger counties (orientation without clutter)
+    ranked.slice(0,12).forEach(function(name){
+      var c=D.counties[name], ct=centroid(c.path), t=document.createElementNS(NS,'text');
+      t.setAttribute('x',ct[0]); t.setAttribute('y',ct[1]); t.setAttribute('text-anchor','middle');
+      t.setAttribute('font-size',11); t.setAttribute('fill', c.staff>=700?'#fff':'var(--text)');
+      t.setAttribute('font-weight',600); t.setAttribute('pointer-events','none'); t.textContent=name;
+      SVG.appendChild(t);
+    });
+
+    // detail panel
+    var P=document.getElementById('panel');
+    function show(name){
+      var c=D.counties[name], tot=D.meta.located_in_county;
+      var rows=c.districts.map(function(d){return '<tr><td>'+d[0]+'</td><td class="n">'+sc(d[1])+'</td></tr>';}).join('');
+      P.innerHTML='<h3>'+name+' County</h3><div class="big">'+nf(c.staff)+'</div>'+
+        '<p class="meta">employed educators &middot; rank '+rankOf[name]+' of 33 &middot; '+(100*c.staff/tot).toFixed(1)+'% of county-placed staff</p>'+
+        '<table>'+rows+'</table>';
+    }
+    function summary(){
+      P.innerHTML='<h3>New Mexico</h3><div class="big">'+nf(D.meta.located_in_county)+'</div>'+
+        '<p class="meta">employed educators placed in a county (of '+nf(D.meta.employed_total)+' total). Hover a county for its districts.</p>'+
+        '<table><tr><td>Largest</td><td class="n">'+ranked[0]+'</td></tr><tr><td>Counties</td><td class="n">33</td></tr></table>';
+    }
+    summary();
+    SVG.addEventListener('mouseleave', summary);
+
+    // category cards (non-county)
+    var m=D.meta;
+    document.getElementById('cards').innerHTML=[
+      ['Charter schools', m.charter, 'statewide-authorized'],
+      ['State special schools', m.state_special_schools, 'Deaf / Blind / Arts'],
+      ['Statewide programs', m.statewide_programs, 'corrections / juvenile justice'],
+      ['No employer named', m.no_employer_named, 'directory-only — to geocode']
+    ].map(function(x){return '<div class="card2"><div class="v">'+nf(x[1])+'</div><div class="l">'+x[0]+'<br><span style="opacity:.75">'+x[2]+'</span></div></div>';}).join('');
+    document.getElementById('footnote').innerHTML='Source: NM PED 2024–25 employment records; district→county crosswalk (draft, under review). Per-district counts under 5 are suppressed. Counties shaded by employed-educator headcount.';
+  </script>
+</body>
+</html>

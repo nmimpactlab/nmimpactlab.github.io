@@ -48,6 +48,11 @@
     .suppressed { color: var(--text-soft); }
     .two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     @media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+    .hubgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 6px 0 2px; }
+    .hubcard { display: block; border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; background: var(--bg-card); box-shadow: var(--shadow); }
+    .hubcard:hover { background: var(--bg-soft); text-decoration: none; }
+    .hubcard b { display: block; color: var(--accent); margin-bottom: 4px; }
+    .hubcard span { font-size: 0.84rem; color: var(--text-soft); }
   </style>
 </head>
 <body>
@@ -59,6 +64,7 @@
       <div class="nav-links">
         <a href="/investigations/">Investigations</a>
         <a href="/articles/">Articles</a>
+        <a href="/education/">Education</a>
         <a href="/data/">Data</a>
         <a href="/methodology.html">Methodology</a>
         <a href="/about.html">About</a>
@@ -76,6 +82,18 @@
         <span>&#128274;</span>
         <div><b>Aggregate figures only — no individual teacher is named or published.</b> Counts resting on fewer than 5 people are withheld; district and employer breakdowns are limited to units with enough staff to protect identities.</div>
       </div>
+
+      <section class="block">
+        <h2>Explore the workforce</h2>
+        <p class="note">Five interactive breakdowns of New Mexico&rsquo;s educator licensure. The dashboard below is the at-a-glance summary.</p>
+        <div class="hubgrid">
+          <a class="hubcard" href="/education/breakdown.html"><b>1 &middot; The licenses themselves</b><span>All 82,266 current licenses, by type, level, grade band, and endorsement.</span></a>
+          <a class="hubcard" href="/education/breakdown-employed.html"><b>2 &middot; The employed workforce</b><span>The same breakdown, run only on the 40,148 employed this year.</span></a>
+          <a class="hubcard" href="/education/compare.html"><b>Licensed vs. employed</b><span>Sets 1 and 2 side by side.</span></a>
+          <a class="hubcard" href="/education/geography.html"><b>3 &middot; Where they work</b><span>An interactive county map, districts delineated.</span></a>
+          <a class="hubcard" href="/education/methods.html"><b>Methods &amp; sourcing</b><span>Datasets, cleaning, and the privacy model.</span></a>
+        </div>
+      </section>
 
       <div id="app"><div class="loading">Loading statewide figures&hellip;</div></div>
 
