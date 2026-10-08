@@ -1,0 +1,1122 @@
+{
+  "meta": {
+    "title": "New Mexico Teacher Licensure \u2014 statewide aggregates",
+    "source": "NM PED IPRA 25-384 (teacher assignments 2016-2023) + PED Current Licensure + 2025 EOY licensed-staff extract + PED Sunshine Portal (position directory & STARS salaries)",
+    "collected": "public records, 2025-2026",
+    "privacy": "Aggregate figures only. No individual teacher is named or published. Person-level records are held internally under pseudonymous IDs; Person-counts <5 suppressed as '<5'; rates suppressed where numerator or complement <5. District breakdowns >=100 staff; employer breakdowns >=150 licensed staff.",
+    "release": "aggregate-only; APS included as incidental statewide data",
+    "verify": "Provided as-is; verify against the official PED record, which governs. Not an official record."
+  },
+  "totals": {
+    "educators_tracked": 93537,
+    "currently_licensed": 82266,
+    "employed_2024_25": 40148,
+    "taught_no_current_license": 11271
+  },
+  "licensure_trends": [
+    {
+      "school_year": "2016",
+      "level1": "868",
+      "level2": "3345",
+      "level3": "3949",
+      "other_waiver": "14",
+      "no_license_on_file": "14431",
+      "level1_pct_of_licensed": "10.6",
+      "level2_pct": "41.0",
+      "level3_pct": "48.4",
+      "alt_pathway_holders": "273",
+      "alt_pathway_pct": "3.3"
+    },
+    {
+      "school_year": "2017",
+      "level1": "949",
+      "level2": "3989",
+      "level3": "4812",
+      "other_waiver": "",
+      "no_license_on_file": "12549",
+      "level1_pct_of_licensed": "9.7",
+      "level2_pct": "40.9",
+      "level3_pct": "49.4",
+      "alt_pathway_holders": "480",
+      "alt_pathway_pct": "4.9"
+    },
+    {
+      "school_year": "2018",
+      "level1": "1213",
+      "level2": "4801",
+      "level3": "5495",
+      "other_waiver": "1",
+      "no_license_on_file": "10314",
+      "level1_pct_of_licensed": "10.5",
+      "level2_pct": "41.7",
+      "level3_pct": "47.7",
+      "alt_pathway_holders": "708",
+      "alt_pathway_pct": "6.2"
+    },
+    {
+      "school_year": "2019",
+      "level1": "1591",
+      "level2": "5744",
+      "level3": "6238",
+      "other_waiver": "1",
+      "no_license_on_file": "8235",
+      "level1_pct_of_licensed": "11.7",
+      "level2_pct": "42.3",
+      "level3_pct": "46.0",
+      "alt_pathway_holders": "999",
+      "alt_pathway_pct": "7.4"
+    },
+    {
+      "school_year": "2020",
+      "level1": "2191",
+      "level2": "6680",
+      "level3": "7133",
+      "other_waiver": "3",
+      "no_license_on_file": "6427",
+      "level1_pct_of_licensed": "13.7",
+      "level2_pct": "41.7",
+      "level3_pct": "44.6",
+      "alt_pathway_holders": "1616",
+      "alt_pathway_pct": "10.1"
+    },
+    {
+      "school_year": "2021",
+      "level1": "2678",
+      "level2": "7295",
+      "level3": "7738",
+      "other_waiver": "16",
+      "no_license_on_file": "4534",
+      "level1_pct_of_licensed": "15.1",
+      "level2_pct": "41.2",
+      "level3_pct": "43.7",
+      "alt_pathway_holders": "2112",
+      "alt_pathway_pct": "11.9"
+    },
+    {
+      "school_year": "2022",
+      "level1": "3025",
+      "level2": "7465",
+      "level3": "8013",
+      "other_waiver": "14",
+      "no_license_on_file": "3614",
+      "level1_pct_of_licensed": "16.3",
+      "level2_pct": "40.3",
+      "level3_pct": "43.3",
+      "alt_pathway_holders": "2498",
+      "alt_pathway_pct": "13.5"
+    },
+    {
+      "school_year": "2023",
+      "level1": "3184",
+      "level2": "7779",
+      "level3": "8676",
+      "other_waiver": "8",
+      "no_license_on_file": "2665",
+      "level1_pct_of_licensed": "16.2",
+      "level2_pct": "39.6",
+      "level3_pct": "44.2",
+      "alt_pathway_holders": "2897",
+      "alt_pathway_pct": "14.7"
+    }
+  ],
+  "churn_statewide": [
+    {
+      "from_year": "2016",
+      "to_year": "2017",
+      "persons": "22371",
+      "retained_same_pct": "82.7",
+      "moved_district_pct": "2.0",
+      "exited_pct": "15.4",
+      "exited_name_reappears": "368",
+      "entrants": "3139"
+    },
+    {
+      "from_year": "2017",
+      "to_year": "2018",
+      "persons": "22071",
+      "retained_same_pct": "82.2",
+      "moved_district_pct": "2.6",
+      "exited_pct": "15.2",
+      "exited_name_reappears": "294",
+      "entrants": "2894"
+    },
+    {
+      "from_year": "2018",
+      "to_year": "2019",
+      "persons": "21613",
+      "retained_same_pct": "81.6",
+      "moved_district_pct": "3.1",
+      "exited_pct": "15.2",
+      "exited_name_reappears": "287",
+      "entrants": "3259"
+    },
+    {
+      "from_year": "2019",
+      "to_year": "2020",
+      "persons": "21583",
+      "retained_same_pct": "84.0",
+      "moved_district_pct": "2.8",
+      "exited_pct": "13.3",
+      "exited_name_reappears": "220",
+      "entrants": "3467"
+    },
+    {
+      "from_year": "2020",
+      "to_year": "2021",
+      "persons": "22190",
+      "retained_same_pct": "86.2",
+      "moved_district_pct": "2.2",
+      "exited_pct": "11.6",
+      "exited_name_reappears": "147",
+      "entrants": "2403"
+    },
+    {
+      "from_year": "2021",
+      "to_year": "2022",
+      "persons": "22022",
+      "retained_same_pct": "82.3",
+      "moved_district_pct": "2.9",
+      "exited_pct": "14.8",
+      "exited_name_reappears": "150",
+      "entrants": "3123"
+    },
+    {
+      "from_year": "2022",
+      "to_year": "2023",
+      "persons": "21886",
+      "retained_same_pct": "83.5",
+      "moved_district_pct": "3.0",
+      "exited_pct": "13.5",
+      "exited_name_reappears": "128",
+      "entrants": "3132"
+    }
+  ],
+  "churn_by_level": [
+    {
+      "level_class": "other",
+      "person_years": "47",
+      "exit_pct": "27.7"
+    },
+    {
+      "level_class": "no license on file",
+      "person_years": "59366",
+      "exit_pct": "23.2"
+    },
+    {
+      "level_class": "Level 1",
+      "person_years": "12384",
+      "exit_pct": "12.7"
+    },
+    {
+      "level_class": "Level 3",
+      "person_years": "43042",
+      "exit_pct": "8.5"
+    },
+    {
+      "level_class": "Level 2",
+      "person_years": "38897",
+      "exit_pct": "6.9"
+    }
+  ],
+  "districts": [
+    {
+      "district_code": "001",
+      "district": "ALBUQUERQUE",
+      "licensed_staff_2023": "5155",
+      "level1_staff": "677",
+      "level1_pct": "13.1",
+      "staff_2022": "6078",
+      "exit_pct_2022_23": "11.9",
+      "moved_out_pct_2022_23": "3.3"
+    },
+    {
+      "district_code": "004",
+      "district": "ROSWELL",
+      "licensed_staff_2023": "599",
+      "level1_staff": "130",
+      "level1_pct": "21.7",
+      "staff_2022": "573",
+      "exit_pct_2022_23": "10.6",
+      "moved_out_pct_2022_23": "3.3"
+    },
+    {
+      "district_code": "012",
+      "district": "CLOVIS",
+      "licensed_staff_2023": "388",
+      "level1_staff": "104",
+      "level1_pct": "26.8",
+      "staff_2022": "469",
+      "exit_pct_2022_23": "16.2",
+      "moved_out_pct_2022_23": "5.5"
+    },
+    {
+      "district_code": "017",
+      "district": "LAS CRUCES",
+      "licensed_staff_2023": "1437",
+      "level1_staff": "248",
+      "level1_pct": "17.3",
+      "staff_2022": "1549",
+      "exit_pct_2022_23": "9.7",
+      "moved_out_pct_2022_23": "3.6"
+    },
+    {
+      "district_code": "019",
+      "district": "GADSDEN",
+      "licensed_staff_2023": "853",
+      "level1_staff": "134",
+      "level1_pct": "15.7",
+      "staff_2022": "924",
+      "exit_pct_2022_23": "14.6",
+      "moved_out_pct_2022_23": "1.9"
+    },
+    {
+      "district_code": "020",
+      "district": "CARLSBAD",
+      "licensed_staff_2023": "316",
+      "level1_staff": "63",
+      "level1_pct": "19.9",
+      "staff_2022": "448",
+      "exit_pct_2022_23": "11.4",
+      "moved_out_pct_2022_23": "17.2"
+    },
+    {
+      "district_code": "022",
+      "district": "ARTESIA",
+      "licensed_staff_2023": "222",
+      "level1_staff": "28",
+      "level1_pct": "12.6",
+      "staff_2022": "245",
+      "exit_pct_2022_23": "10.6",
+      "moved_out_pct_2022_23": "4.5"
+    },
+    {
+      "district_code": "023",
+      "district": "SILVER CITY",
+      "licensed_staff_2023": "148",
+      "level1_staff": "26",
+      "level1_pct": "17.6",
+      "staff_2022": "160",
+      "exit_pct_2022_23": "7.5",
+      "moved_out_pct_2022_23": "6.9"
+    },
+    {
+      "district_code": "031",
+      "district": "LOVINGTON",
+      "licensed_staff_2023": "176",
+      "level1_staff": "30",
+      "level1_pct": "17.0",
+      "staff_2022": "231",
+      "exit_pct_2022_23": "15.6",
+      "moved_out_pct_2022_23": "3.9"
+    },
+    {
+      "district_code": "033",
+      "district": "HOBBS",
+      "licensed_staff_2023": "472",
+      "level1_staff": "101",
+      "level1_pct": "21.4",
+      "staff_2022": "572",
+      "exit_pct_2022_23": "12.6",
+      "moved_out_pct_2022_23": "2.4"
+    },
+    {
+      "district_code": "036",
+      "district": "RUIDOSO",
+      "licensed_staff_2023": "115",
+      "level1_staff": "10",
+      "level1_pct": "8.7",
+      "staff_2022": "110",
+      "exit_pct_2022_23": "5.5",
+      "moved_out_pct_2022_23": "1.8"
+    },
+    {
+      "district_code": "041",
+      "district": "LOS ALAMOS",
+      "licensed_staff_2023": "263",
+      "level1_staff": "37",
+      "level1_pct": "14.1",
+      "staff_2022": "290",
+      "exit_pct_2022_23": "14.1",
+      "moved_out_pct_2022_23": "1.4"
+    },
+    {
+      "district_code": "042",
+      "district": "DEMING",
+      "licensed_staff_2023": "318",
+      "level1_staff": "72",
+      "level1_pct": "22.6",
+      "staff_2022": "370",
+      "exit_pct_2022_23": "13.2",
+      "moved_out_pct_2022_23": "2.7"
+    },
+    {
+      "district_code": "043",
+      "district": "GALLUP",
+      "licensed_staff_2023": "535",
+      "level1_staff": "91",
+      "level1_pct": "17.0",
+      "staff_2022": "726",
+      "exit_pct_2022_23": "20.9",
+      "moved_out_pct_2022_23": "4.3"
+    },
+    {
+      "district_code": "046",
+      "district": "ALAMOGORDO",
+      "licensed_staff_2023": "324",
+      "level1_staff": "76",
+      "level1_pct": "23.5",
+      "staff_2022": "324",
+      "exit_pct_2022_23": "17.9",
+      "moved_out_pct_2022_23": "5.6"
+    },
+    {
+      "district_code": "055",
+      "district": "ESPANOLA",
+      "licensed_staff_2023": "204",
+      "level1_staff": "36",
+      "level1_pct": "17.6",
+      "staff_2022": "266",
+      "exit_pct_2022_23": "27.4",
+      "moved_out_pct_2022_23": "6.0"
+    },
+    {
+      "district_code": "057",
+      "district": "PORTALES",
+      "licensed_staff_2023": "180",
+      "level1_staff": "25",
+      "level1_pct": "13.9",
+      "staff_2022": "193",
+      "exit_pct_2022_23": "7.3",
+      "moved_out_pct_2022_23": "3.1"
+    },
+    {
+      "district_code": "061",
+      "district": "BERNALILLO",
+      "licensed_staff_2023": "194",
+      "level1_staff": "34",
+      "level1_pct": "17.5",
+      "staff_2022": "209",
+      "exit_pct_2022_23": "18.7",
+      "moved_out_pct_2022_23": "6.2"
+    },
+    {
+      "district_code": "064",
+      "district": "AZTEC",
+      "licensed_staff_2023": "134",
+      "level1_staff": "23",
+      "level1_pct": "17.2",
+      "staff_2022": "176",
+      "exit_pct_2022_23": "12.5",
+      "moved_out_pct_2022_23": "6.8"
+    },
+    {
+      "district_code": "065",
+      "district": "FARMINGTON",
+      "licensed_staff_2023": "649",
+      "level1_staff": "101",
+      "level1_pct": "15.6",
+      "staff_2022": "686",
+      "exit_pct_2022_23": "10.5",
+      "moved_out_pct_2022_23": "2.2"
+    },
+    {
+      "district_code": "066",
+      "district": "BLOOMFIELD",
+      "licensed_staff_2023": "160",
+      "level1_staff": "18",
+      "level1_pct": "11.2",
+      "staff_2022": "173",
+      "exit_pct_2022_23": "13.9",
+      "moved_out_pct_2022_23": "4.0"
+    },
+    {
+      "district_code": "067",
+      "district": "CENTRAL",
+      "licensed_staff_2023": "290",
+      "level1_staff": "44",
+      "level1_pct": "15.2",
+      "staff_2022": "356",
+      "exit_pct_2022_23": "11.8",
+      "moved_out_pct_2022_23": "4.5"
+    },
+    {
+      "district_code": "071",
+      "district": "SANTA FE",
+      "licensed_staff_2023": "846",
+      "level1_staff": "100",
+      "level1_pct": "11.8",
+      "staff_2022": "858",
+      "exit_pct_2022_23": "12.9",
+      "moved_out_pct_2022_23": "3.8"
+    },
+    {
+      "district_code": "074",
+      "district": "SOCORRO",
+      "licensed_staff_2023": "106",
+      "level1_staff": "26",
+      "level1_pct": "24.5",
+      "staff_2022": "110",
+      "exit_pct_2022_23": "20.0",
+      "moved_out_pct_2022_23": "6.4"
+    },
+    {
+      "district_code": "076",
+      "district": "TAOS",
+      "licensed_staff_2023": "171",
+      "level1_staff": "23",
+      "level1_pct": "13.5",
+      "staff_2022": "205",
+      "exit_pct_2022_23": "17.1",
+      "moved_out_pct_2022_23": "5.9"
+    },
+    {
+      "district_code": "081",
+      "district": "MORIARTY-EDGEWOOD",
+      "licensed_staff_2023": "153",
+      "level1_staff": "23",
+      "level1_pct": "15.0",
+      "staff_2022": "143",
+      "exit_pct_2022_23": "9.1",
+      "moved_out_pct_2022_23": "2.8"
+    },
+    {
+      "district_code": "083",
+      "district": "RIO RANCHO",
+      "licensed_staff_2023": "1157",
+      "level1_staff": "181",
+      "level1_pct": "15.6",
+      "staff_2022": "1139",
+      "exit_pct_2022_23": "13.2",
+      "moved_out_pct_2022_23": "4.9"
+    },
+    {
+      "district_code": "086",
+      "district": "LOS LUNAS",
+      "licensed_staff_2023": "440",
+      "level1_staff": "69",
+      "level1_pct": "15.7",
+      "staff_2022": "468",
+      "exit_pct_2022_23": "13.5",
+      "moved_out_pct_2022_23": "4.7"
+    },
+    {
+      "district_code": "087",
+      "district": "BELEN",
+      "licensed_staff_2023": "193",
+      "level1_staff": "25",
+      "level1_pct": "13.0",
+      "staff_2022": "231",
+      "exit_pct_2022_23": "6.9",
+      "moved_out_pct_2022_23": "7.8"
+    },
+    {
+      "district_code": "088",
+      "district": "GRANTS",
+      "licensed_staff_2023": "219",
+      "level1_staff": "46",
+      "level1_pct": "21.0",
+      "staff_2022": "259",
+      "exit_pct_2022_23": "17.0",
+      "moved_out_pct_2022_23": "5.4"
+    },
+    {
+      "district_code": "542",
+      "district": "MISSION ACHIEVEMENT AND SUCCESS",
+      "licensed_staff_2023": "147",
+      "level1_staff": "50",
+      "level1_pct": "34.0",
+      "staff_2022": "171",
+      "exit_pct_2022_23": "27.5",
+      "moved_out_pct_2022_23": "12.3"
+    }
+  ],
+  "endorsement_supply": [
+    {
+      "endorsement": "language_arts",
+      "licensed_persons": "11813",
+      "employed_2025": "6928",
+      "not_employed": "4885",
+      "not_employed_pct": "41.4",
+      "not_employed_taught_before": "2239",
+      "not_employed_taught_2022plus": "1111"
+    },
+    {
+      "endorsement": "tesol",
+      "licensed_persons": "9828",
+      "employed_2025": "6289",
+      "not_employed": "3539",
+      "not_employed_pct": "36.0",
+      "not_employed_taught_before": "1910",
+      "not_employed_taught_2022plus": "914"
+    },
+    {
+      "endorsement": "social_studies",
+      "licensed_persons": "9443",
+      "employed_2025": "5627",
+      "not_employed": "3816",
+      "not_employed_pct": "40.4",
+      "not_employed_taught_before": "1747",
+      "not_employed_taught_2022plus": "871"
+    },
+    {
+      "endorsement": "science",
+      "licensed_persons": "6452",
+      "employed_2025": "3584",
+      "not_employed": "2868",
+      "not_employed_pct": "44.5",
+      "not_employed_taught_before": "1238",
+      "not_employed_taught_2022plus": "628"
+    },
+    {
+      "endorsement": "mathematics",
+      "licensed_persons": "6379",
+      "employed_2025": "3545",
+      "not_employed": "2834",
+      "not_employed_pct": "44.4",
+      "not_employed_taught_before": "1176",
+      "not_employed_taught_2022plus": "592"
+    },
+    {
+      "endorsement": "bilingual_education",
+      "licensed_persons": "3983",
+      "employed_2025": "2547",
+      "not_employed": "1436",
+      "not_employed_pct": "36.1",
+      "not_employed_taught_before": "668",
+      "not_employed_taught_2022plus": "298"
+    },
+    {
+      "endorsement": "reading",
+      "licensed_persons": "3626",
+      "employed_2025": "2137",
+      "not_employed": "1489",
+      "not_employed_pct": "41.1",
+      "not_employed_taught_before": "624",
+      "not_employed_taught_2022plus": "340"
+    },
+    {
+      "endorsement": "physical_education",
+      "licensed_persons": "3602",
+      "employed_2025": "2173",
+      "not_employed": "1429",
+      "not_employed_pct": "39.7",
+      "not_employed_taught_before": "598",
+      "not_employed_taught_2022plus": "279"
+    },
+    {
+      "endorsement": "modern_classical_native_languages",
+      "licensed_persons": "2380",
+      "employed_2025": "1327",
+      "not_employed": "1053",
+      "not_employed_pct": "44.2",
+      "not_employed_taught_before": "450",
+      "not_employed_taught_2022plus": "209"
+    },
+    {
+      "endorsement": "health",
+      "licensed_persons": "1923",
+      "employed_2025": "1222",
+      "not_employed": "701",
+      "not_employed_pct": "36.5",
+      "not_employed_taught_before": "328",
+      "not_employed_taught_2022plus": "168"
+    },
+    {
+      "endorsement": "performing_arts",
+      "licensed_persons": "1827",
+      "employed_2025": "1087",
+      "not_employed": "740",
+      "not_employed_pct": "40.5",
+      "not_employed_taught_before": "371",
+      "not_employed_taught_2022plus": "197"
+    },
+    {
+      "endorsement": "visual_arts",
+      "licensed_persons": "1729",
+      "employed_2025": "1025",
+      "not_employed": "704",
+      "not_employed_pct": "40.7",
+      "not_employed_taught_before": "314",
+      "not_employed_taught_2022plus": "158"
+    },
+    {
+      "endorsement": "gifted_education",
+      "licensed_persons": "1506",
+      "employed_2025": "903",
+      "not_employed": "603",
+      "not_employed_pct": "40.0",
+      "not_employed_taught_before": "367",
+      "not_employed_taught_2022plus": "159"
+    },
+    {
+      "endorsement": "business_education",
+      "licensed_persons": "1496",
+      "employed_2025": "854",
+      "not_employed": "642",
+      "not_employed_pct": "42.9",
+      "not_employed_taught_before": "281",
+      "not_employed_taught_2022plus": "146"
+    },
+    {
+      "endorsement": "psychology",
+      "licensed_persons": "933",
+      "employed_2025": "546",
+      "not_employed": "387",
+      "not_employed_pct": "41.5",
+      "not_employed_taught_before": "151",
+      "not_employed_taught_2022plus": "75"
+    },
+    {
+      "endorsement": "library_media",
+      "licensed_persons": "848",
+      "employed_2025": "509",
+      "not_employed": "339",
+      "not_employed_pct": "40.0",
+      "not_employed_taught_before": "175",
+      "not_employed_taught_2022plus": "88"
+    },
+    {
+      "endorsement": "technology_education",
+      "licensed_persons": "845",
+      "employed_2025": "463",
+      "not_employed": "382",
+      "not_employed_pct": "45.2",
+      "not_employed_taught_before": "154",
+      "not_employed_taught_2022plus": "78"
+    },
+    {
+      "endorsement": "family_and_consumer_science",
+      "licensed_persons": "678",
+      "employed_2025": "399",
+      "not_employed": "279",
+      "not_employed_pct": "41.2",
+      "not_employed_taught_before": "126",
+      "not_employed_taught_2022plus": "71"
+    },
+    {
+      "endorsement": "agriculture",
+      "licensed_persons": "437",
+      "employed_2025": "275",
+      "not_employed": "162",
+      "not_employed_pct": "37.1",
+      "not_employed_taught_before": "74",
+      "not_employed_taught_2022plus": "34"
+    },
+    {
+      "endorsement": "information_tech_coordinator",
+      "licensed_persons": "324",
+      "employed_2025": "172",
+      "not_employed": "152",
+      "not_employed_pct": "46.9",
+      "not_employed_taught_before": "78",
+      "not_employed_taught_2022plus": "37"
+    },
+    {
+      "endorsement": "computer_science",
+      "licensed_persons": "138",
+      "employed_2025": "94",
+      "not_employed": "44",
+      "not_employed_pct": "31.9",
+      "not_employed_taught_before": "10",
+      "not_employed_taught_2022plus": "10"
+    },
+    {
+      "endorsement": "elementary_math_specialist",
+      "licensed_persons": "56",
+      "employed_2025": "38",
+      "not_employed": "18",
+      "not_employed_pct": "32.1",
+      "not_employed_taught_before": "4",
+      "not_employed_taught_2022plus": "3"
+    },
+    {
+      "endorsement": "fine_arts",
+      "licensed_persons": "8",
+      "employed_2025": "5",
+      "not_employed": "3",
+      "not_employed_pct": "37.5",
+      "not_employed_taught_before": "1",
+      "not_employed_taught_2022plus": "1"
+    }
+  ],
+  "endorsement_coverage": [
+    {
+      "employer": "ALBUQUERQUE",
+      "licensed_staff": "9579",
+      "tesol_pct": "22.9",
+      "bilingual_pct": "7.2",
+      "math_pct": "9.5",
+      "reading_pct": "5.4",
+      "cs_endorsed_count": "28"
+    },
+    {
+      "employer": "LAS CRUCES",
+      "licensed_staff": "2829",
+      "tesol_pct": "10.0",
+      "bilingual_pct": "9.0",
+      "math_pct": "8.9",
+      "reading_pct": "4.6",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "GADSDEN",
+      "licensed_staff": "1579",
+      "tesol_pct": "27.9",
+      "bilingual_pct": "18.9",
+      "math_pct": "7.7",
+      "reading_pct": "4.1",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "GALLUP",
+      "licensed_staff": "1540",
+      "tesol_pct": "13.1",
+      "bilingual_pct": "1.4",
+      "math_pct": "8.5",
+      "reading_pct": "4.6",
+      "cs_endorsed_count": "7"
+    },
+    {
+      "employer": "SANTA FE",
+      "licensed_staff": "1322",
+      "tesol_pct": "20.7",
+      "bilingual_pct": "11.0",
+      "math_pct": "7.7",
+      "reading_pct": "4.3",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "FARMINGTON",
+      "licensed_staff": "1177",
+      "tesol_pct": "26.1",
+      "bilingual_pct": "2.8",
+      "math_pct": "8.2",
+      "reading_pct": "7.6",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "ROSWELL",
+      "licensed_staff": "1104",
+      "tesol_pct": "6.5",
+      "bilingual_pct": "6.2",
+      "math_pct": "7.0",
+      "reading_pct": "3.8",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "RIO RANCHO",
+      "licensed_staff": "1070",
+      "tesol_pct": "11.6",
+      "bilingual_pct": "2.4",
+      "math_pct": "8.3",
+      "reading_pct": "7.1",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "LOS LUNAS",
+      "licensed_staff": "1053",
+      "tesol_pct": "12.9",
+      "bilingual_pct": "2.3",
+      "math_pct": "7.2",
+      "reading_pct": "4.5",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "CLOVIS",
+      "licensed_staff": "1052",
+      "tesol_pct": "7.2",
+      "bilingual_pct": "3.7",
+      "math_pct": "4.9",
+      "reading_pct": "5.4",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "HOBBS",
+      "licensed_staff": "945",
+      "tesol_pct": "9.4",
+      "bilingual_pct": "5.9",
+      "math_pct": "7.8",
+      "reading_pct": "3.5",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "CARLSBAD",
+      "licensed_staff": "808",
+      "tesol_pct": "6.4",
+      "bilingual_pct": "3.7",
+      "math_pct": "8.2",
+      "reading_pct": "3.2",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "DEMING",
+      "licensed_staff": "768",
+      "tesol_pct": "10.7",
+      "bilingual_pct": "10.2",
+      "math_pct": "8.5",
+      "reading_pct": "1.7",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "ALAMOGORDO",
+      "licensed_staff": "691",
+      "tesol_pct": "5.5",
+      "bilingual_pct": "1.0",
+      "math_pct": "7.5",
+      "reading_pct": "7.1",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "CENTRAL",
+      "licensed_staff": "664",
+      "tesol_pct": "30.3",
+      "bilingual_pct": "4.7",
+      "math_pct": "7.7",
+      "reading_pct": "6.6",
+      "cs_endorsed_count": "5"
+    },
+    {
+      "employer": "ESPANOLA",
+      "licensed_staff": "486",
+      "tesol_pct": "20.8",
+      "bilingual_pct": "11.7",
+      "math_pct": "5.8",
+      "reading_pct": "8.6",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "BELEN",
+      "licensed_staff": "433",
+      "tesol_pct": "7.6",
+      "bilingual_pct": "3.7",
+      "math_pct": "8.3",
+      "reading_pct": "6.0",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "LOS ALAMOS",
+      "licensed_staff": "429",
+      "tesol_pct": "10.3",
+      "bilingual_pct": "",
+      "math_pct": "11.7",
+      "reading_pct": "9.6",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "BERNALILLO",
+      "licensed_staff": "421",
+      "tesol_pct": "21.4",
+      "bilingual_pct": "9.3",
+      "math_pct": "7.1",
+      "reading_pct": "6.7",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "ARTESIA",
+      "licensed_staff": "420",
+      "tesol_pct": "4.8",
+      "bilingual_pct": "2.4",
+      "math_pct": "9.5",
+      "reading_pct": "2.1",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "GRANTS",
+      "licensed_staff": "414",
+      "tesol_pct": "20.3",
+      "bilingual_pct": "1.2",
+      "math_pct": "10.4",
+      "reading_pct": "6.0",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "LOVINGTON",
+      "licensed_staff": "382",
+      "tesol_pct": "8.6",
+      "bilingual_pct": "7.6",
+      "math_pct": "6.5",
+      "reading_pct": "4.2",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "BLOOMFIELD",
+      "licensed_staff": "361",
+      "tesol_pct": "12.7",
+      "bilingual_pct": "2.2",
+      "math_pct": "5.3",
+      "reading_pct": "3.6",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "TAOS",
+      "licensed_staff": "337",
+      "tesol_pct": "13.4",
+      "bilingual_pct": "9.8",
+      "math_pct": "6.8",
+      "reading_pct": "9.2",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "MORIARTY-EDGEWOOD",
+      "licensed_staff": "328",
+      "tesol_pct": "9.1",
+      "bilingual_pct": "2.1",
+      "math_pct": "7.6",
+      "reading_pct": "6.1",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "PORTALES",
+      "licensed_staff": "317",
+      "tesol_pct": "9.8",
+      "bilingual_pct": "7.9",
+      "math_pct": "7.6",
+      "reading_pct": "4.4",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "SILVER CITY",
+      "licensed_staff": "288",
+      "tesol_pct": "4.2",
+      "bilingual_pct": "2.1",
+      "math_pct": "11.1",
+      "reading_pct": "7.3",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "RUIDOSO",
+      "licensed_staff": "287",
+      "tesol_pct": "7.7",
+      "bilingual_pct": "3.8",
+      "math_pct": "7.0",
+      "reading_pct": "7.0",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "AZTEC",
+      "licensed_staff": "283",
+      "tesol_pct": "6.4",
+      "bilingual_pct": "",
+      "math_pct": "6.7",
+      "reading_pct": "2.8",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "POJOAQUE",
+      "licensed_staff": "187",
+      "tesol_pct": "16.0",
+      "bilingual_pct": "9.1",
+      "math_pct": "8.0",
+      "reading_pct": "3.7",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "ZUNI",
+      "licensed_staff": "179",
+      "tesol_pct": "19.0",
+      "bilingual_pct": "",
+      "math_pct": "8.9",
+      "reading_pct": "5.0",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "EXPLORE ACADEMY",
+      "licensed_staff": "167",
+      "tesol_pct": "14.4",
+      "bilingual_pct": "",
+      "math_pct": "18.0",
+      "reading_pct": "7.2",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "COBRE",
+      "licensed_staff": "167",
+      "tesol_pct": "18.0",
+      "bilingual_pct": "7.8",
+      "math_pct": "11.4",
+      "reading_pct": "4.8",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "SOCORRO",
+      "licensed_staff": "165",
+      "tesol_pct": "5.5",
+      "bilingual_pct": "",
+      "math_pct": "9.7",
+      "reading_pct": "4.8",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "MISSION ACHIEVEMENT AND SUCCESS",
+      "licensed_staff": "162",
+      "tesol_pct": "6.2",
+      "bilingual_pct": "",
+      "math_pct": "11.1",
+      "reading_pct": "10.5",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "T OR C",
+      "licensed_staff": "156",
+      "tesol_pct": "8.3",
+      "bilingual_pct": "",
+      "math_pct": "6.4",
+      "reading_pct": "",
+      "cs_endorsed_count": "<5"
+    },
+    {
+      "employer": "CUBA",
+      "licensed_staff": "153",
+      "tesol_pct": "12.4",
+      "bilingual_pct": "",
+      "math_pct": "5.9",
+      "reading_pct": "3.3",
+      "cs_endorsed_count": "<5"
+    }
+  ],
+  "salary": [
+    {
+      "school_year": "2011-12",
+      "teacher_assignments": "23610",
+      "p25_usd": "34606",
+      "median_usd": "44458",
+      "p75_usd": "51009",
+      "mean_usd": "41653"
+    },
+    {
+      "school_year": "2018-19",
+      "teacher_assignments": "20817",
+      "p25_usd": "44010",
+      "median_usd": "48691",
+      "p75_usd": "55468",
+      "mean_usd": "48264"
+    }
+  ],
+  "not_employed_pool": [
+    {
+      "category": "Taught in NM public schools 2016-2023",
+      "people": "6058",
+      "meaning": "Real NM classroom experience; license still current"
+    },
+    {
+      "category": "  of which last taught 2022 or later",
+      "people": "3095",
+      "meaning": "Recent leavers"
+    },
+    {
+      "category": "Namesake-ambiguous",
+      "people": "760",
+      "meaning": "A panel teacher shares the name; attribution unsafe"
+    },
+    {
+      "category": "Newly licensed 2024+",
+      "people": "2087",
+      "meaning": "Incoming pipeline, not yet hired"
+    },
+    {
+      "category": "No NM public-school teaching record",
+      "people": "5482",
+      "meaning": "Out-of-state / private / never entered"
+    }
+  ]
+}
