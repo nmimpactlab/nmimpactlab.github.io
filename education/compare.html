@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Licensed vs. employed — New Mexico education workforce — New Mexico Impact Lab</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    .wrapC { max-width: 1200px; margin: 0 auto; padding: 24px 20px 70px; }
+    h1 { font-size: clamp(1.4rem,3vw,1.9rem); margin: 0 0 4px; }
+    .intro { color: var(--text-soft); max-width: 70ch; margin: 0 0 20px; font-size: 0.95rem; }
+    h2.sec { font-size: 1.15rem; margin: 34px 0 8px; padding-top: 14px; border-top: 2px solid var(--border); }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; align-items: start; }
+    .colhead { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; position: sticky; top: 0; background: var(--bg); z-index: 5; padding: 10px 0 8px; border-bottom: 2px solid var(--accent); }
+    .colhead .h { font-weight: 800; font-size: 0.95rem; }
+    .colhead .s { color: var(--text-soft); font-size: 0.82rem; }
+    .colhead .everyone { color: var(--accent); } .colhead .employed { color: var(--accent-2); }
+    svg { width: 100%; height: auto; display: block; }
+    .analysis { display: none; border: 1px dashed var(--border); border-radius: 10px; padding: 12px 14px; min-height: 120px; background: var(--bg-soft); font-size: 0.9rem; color: var(--text-soft); }
+    .analysis .lab { text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.68rem; font-weight: 700; color: var(--accent); display: block; margin-bottom: 6px; }
+    @media (max-width: 1080px){ .cols, .colhead { grid-template-columns: 1fr; } .colhead { position: static; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="/"><span class="mark">NM</span> Impact Lab</a>
+      <div class="nav-links"><a href="/articles/">Articles</a><a href="/data/">Data</a><a href="/methodology.html">Methodology</a></div>
+    </nav>
+  </header>
+  <main>
+    <div class="wrapC">
+      <h1>Licensed vs. employed, side by side</h1>
+      <p class="intro">The same breakdowns, in parallel: <strong>everyone who holds a current license</strong> (82,266) on the left, and <strong>only those employed</strong> in New Mexico public education this year (40,148) on the right. Full detail: <a href="/education/breakdown.html">Set 1 (all)</a> &middot; <a href="/education/breakdown-employed.html">Set 2 (employed)</a>.</p>
+
+      <div class="colhead">
+        <div><span class="h everyone">Everyone</span><div class="s">82,266 current license holders</div></div>
+        <div><span class="h employed">Employed only</span><div class="s">40,148 employed in NM public ed</div></div>
+      </div>
+
+      <h2 class="sec">By license type</h2>
+      <div class="cols">
+        <svg id="pie1_all" viewBox="0 0 900 470"></svg>
+        <svg id="pie1_emp" viewBox="0 0 900 470"></svg>
+        <div class="analysis" id="an_pie1"><span class="lab">Analysis</span></div>
+      </div>
+
+      <h2 class="sec">By license level</h2>
+      <div class="cols">
+        <svg id="levelpie_all" viewBox="0 0 900 470"></svg>
+        <svg id="levelpie_emp" viewBox="0 0 900 470"></svg>
+        <div class="analysis" id="an_level"><span class="lab">Analysis</span></div>
+      </div>
+
+      <h2 class="sec">Teachers, by grade band</h2>
+      <div class="cols">
+        <svg id="pie5_all" viewBox="0 0 900 470"></svg>
+        <svg id="pie5_emp" viewBox="0 0 900 470"></svg>
+        <div class="analysis" id="an_pie5"><span class="lab">Analysis</span></div>
+      </div>
+
+      <h2 class="sec">Support-provider specialties</h2>
+      <div class="cols">
+        <svg id="pie2_all" viewBox="0 0 900 470"></svg>
+        <svg id="pie2_emp" viewBox="0 0 900 470"></svg>
+        <div class="analysis" id="an_pie2"><span class="lab">Analysis</span></div>
+      </div>
+
+      <h2 class="sec">Administrators</h2>
+      <div class="cols">
+        <svg id="pie3_all" viewBox="0 0 900 470"></svg>
+        <svg id="pie3_emp" viewBox="0 0 900 470"></svg>
+        <div class="analysis" id="an_pie3"><span class="lab">Analysis</span></div>
+      </div>
+
+      <h2 class="sec">Instructional support providers</h2>
+      <div class="cols">
+        <svg id="pie4_all" viewBox="0 0 900 470"></svg>
+        <svg id="pie4_emp" viewBox="0 0 900 470"></svg>
+        <div class="analysis" id="an_pie4"><span class="lab">Analysis</span></div>
+      </div>
+
+      <h2 class="sec">Teacher endorsements, by subject</h2>
+      <p class="intro" style="margin:2px 0 10px">Each bar counts endorsements, not teachers (a teacher may hold several), so bars aren&rsquo;t additive.</p>
+      <div class="cols">
+        <svg id="endo7_all" viewBox="0 0 900 560"></svg>
+        <svg id="endo7_emp" viewBox="0 0 900 560"></svg>
+        <div class="analysis" id="an_endo"><span class="lab">Analysis</span></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/assets/data/employed.js"></script>
+  <script>
+    var FULL=window.EMP.full, EMP=window.EMP.emp, FS=1.42;
+    function cs(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+    function E(s,a){var e=document.createElementNS('http://www.w3.org/2000/svg',s);for(var k in a)e.setAttribute(k,a[k]);return e;}
+    function nf(n){return Number(n).toLocaleString('en-US');}
+    function V(o,k){return (o&&o[k])||0;}
+    function sortBars(o){return Object.keys(o).map(function(k){return [k,o[k]];}).sort(function(a,b){return b[1]-a[1];});}
+
+    function donut(svgId, data, centerLabel){
+      var svg=document.getElementById(svgId); if(!svg)return; svg.innerHTML='';
+      var total=data.reduce(function(a,d){return a+d[1];},0);
+      var cx=225, cy=235, R=185, r=100, TXT=cs('--text'), SOFT=cs('--text-soft'), BG=cs('--bg');
+      function pt(ang,rad){return [cx+rad*Math.cos(ang), cy+rad*Math.sin(ang)];}
+      var a0=-Math.PI/2;
+      data.forEach(function(d,i){
+        var frac=d[1]/total, a1=a0+frac*2*Math.PI, big=(a1-a0)>Math.PI?1:0;
+        var o0=pt(a0,R),o1=pt(a1,R),i1=pt(a1,r),i0=pt(a0,r);
+        var path='M'+o0[0]+' '+o0[1]+'A'+R+' '+R+' 0 '+big+' 1 '+o1[0]+' '+o1[1]+'L'+i1[0]+' '+i1[1]+'A'+r+' '+r+' 0 '+big+' 0 '+i0[0]+' '+i0[1]+'Z';
+        svg.appendChild(E('path',{d:path,fill:d[2],stroke:BG,'stroke-width':2}));
+        if(frac>0.05){var mid=(a0+a1)/2,lp=pt(mid,(R+r)/2);
+          var t=E('text',{x:lp[0],y:lp[1]+4,fill:'#fff','text-anchor':'middle','font-size':13*FS,'font-weight':700});
+          t.textContent=Math.round(frac*100)+'%';svg.appendChild(t);}
+        a0=a1;
+      });
+      svg.appendChild(E('circle',{cx:cx,cy:cy,r:r-2,fill:BG}));
+      var c1=E('text',{x:cx,y:cy-2,'text-anchor':'middle',fill:TXT,'font-size':26*FS,'font-weight':800});c1.textContent=nf(total);svg.appendChild(c1);
+      var c2=E('text',{x:cx,y:cy+22,'text-anchor':'middle',fill:SOFT,'font-size':12*FS});c2.textContent=centerLabel;svg.appendChild(c2);
+      var lx=480, ly=46, rh=(470-60)/data.length;
+      data.forEach(function(d,i){
+        var y=ly+i*rh;
+        svg.appendChild(E('rect',{x:lx,y:y-13,width:16,height:16,rx:3,fill:d[2]}));
+        var n=E('text',{x:lx+26,y:y,fill:TXT,'font-size':13*FS,'font-weight':600});n.textContent=d[0];svg.appendChild(n);
+        var v=E('text',{x:lx+26,y:y+18,fill:SOFT,'font-size':12*FS});v.textContent=nf(d[1])+'  ·  '+(100*d[1]/total).toFixed(1)+'%';svg.appendChild(v);
+      });
+    }
+    function hbars(svgId, data, H){
+      var svg=document.getElementById(svgId); if(!svg)return; svg.innerHTML='';
+      var W=900, pl=300, pr=84, pt=6, iw=W-pl-pr, TXT=cs('--text'), SOFT=cs('--text-soft');
+      var max=Math.max.apply(null,data.map(function(d){return d[1];})), rh=(H-pt)/data.length, bh=rh*0.62, x=function(v){return Math.max(iw*(v/max),2);};
+      data.forEach(function(d,i){
+        var cy=pt+rh*(i+0.5);
+        var lb=E('text',{x:pl-10,y:cy+4,'text-anchor':'end',fill:TXT,'font-size':12*FS,'font-weight':600});lb.textContent=d[0];svg.appendChild(lb);
+        svg.appendChild(E('rect',{x:pl,y:cy-bh/2,width:x(d[1]),height:bh,rx:2,fill:'#6a8caf'}));
+        var v=E('text',{x:pl+x(d[1])+8,y:cy+4,fill:SOFT,'font-size':11.5*FS});v.textContent=nf(d[1]);svg.appendChild(v);
+      });
+    }
+
+    // builders (dataset -> colored array), reused for both populations
+    var CT={'Teacher only':'#0b4f6c','Support provider only':'#5b7384','Teacher + Support provider':'#3d8ca6',
+      'Teacher + Administrator':'#c1440e','Teacher + Admin + Support':'#e07a3f','Other':'#b8c0c9','Administrator only':'#e9b24a','Administrator + Support':'#9aa7b4'};
+    function bPie1(ds){return ['Teacher only','Support provider only','Teacher + Support provider','Teacher + Administrator','Teacher + Admin + Support','Other','Administrator only','Administrator + Support']
+      .map(function(k){return [k,V(ds.pie1,k),CT[k]];}).filter(function(d){return d[1]>0;}).sort(function(a,b){return b[1]-a[1];});}
+    function bLevel(ds){return [['Level 1 (novice)',V(ds.levelpie,'1'),'#8fb8c9'],['Level 2 (professional)',V(ds.levelpie,'2'),'#3d8ca6'],
+      ['Level 3 (master)',V(ds.levelpie,'3'),'#0b4f6c'],['Pre-Level 1',V(ds.levelpie,'0'),'#c3cbd3']].filter(function(d){return d[1]>0;});}
+    var P5C={'Elementary (K-8)':'#0b4f6c','Secondary (6-12)':'#2a9d8f','All grades (PK-12)':'#c1440e','Multiple grade bands':'#e9b24a','Early Childhood':'#6a8caf','Middle (5-9)':'#8e5a9c'};
+    function bPie5(ds){return sortBars(ds.pie5).map(function(d){return [d[0],d[1],P5C[d[0]]||'#c3cbd3'];});}
+    var P2=['Substitute','Educational assistant','Coach','School nurse / health','Speech-language pathologist','School counselor','Social worker'];
+    var P2C={'Substitute':'#5b7384','Educational assistant':'#7e8b99','Coach':'#a8b2bc','School nurse / health':'#2a9d8f','Speech-language pathologist':'#0b4f6c','School counselor':'#3d8ca6','Social worker':'#c1440e'};
+    function bPie2(ds){var sum=0,arr=P2.map(function(k){sum+=V(ds.pie2,k);return [k,V(ds.pie2,k),P2C[k]];});
+      var tot=Object.keys(ds.pie2).reduce(function(a,k){return a+ds.pie2[k];},0); arr.push(['Other specialists',tot-sum,'#e9b24a']); return arr.filter(function(d){return d[1]>0;});}
+    function bPie3(ds){return [['Teacher + administrator',V(ds.pie3,'Teacher + Administrator'),'#0b4f6c'],['Teacher + admin + support',V(ds.pie3,'Teacher + Admin + Support'),'#3d8ca6'],
+      ['Administrator only',V(ds.pie3,'Administrator only'),'#e9b24a'],['Administrator + support',V(ds.pie3,'Administrator + Support'),'#9aa7b4']].filter(function(d){return d[1]>0;});}
+    var P4C=['#0b4f6c','#2a9d8f','#c1440e','#3d8ca6','#e9b24a','#6a8caf','#8e5a9c','#d98a5b','#5b8c5a','#9aa7b4','#c3cbd3'];
+    function bPie4(ds){return sortBars(ds.pie4).map(function(d,i){return [d[0],d[1],P4C[i]||'#c3cbd3'];});}
+
+    donut('pie1_all', bPie1(FULL), 'licenses'); donut('pie1_emp', bPie1(EMP), 'employed');
+    donut('levelpie_all', bLevel(FULL), 'holders'); donut('levelpie_emp', bLevel(EMP), 'employed');
+    donut('pie5_all', bPie5(FULL), 'teachers'); donut('pie5_emp', bPie5(EMP), 'employed');
+    donut('pie2_all', bPie2(FULL), 'support'); donut('pie2_emp', bPie2(EMP), 'employed');
+    donut('pie3_all', bPie3(FULL), 'admins'); donut('pie3_emp', bPie3(EMP), 'employed');
+    donut('pie4_all', bPie4(FULL), 'specialists'); donut('pie4_emp', bPie4(EMP), 'employed');
+    hbars('endo7_all', sortBars(FULL.endo7), 560); hbars('endo7_emp', sortBars(EMP.endo7), 560);
+  </script>
+</body>
+</html>

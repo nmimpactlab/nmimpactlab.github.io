@@ -148,7 +148,9 @@ section.block { padding: 56px 0; }
 .card .status { font-weight: 600; }
 .status.live { color: #2e7d32; }
 .status.progress { color: var(--accent-2); }
+.status.ongoing { color: var(--accent); }
 .status.planned { color: var(--text-soft); }
+.card .updated { color: var(--text-soft); font-weight: 400; font-size: 0.85em; margin-left: 6px; }
 
 /* Stat strip */
 .stats { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
