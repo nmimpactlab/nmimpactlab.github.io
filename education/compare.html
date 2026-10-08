@@ -18,6 +18,14 @@
     svg { width: 100%; height: auto; display: block; }
     .analysis { display: none; border: 1px dashed var(--border); border-radius: 10px; padding: 12px 14px; min-height: 120px; background: var(--bg-soft); font-size: 0.9rem; color: var(--text-soft); }
     .analysis .lab { text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.68rem; font-weight: 700; color: var(--accent); display: block; margin-bottom: 6px; }
+    .ltgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
+    .ltcard { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+    .ltcard h4 { margin: 0 0 8px; font-size: 0.98rem; }
+    .ltrow { display: grid; grid-template-columns: 64px 1fr 58px; align-items: center; gap: 8px; margin: 5px 0; }
+    .ltlab { font-size: 0.82rem; color: var(--text-soft); }
+    .ltbar { display: flex; height: 20px; border-radius: 4px; overflow: hidden; }
+    .ltbar div { display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10.5px; font-weight: 700; }
+    .ltn { font-size: 0.8rem; color: var(--text-soft); text-align: right; font-variant-numeric: tabular-nums; }
     @media (max-width: 1080px){ .cols, .colhead { grid-template-columns: 1fr; } .colhead { position: static; } }
   </style>
 </head>
@@ -87,6 +95,19 @@
         <svg id="endo7_emp" viewBox="0 0 900 560"></svg>
         <div class="analysis" id="an_endo"><span class="lab">Analysis</span></div>
       </div>
+
+      <h2 class="sec">Of the licensed, how many are <em>not</em> employed?</h2>
+      <p class="intro">Each license type, split into employed (<span style="color:#0b4f6c;font-weight:700">teal</span>) and not currently employed in NM public education (<span style="color:#c1440e;font-weight:700">clay</span>). Overall, <strong>42,118 of the 82,266 licensed (51%) are not employed</strong> in a New Mexico public school this year. Support-only licenses (substitutes, aides) account for most of the gap; teacher-plus-support holders are employed at the highest rate.</p>
+      <svg id="empsplit" viewBox="0 0 980 300" role="img" aria-label="Employed versus not employed, by license type."></svg>
+
+      <h2 class="sec">License level, within each license type</h2>
+      <p class="intro">Each type&rsquo;s level mix (Level 1 novice &rarr; Level 3 master), licensed vs. employed. Administrators are Level 3 by definition; support providers carry the most Level 1.</p>
+      <div style="display:flex;gap:16px;font-size:0.82rem;color:var(--text-soft);margin:2px 0 12px">
+        <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#8fb8c9;vertical-align:middle"></i> Level 1</span>
+        <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#3d8ca6;vertical-align:middle"></i> Level 2</span>
+        <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#0b4f6c;vertical-align:middle"></i> Level 3</span>
+      </div>
+      <div id="leveltypes" class="ltgrid"></div>
     </div>
   </main>
 
@@ -142,11 +163,12 @@
     var CT={'Teacher only':'#0b4f6c','Support provider only':'#5b7384','Teacher + Support provider':'#3d8ca6',
       'Teacher + Administrator':'#c1440e','Teacher + Admin + Support':'#e07a3f','Other':'#b8c0c9','Administrator only':'#e9b24a','Administrator + Support':'#9aa7b4'};
     function bPie1(ds){return ['Teacher only','Support provider only','Teacher + Support provider','Teacher + Administrator','Teacher + Admin + Support','Other','Administrator only','Administrator + Support']
-      .map(function(k){return [k,V(ds.pie1,k),CT[k]];}).filter(function(d){return d[1]>0;}).sort(function(a,b){return b[1]-a[1];});}
+      .map(function(k){return [k,V(ds.pie1,k),CT[k]];}).filter(function(d){return d[1]>0;});}
     function bLevel(ds){return [['Level 1 (novice)',V(ds.levelpie,'1'),'#8fb8c9'],['Level 2 (professional)',V(ds.levelpie,'2'),'#3d8ca6'],
       ['Level 3 (master)',V(ds.levelpie,'3'),'#0b4f6c'],['Pre-Level 1',V(ds.levelpie,'0'),'#c3cbd3']].filter(function(d){return d[1]>0;});}
     var P5C={'Elementary (K-8)':'#0b4f6c','Secondary (6-12)':'#2a9d8f','All grades (PK-12)':'#c1440e','Multiple grade bands':'#e9b24a','Early Childhood':'#6a8caf','Middle (5-9)':'#8e5a9c'};
-    function bPie5(ds){return sortBars(ds.pie5).map(function(d){return [d[0],d[1],P5C[d[0]]||'#c3cbd3'];});}
+    var P5ORDER=['Elementary (K-8)','Secondary (6-12)','All grades (PK-12)','Multiple grade bands','Early Childhood','Middle (5-9)'];
+    function bPie5(ds){return P5ORDER.map(function(k){return [k,V(ds.pie5,k),P5C[k]||'#c3cbd3'];}).filter(function(d){return d[1]>0;});}
     var P2=['Substitute','Educational assistant','Coach','School nurse / health','Speech-language pathologist','School counselor','Social worker'];
     var P2C={'Substitute':'#5b7384','Educational assistant':'#7e8b99','Coach':'#a8b2bc','School nurse / health':'#2a9d8f','Speech-language pathologist':'#0b4f6c','School counselor':'#3d8ca6','Social worker':'#c1440e'};
     function bPie2(ds){var sum=0,arr=P2.map(function(k){sum+=V(ds.pie2,k);return [k,V(ds.pie2,k),P2C[k]];});
@@ -154,7 +176,8 @@
     function bPie3(ds){return [['Teacher + administrator',V(ds.pie3,'Teacher + Administrator'),'#0b4f6c'],['Teacher + admin + support',V(ds.pie3,'Teacher + Admin + Support'),'#3d8ca6'],
       ['Administrator only',V(ds.pie3,'Administrator only'),'#e9b24a'],['Administrator + support',V(ds.pie3,'Administrator + Support'),'#9aa7b4']].filter(function(d){return d[1]>0;});}
     var P4C=['#0b4f6c','#2a9d8f','#c1440e','#3d8ca6','#e9b24a','#6a8caf','#8e5a9c','#d98a5b','#5b8c5a','#9aa7b4','#c3cbd3'];
-    function bPie4(ds){return sortBars(ds.pie4).map(function(d,i){return [d[0],d[1],P4C[i]||'#c3cbd3'];});}
+    var P4ORDER=['School counselor','Speech-language pathologist','Social worker','Educational diagnostician','School nurse','Occupational therapist','School psychologist','Physical therapist','Student success advisor','Interpreter (deaf/blind)','Other'];
+    function bPie4(ds){return P4ORDER.map(function(k,i){return [k,V(ds.pie4,k),P4C[i]||'#c3cbd3'];}).filter(function(d){return d[1]>0;});}
 
     donut('pie1_all', bPie1(FULL), 'licenses'); donut('pie1_emp', bPie1(EMP), 'employed');
     donut('levelpie_all', bLevel(FULL), 'holders'); donut('levelpie_emp', bLevel(EMP), 'employed');
@@ -162,7 +185,44 @@
     donut('pie2_all', bPie2(FULL), 'support'); donut('pie2_emp', bPie2(EMP), 'employed');
     donut('pie3_all', bPie3(FULL), 'admins'); donut('pie3_emp', bPie3(EMP), 'employed');
     donut('pie4_all', bPie4(FULL), 'specialists'); donut('pie4_emp', bPie4(EMP), 'employed');
-    hbars('endo7_all', sortBars(FULL.endo7), 560); hbars('endo7_emp', sortBars(EMP.endo7), 560);
+    var ENDO_ORDER=sortBars(FULL.endo7).map(function(d){return d[0];});
+    function endoOrd(ds){return ENDO_ORDER.map(function(k){return [k,V(ds.endo7,k)];}).filter(function(d){return d[1]>0;});}
+    hbars('endo7_all', endoOrd(FULL), 560); hbars('endo7_emp', endoOrd(EMP), 560);
+
+    // ===== Item 2+4: employed vs. not currently employed, by license type =====
+    function empSplit(svgId, rows){
+      var svg=document.getElementById(svgId); if(!svg)return; svg.innerHTML='';
+      var vb=svg.getAttribute('viewBox').split(' '), W=+vb[2], H=+vb[3], pl=210, pr=168, pt=6, iw=W-pl-pr;
+      var TXT=cs('--text'), SOFT=cs('--text-soft');
+      var max=Math.max.apply(null, rows.map(function(r){return r[1]+r[2];}));
+      var rh=(H-pt)/rows.length, bh=rh*0.56, x=function(v){return iw*(v/max);};
+      rows.forEach(function(r,i){
+        var cy=pt+rh*(i+0.5), emp=r[1], ne=r[2], tot=emp+ne;
+        var lb=E('text',{x:pl-10,y:cy+4,'text-anchor':'end',fill:TXT,'font-size':12.5,'font-weight':600});lb.textContent=r[0];svg.appendChild(lb);
+        svg.appendChild(E('rect',{x:pl,y:cy-bh/2,width:x(emp),height:bh,fill:'#0b4f6c'}));
+        svg.appendChild(E('rect',{x:pl+x(emp),y:cy-bh/2,width:x(ne),height:bh,fill:'#c1440e'}));
+        var v=E('text',{x:pl+x(tot)+8,y:cy+4,fill:SOFT,'font-size':12});
+        v.textContent=nf(ne)+' not employed  ('+Math.round(100*ne/tot)+'%)';svg.appendChild(v);
+      });
+    }
+    var EMPSPLIT_ORDER=['Support provider only','Teacher only','Teacher + Support provider','Teacher + Administrator','Teacher + Admin + Support','Administrator only','Administrator + Support','Other'];
+    empSplit('empsplit', EMPSPLIT_ORDER.map(function(k){var tot=V(FULL.pie1,k),emp=V(EMP.pie1,k);return [k,emp,tot-emp];}).filter(function(r){return r[1]+r[2]>0;}));
+
+    // ===== Item 3: license level, within each license type (all vs employed) =====
+    function levelMini(el, allv, empv){
+      function bar(label, v){
+        var t=v[0]+v[1]+v[2]; if(!t) return '';
+        var seg=[['#8fb8c9',v[0]],['#3d8ca6',v[1]],['#0b4f6c',v[2]]], x=0, s='';
+        seg.forEach(function(g){var w=100*g[1]/t; if(w<=0)return;
+          s+='<div style="width:'+w+'%;background:'+g[0]+'" title="'+nf(g[1])+'">'+(w>=11?Math.round(w)+'%':'')+'</div>'; });
+        return '<div class="ltrow"><span class="ltlab">'+label+'</span><div class="ltbar">'+s+'</div><span class="ltn">'+nf(t)+'</span></div>';
+      }
+      return bar('All', allv)+bar('Employed', empv);
+    }
+    var LT=[['Teacher','TEACHER'],['Support provider','SUPPORT PROVIDER'],['Instructional support','INSTRUCTIONAL SUPPORT PROVIDER'],['Administrator','ADMINISTRATOR']];
+    document.getElementById('leveltypes').innerHTML = LT.map(function(t){
+      return '<div class="ltcard"><h4>'+t[0]+'</h4>'+levelMini(null, FULL.levelmix[t[1]], EMP.levelmix[t[1]])+'</div>';
+    }).join('');
   </script>
 </body>
 </html>
