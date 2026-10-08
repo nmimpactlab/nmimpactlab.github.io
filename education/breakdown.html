@@ -32,11 +32,36 @@
   <main>
     <div class="wrap2">
       <h1>82,266 New Mexico education licenses, by type</h1>
-      <p class="sub">Every person holding a current license, grouped by the combination of license types they hold. Hover a row to isolate its slice.</p>
+      <p class="sub">Every person holding a current license, grouped by the combination of license types they hold. Hover a row to isolate its slice. <a href="/education/methods.html">How this dataset was built &rarr;</a></p>
       <p class="sub" style="background:var(--bg-soft);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;max-width:none">
         <strong>Set 1 of 3 &mdash; the licenses themselves.</strong> This set looks only at who is credentialed in New Mexico and in what. It does <strong>not</strong> account for who is currently employed, or for where these teachers are. Employment comes in the second set; geography in the third.
       </p>
       <svg id="pie1" viewBox="0 0 900 470" role="img" aria-label="Pie of 82,266 current licenses by type combination."></svg>
+
+      <h2>The same 82,266, by license level</h2>
+      <p class="sub">New Mexico licenses sit on a three-step ladder &mdash; Level 1 (novice), Level 2 (professional), Level 3 (master / instructional leader). Nearly half of all holders are at Level 3. Hover a row to isolate its slice.</p>
+      <svg id="levelpie" viewBox="0 0 900 470" role="img" aria-label="Pie of 82,266 license holders by highest level."></svg>
+      <p class="note">Current licensure snapshot. Each person counted once, at the highest level they hold across all their licenses. 25 pre-Level-1 / unspecified holders omitted from the ladder.</p>
+
+      <h2>Level isn&rsquo;t the same ladder for every license type</h2>
+      <p class="sub">The share at each level <em>within</em> each category (each person placed at their highest level in that category). Administrators are Level 3 by definition &mdash; the administrator license is a Level 3-B credential &mdash; so the &ldquo;48% Level 3 overall&rdquo; is partly that. Teachers skew to Levels 2&ndash;3; support providers carry the most Level 1.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;margin:4px 2px 2px;font-size:0.84rem;color:var(--text-soft)">
+        <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#8fb8c9;vertical-align:middle"></i> Level 1 (novice)</span>
+        <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#3d8ca6;vertical-align:middle"></i> Level 2 (professional)</span>
+        <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#0b4f6c;vertical-align:middle"></i> Level 3 (master)</span>
+      </div>
+      <svg id="levelmix" viewBox="0 0 900 250" role="img" aria-label="Level mix within each license category."></svg>
+      <p class="note">Person-level; counts are people holding a license in that category. Bars are normalized to 100% to compare mix across categories of different sizes.</p>
+
+      <h2>New teachers entering, 2021&ndash;2025</h2>
+      <p class="sub">Level 1 is the entry rung, so counting people whose <strong>first</strong> New Mexico teaching license is a Level 1 &mdash; by year &mdash; is the cleanest read on new entrants. New Mexico licenses roughly <strong>1,400&ndash;2,200 new teachers a year</strong>, and the <strong>alternative pathway</strong> (clay) has grown to rival the traditional provisional route &mdash; overtaking it in 2024.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;margin:4px 2px 2px;font-size:0.84rem;color:var(--text-soft)">
+        <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#0b4f6c;vertical-align:middle"></i> Provisional (traditional)</span>
+        <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#c1440e;vertical-align:middle"></i> Alternative pathway</span>
+        <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#8fb8c9;vertical-align:middle"></i> Other entry (standard / one-year / temp)</span>
+      </div>
+      <svg id="entrants" viewBox="0 0 900 340" role="img" aria-label="New teachers entering each year 2021-2025 by licensure pathway."></svg>
+      <p class="note">Counts persons whose <em>earliest</em> teaching license is a Level 1, by issue year. The window is limited to recent years: a Level 1 license advances to Level 2 after about five years and then no longer appears as Level 1, so entrants before ~2021 have aged out of this snapshot. 2025 is partial (lighter bar) &mdash; the data was pulled in July 2025 (latest license date 2025-07-01), before the full 2025&ndash;26 entering cohort was licensed.</p>
 
       <h2>Inside the largest slice: 35,771 support-provider licenses</h2>
       <p class="sub">The biggest group isn't classroom teachers. Four in five hold a substitute, educational-assistant, or coaching license &mdash; not a clinical specialty.</p>
@@ -44,7 +69,7 @@
       <p class="note">Current licensure snapshot. Source: NM PED Current Licensure. Each person counted once; a person holding several support licenses is placed in their most specialized one.</p>
 
       <h2>Which support personnel also hold a teacher or administrator license?</h2>
-      <p class="sub">All 43,612 support-license holders, by specialty. Coaches and counselors are often teachers too; clinical roles almost never are.</p>
+      <p class="sub">All 43,612 support-license holders, by specialty. Many coaches and counselors are teachers too; clinical roles almost never are.</p>
       <div style="display:flex;flex-wrap:wrap;gap:16px;margin:4px 2px 2px;font-size:0.84rem;color:var(--text-soft)">
         <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#0b4f6c;vertical-align:middle"></i> Support only</span>
         <span><i style="display:inline-block;width:13px;height:13px;border-radius:3px;background:#5aa0bd;vertical-align:middle"></i> + teacher</span>
@@ -54,7 +79,7 @@
       <svg id="bars" viewBox="0 0 900 440" role="img" aria-label="Support specialties split by whether the person also holds a teacher or administrator license."></svg>
 
       <h2>The simplest category: 5,390 administrator licenses</h2>
-      <p class="sub">Administrators hold essentially one license type (PK-12 school administrator). New Mexico requires classroom experience to earn it, so effectively all of them taught &mdash; the pie shows how many still carry a <strong>current</strong> teacher license alongside it (<strong>92%</strong>); the rest have let theirs lapse.</p>
+      <p class="sub">Administrators hold essentially one license type (PK-12 school administrator). New Mexico requires classroom experience to earn it, so effectively all of them taught &mdash; the pie shows how many still carry a <strong>current</strong> teacher license alongside it (<strong>92%</strong>); the rest no longer hold a current teacher license.</p>
       <svg id="pie3" viewBox="0 0 900 470" role="img" aria-label="5,390 administrator licenses by what else the person holds."></svg>
 
       <h2>The clinical bench: 7,406 instructional support providers</h2>
@@ -84,11 +109,11 @@
       <svg id="endo7" viewBox="0 0 900 560" role="img" aria-label="Teachers by subject endorsement."></svg>
 
       <h2>Special-education licenses, by subject endorsement</h2>
-      <p class="sub">Of 9,867 special-education license holders, <strong>5,326 carry a subject endorsement</strong> (the rest teach at levels where none is required). These are the subjects they're endorsed in &mdash; overwhelmingly the core academic areas, as expected for special-education teachers at the secondary level. Each bar counts endorsements; a teacher may hold several.</p>
+      <p class="sub">Of 9,867 special-education license holders, <strong>5,326 carry a subject endorsement</strong>; the other 4,541 do not &mdash; no subject endorsement is required at the elementary and early-childhood levels. The bars show the subjects the endorsed holders carry &mdash; overwhelmingly the core academic areas. Each bar counts endorsements; a teacher may hold several.</p>
       <svg id="sped8" viewBox="0 0 900 510" role="img" aria-label="Special-education licenses by subject endorsement."></svg>
 
       <h2>Administrators' teacher endorsements, by subject</h2>
-      <p class="sub">The administrator license carries no endorsement, but 92% of administrators also hold a teacher license. Of the 4,934 who do, <strong>4,161 carry a subject endorsement</strong> &mdash; the subjects they taught before or alongside administration. Each bar counts endorsements; a person may hold several.</p>
+      <p class="sub">The administrator license carries no endorsement, but 92% of administrators also hold a teacher license. Of the 4,934 who do, <strong>4,161 carry a subject endorsement</strong> &mdash; the subjects they are endorsed in. Each bar counts endorsements; a person may hold several.</p>
       <svg id="adm9" viewBox="0 0 900 510" role="img" aria-label="Administrators' teacher endorsements by subject."></svg>
 
       <h2>Endorsements per person</h2>
@@ -136,7 +161,7 @@
       <svg id="laanchor" viewBox="0 0 900 520" role="img" aria-label="Subjects that co-occur with a Language Arts endorsement."></svg>
 
       <h2>Endorsements that almost never stand alone</h2>
-      <p class="sub">For each subject, the share of its holders who also hold at least one other endorsement. Some are essentially always add-ons &mdash; <strong>Information Tech Coordinator, Computer Science, Health, and Gifted Education</strong> are almost never a teacher's only endorsement; they sit on top of a core subject. (Subjects with at least 100 holders; the figure in parentheses is how many hold each.)</p>
+      <p class="sub">For each subject, the share of its holders who also hold at least one other endorsement. Some are essentially always add-ons &mdash; <strong>Information Tech Coordinator, Computer Science, Health, and Gifted Education</strong> are almost never a teacher's only endorsement; they sit on top of another endorsement. (Subjects with at least 100 holders; the figure in parentheses is how many hold each.)</p>
       <svg id="alone12" viewBox="0 0 900 500" role="img" aria-label="Share of each subject's holders who also hold another endorsement."></svg>
 
       <h2>Anchor: Computer Science &mdash; predictable and maybe-unexpected partners</h2>
@@ -147,7 +172,7 @@
       <svg id="cspie2" viewBox="0 0 900 470" role="img" aria-label="Less expected partners of a Computer Science endorsement."></svg>
 
       <h2>Anchor: Health &mdash; what it pairs with</h2>
-      <p class="sub"><strong>1,922 teachers hold a Health endorsement</strong>; just 64 hold it alone. The other 1,858 also hold another subject &mdash; overwhelmingly <strong>Physical Education</strong> (1,232), the classic Health/PE pairing. A teacher endorsed in several appears for each, so bars aren't additive.</p>
+      <p class="sub"><strong>1,922 teachers hold a Health endorsement</strong>; just 64 hold it alone. The other 1,858 also hold another subject &mdash; overwhelmingly <strong>Physical Education</strong> (1,232), the common Health&ndash;PE pairing. A teacher endorsed in several appears for each, so bars aren't additive.</p>
       <svg id="healthanchor" viewBox="0 0 900 480" role="img" aria-label="Subjects that co-occur with a Health endorsement."></svg>
 
       <h2>Anchor: Information Tech Coordinator &mdash; what it pairs with</h2>
@@ -202,6 +227,70 @@
       ['Administrator only',          342, '#e9b24a'],
       ['Administrator + Support',     114, '#9aa7b4']
     ], 'current licenses');
+
+    donut('levelpie', [
+      ['Level 1 (novice)',        17347, '#8fb8c9'],
+      ['Level 2 (professional)',  25671, '#3d8ca6'],
+      ['Level 3 (master)',        39223, '#0b4f6c'],
+      ['Pre-Level 1 / other',        25, '#c3cbd3']
+    ], 'license holders');
+
+    function levelStack(svgId, data){
+      var svg=document.getElementById(svgId), vb=svg.getAttribute('viewBox').split(' ');
+      var W=+vb[2], H=+vb[3], pl=196, pr=54, pt=8, iw=W-pl-pr;
+      var TXT=cs('--text'), SOFT=cs('--text-soft'), cols=['#8fb8c9','#3d8ca6','#0b4f6c'];
+      var rh=(H-pt)/data.length, bh=rh*0.5;
+      data.forEach(function(d,i){
+        var l1=d[1],l2=d[2],l3=d[3], tot=l1+l2+l3, cy=pt+rh*(i+0.5), cx=pl;
+        var lb=E('text',{x:pl-10,y:cy-1,'text-anchor':'end',fill:TXT,'font-size':12.5,'font-weight':600});lb.textContent=d[0];svg.appendChild(lb);
+        var nl=E('text',{x:pl-10,y:cy+14,'text-anchor':'end',fill:SOFT,'font-size':11});nl.textContent=nf(tot);svg.appendChild(nl);
+        [l1,l2,l3].forEach(function(v,j){
+          var w=iw*(v/tot); if(w<=0) return;
+          svg.appendChild(E('rect',{x:cx,y:cy-bh/2,width:w,height:bh,fill:cols[j]}));
+          if(w>30){var t=E('text',{x:cx+w/2,y:cy+4,'text-anchor':'middle',fill:'#fff','font-size':11.5,'font-weight':700});t.textContent=Math.round(100*v/tot)+'%';svg.appendChild(t);}
+          cx+=w;
+        });
+      });
+    }
+    levelStack('levelmix', [
+      ['Teacher',                7144, 18041, 20187],
+      ['Support provider',      11679,  8934, 16075],
+      ['Instructional support',  2212,  2508,  2686],
+      ['Administrator',             2,     0,  5386]
+    ]);
+
+    function entrantCols(svgId, data){
+      var svg=document.getElementById(svgId), vb=svg.getAttribute('viewBox').split(' ');
+      var W=+vb[2], H=+vb[3], padL=48, padR=14, padT=22, padB=48, iw=W-padL-padR, ih=H-padT-padB;
+      var TXT=cs('--text'), SOFT=cs('--text-soft');
+      var max=Math.max.apply(null, data.map(function(d){return d[1]+d[2]+d[3];}));
+      max=Math.ceil(max/500)*500;
+      var gap=iw/data.length, bw=gap*0.54;
+      function y(v){return padT+ih*(1-v/max);}
+      for(var g=0; g<=max; g+=500){
+        svg.appendChild(E('line',{x1:padL,y1:y(g),x2:W-padR,y2:y(g),stroke:cs('--border'),'stroke-width':1}));
+        var gt=E('text',{x:padL-6,y:y(g)+4,'text-anchor':'end',fill:SOFT,'font-size':10.5});gt.textContent=nf(g);svg.appendChild(gt);
+      }
+      data.forEach(function(d,i){
+        var cx=padL+gap*i+gap/2, x=cx-bw/2, total=d[1]+d[2]+d[3], partial=d[4], acc=0;
+        [[d[1],'#0b4f6c'],[d[2],'#c1440e'],[d[3],'#8fb8c9']].forEach(function(s){
+          if(s[0]<=0) return; var h=ih*(s[0]/max);
+          var r=E('rect',{x:x,y:y(acc+s[0]),width:bw,height:h,fill:s[1]});
+          if(partial) r.setAttribute('opacity','0.5');
+          svg.appendChild(r); acc+=s[0];
+        });
+        var tl=E('text',{x:cx,y:y(total)-6,'text-anchor':'middle',fill:TXT,'font-size':12,'font-weight':700});tl.textContent=nf(total);svg.appendChild(tl);
+        var yl=E('text',{x:cx,y:H-26,'text-anchor':'middle',fill:TXT,'font-size':12.5,'font-weight':600});yl.textContent=d[0];svg.appendChild(yl);
+        if(partial){var pt=E('text',{x:cx,y:H-11,'text-anchor':'middle',fill:SOFT,'font-size':10.5});pt.textContent='(partial)';svg.appendChild(pt);}
+      });
+    }
+    entrantCols('entrants', [
+      ['2021', 660, 613, 140, 0],
+      ['2022', 871, 754, 259, 0],
+      ['2023', 864, 757, 399, 0],
+      ['2024', 836, 915, 409, 0],
+      ['2025', 517, 465, 364, 1]
+    ]);
 
     function stackedBars(svgId, data){
       // data rows: [name, supportOnly, teacher, admin, both]

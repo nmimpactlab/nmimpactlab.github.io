@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teacher licensure data — methods &amp; sourcing — New Mexico Impact Lab</title>
+  <meta name="description" content="The datasets, provenance, cleaning, employment definition, and privacy controls behind the New Mexico Impact Lab teacher-licensure database and data stories.">
+  <link rel="canonical" href="https://nmimpactlab.org/education/methods.html">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    article.prose table.src { border-collapse: collapse; width: 100%; margin: 14px 0 6px; font-size: 0.92rem; }
+    article.prose table.src th, article.prose table.src td { padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    article.prose table.src th { color: var(--text-soft); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    article.prose table.src td code { font-size: 0.82rem; word-break: break-word; }
+    article.prose .lede { font-size: 1.05rem; color: var(--text-soft); max-width: 70ch; }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="/"><span class="mark">NM</span> Impact Lab</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+      <div class="nav-links">
+        <a href="/investigations/">Investigations</a>
+        <a href="/articles/">Articles</a>
+        <a href="/data/">Data</a>
+        <a href="/methodology.html">Methodology</a>
+        <a href="/about.html">About</a>
+        <a href="/support.html">Support</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <article class="prose">
+      <h1>Teacher licensure data &mdash; methods &amp; sourcing</h1>
+      <p class="byline">The datasets, where they came from, how they were cleaned, and how individual privacy is protected.</p>
+
+      <p class="lede">This page documents the specific data behind the teacher-licensure database and its breakdowns (<a href="/education/breakdown.html">the licenses themselves</a>, and the employed-workforce set). It follows the site&rsquo;s general <a href="/methodology.html">methodology &amp; sourcing</a> principles; here are the particulars for this dataset.</p>
+
+      <h2>The datasets</h2>
+      <p>Everything here is built from public records produced by the <strong>New Mexico Public Education Department (PED)</strong>. Five extracts are used:</p>
+      <table class="src">
+        <thead><tr><th>Dataset</th><th>Scope</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Current Licensure</strong><br><code>Current Licensure.csv</code></td>
+            <td>178,662 license&times;endorsement rows &rarr; <strong>82,266 people</strong>. Every current New Mexico educator license and the subject endorsements attached to it.</td>
+            <td>The spine of the analysis. Drives the license-type, grade-band, specialty, and endorsement breakdowns.</td>
+          </tr>
+          <tr>
+            <td><strong>2025 EOY Licensed, Employed &amp; Assigned Staff</strong><br><code>Currently Licensed Employed and Assigned Staff 2025 EOY.csv</code></td>
+            <td>92,460 rows &rarr; 82,637 people. End-of-year 2024&ndash;25 snapshot with employer, assigned district and school, demographics, and the PED <code>staffUSI</code> identifier.</td>
+            <td>Employment signal 1 (who an employer is named for).</td>
+          </tr>
+          <tr>
+            <td><strong>2024&ndash;25 Employee Position Directory</strong><br><code>2024-2025 Employee Position Directory.xlsx</code> (PED Sunshine Portal)</td>
+            <td><code>staffUSI</code>-keyed, 40th-day positions. Every active position row carries a school.</td>
+            <td>Employment signal 2 &mdash; the authoritative current-employment source.</td>
+          </tr>
+          <tr>
+            <td><strong>Teacher assignment panel</strong><br>IPRA request <strong>25-384</strong></td>
+            <td>Ten years of assignment history, school years 2016&ndash;2023.</td>
+            <td>Career history: whether a licensed person has taught in New Mexico before, year-over-year retention and exit (churn).</td>
+          </tr>
+          <tr>
+            <td><strong>STARS Salaries for Staff Assignments</strong><br>PED Sunshine Portal (2011&ndash;12 and 2018&ndash;19)</td>
+            <td>Anonymous salary-per-assignment snapshots. These are the only two school years PED has published through the Sunshine Portal; other years were not available when the records were retrieved.</td>
+            <td>Teacher salary distributions.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Where we got them</h2>
+      <p>The ten-year assignment panel was obtained through an <strong>Inspection of Public Records Act request (IPRA 25-384)</strong> to PED. The licensure file, the EOY licensed-staff extract, the position directory, and the STARS salary files are PED&rsquo;s own published extracts and <strong>Sunshine Portal</strong> downloads. All of it is public record. We keep the original, unmodified files so every published figure can be traced back to its source.</p>
+
+      <h2>How we cleaned them</h2>
+      <ul>
+        <li><strong>Normalization.</strong> <code>NULL</code> and empty strings are read as missing; every text column is whitespace-trimmed. Original values are preserved alongside cleaned ones.</li>
+        <li><strong>One row per person.</strong> Records are collapsed to a single row per person, keyed on <strong>certNum</strong> (the license number). A person holding several licenses or endorsements is counted <em>once</em>, so no one is double-counted across the breakdowns.</li>
+        <li><strong>Linking across extracts.</strong> The extracts slice the same people differently. We join on certNum first; but because <strong>24.6%</strong> of assignment-panel rows carry no certNum, we added a name, and name-plus-teacher-license, fallback match &mdash; each link recorded so it can be audited. A certNum-only join would silently drop whole teaching careers.</li>
+        <li><strong>Lifetime licenses.</strong> Identified by the <code>LIFE:</code> license type rather than an expiry-year rule. (An earlier expiry-year heuristic caught only two mistyped rows; keying on the license type gives the true count, 1,422.)</li>
+        <li><strong>Grade bands.</strong> Special Education and Specialty Area credentials authorize all grades (PK&ndash;12), so they are shown as their own category rather than being forced into a single grade band.</li>
+        <li><strong>Specialty vs. endorsement.</strong> A specialty license (its own subject credential) is kept distinct from an endorsement (a subject add-on to a base teaching license). They are never mixed.</li>
+      </ul>
+
+      <h2>How &ldquo;employed&rdquo; is defined</h2>
+      <p>A licensed person is counted as <strong>employed</strong> if the EOY extract names an employer for them <em>or</em> they have an active (no end-date) position row in the authoritative 2024&ndash;25 Position Directory. That yields <strong>40,148</strong> employed, of the 82,266 current license holders.</p>
+      <p>The two signals overlap heavily (the directory lists 37,169 active, the EOY extract names an employer for 38,434). A small group &mdash; 1,806 people &mdash; has an employing district named but no school assignment and no directory row; these are counted as employed, on the basis that PED names an employer for them and the missing school is a data-completeness gap, not evidence of non-employment. In the source data, an assigned district and an assigned school are always populated together, so there is no &ldquo;district listed, school blank&rdquo; assignment bucket &mdash; the only edge case is employer-named-without-assignment.</p>
+
+      <h2>Counting rules</h2>
+      <ul>
+        <li>License-type, grade-band, and support/administrator breakdowns count <strong>people</strong>, each once.</li>
+        <li>Endorsement breakdowns count <strong>endorsements</strong>, not people: one teacher can hold several, so subject bars are <em>not</em> additive and sum to more than the number of teachers. Each such chart says so.</li>
+        <li>Every chart states its base population and denominator so it stands on its own.</li>
+      </ul>
+
+      <h2>Privacy &amp; disclosure control</h2>
+      <p>This is a release of <strong>statewide aggregates only</strong>. No individual teacher is named or published, and almost every published cell counts people in the hundreds or thousands.</p>
+      <ul>
+        <li><strong>No person rows.</strong> Person-level records exist only in an internal file and never leave it.</li>
+        <li><strong>Keyed pseudonyms.</strong> Internally, direct identifiers are replaced by a secret-keyed HMAC-SHA256 pseudonym. Because a license number is publicly enumerable through PED&rsquo;s license lookup, a plain hash could be brute-forced; a secret-keyed code cannot. The key and the pseudonym&harr;identity crosswalk are never published.</li>
+        <li><strong>Small-cell suppression.</strong> Any person-count below five is blanked; any rate is blanked when its numerator or its complement is below five, so neither a tiny group nor a tiny remainder can pin down an individual. District breakdowns are limited to districts with at least 100 staff; employer breakdowns to at least 150.</li>
+        <li><strong>Re-identification scan.</strong> Before release, candidate aggregate schemas are run through a k-anonymity scan, and the release form is chosen on measured risk.</li>
+        <li><strong>No single-institution framing.</strong> Albuquerque Public Schools appears only as one district among roughly 89 &mdash; incidental statewide data, not the subject.</li>
+      </ul>
+
+      <h2>Limits &amp; caveats</h2>
+      <ul>
+        <li>The licensure file is a <strong>current snapshot</strong>. It reflects who is licensed now, not a time series, and renewal cycles mean a &ldquo;licensed&rdquo; count is not the same as an &ldquo;actively teaching&rdquo; count.</li>
+        <li>The <strong>salary</strong> figures cover only the two school years PED has made available through the Sunshine Portal (2011&ndash;12 and 2018&ndash;19). They are point-in-time snapshots, not a continuous series; intervening years were not published.</li>
+        <li>Employment reflects the <strong>2024&ndash;25</strong> school year as captured in the EOY extract and the 40th-day directory.</li>
+        <li>Cross-extract links recovered by name are high-confidence but not certain; ambiguous names are left unlinked rather than guessed.</li>
+      </ul>
+
+      <div class="callout">
+        Verify before you rely: these figures are compiled from public records as a research and finding aid. The official PED record governs. Before using any figure in an official, legal, journalistic, or financial capacity, confirm it against the source.
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <h4>New Mexico Impact Lab</h4>
+          <p style="max-width:340px;margin:0 0 8px;">Public-interest data and accountability for New Mexico.</p>
+          <p style="margin:0;"><a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a></p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="/investigations/">Investigations</a></li>
+            <li><a href="/articles/">Articles</a></li>
+            <li><a href="/data/">Data</a></li>
+            <li><a href="/methodology.html">Methodology &amp; sourcing</a></li>
+            <li><a href="/about.html">About</a></li>
+            <li><a href="/resources.html">Resources</a></li>
+            <li><a href="/support.html">Support</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="disclaimer"><span class="dh">Verify before you rely</span>The data and analysis here are compiled from public records using the New Mexico Impact Lab's own custom-built data tools, and are provided as-is, as a research and finding aid. The original official record always governs: before using any figure, record, or finding in an official, legal, journalistic, or financial capacity, <strong>confirm it against the source document.</strong> This site is not an official record.</div>
+      <div class="footer-bottom">&copy; <span id="year">2026</span> New Mexico Impact Lab. Built on public records.</div>
+    </div>
+  </footer>
+  <script>
+    (function(){var b=document.querySelector('.nav-toggle'),l=document.querySelector('.nav-links');if(b&&l){b.addEventListener('click',function(){var o=l.classList.toggle('open');b.setAttribute('aria-expanded',o?'true':'false');});}var y=document.getElementById('year');if(y){y.textContent=new Date().getFullYear();}})();
+  </script>
+</body>
+</html>
