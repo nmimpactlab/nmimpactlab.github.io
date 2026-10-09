@@ -105,7 +105,6 @@
         <li><strong>Keyed pseudonyms.</strong> Internally, direct identifiers are replaced by a secret-keyed HMAC-SHA256 pseudonym. Because a license number is publicly enumerable through PED&rsquo;s license lookup, a plain hash could be brute-forced; a secret-keyed code cannot. The key and the pseudonym&harr;identity crosswalk are never published.</li>
         <li><strong>Small-cell suppression.</strong> Any person-count below five is blanked; any rate is blanked when its numerator or its complement is below five, so neither a tiny group nor a tiny remainder can pin down an individual. District breakdowns are limited to districts with at least 100 staff; employer breakdowns to at least 150.</li>
         <li><strong>Re-identification scan.</strong> Before release, candidate aggregate schemas are run through a k-anonymity scan, and the release form is chosen on measured risk.</li>
-        <li><strong>No single-institution framing.</strong> Albuquerque Public Schools appears only as one district among roughly 89 &mdash; incidental statewide data, not the subject.</li>
       </ul>
 
       <h2>Limits &amp; caveats</h2>
