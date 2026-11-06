@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sources &amp; gaps &mdash; New Mexico Impact Lab</title>
+  <meta name="description" content="Per dataset: where the records came from, how they were obtained, what period they really cover, what is missing from New Mexico's public record and why, what had to be reconciled, and what not to conclude.">
+  <link rel="canonical" href="https://nmimpactlab.org/sources.html">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    article.prose table.src { border-collapse: collapse; width: 100%; margin: 14px 0 6px; font-size: 0.92rem; }
+    article.prose table.src th, article.prose table.src td { padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    article.prose table.src th { color: var(--text-soft); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    article.prose table.src td code { font-size: 0.82rem; word-break: break-word; }
+    article.prose .lede { font-size: 1.05rem; color: var(--text-soft); max-width: 70ch; }
+    article.prose .ds { border-top: 2px solid var(--border); margin-top: 48px; padding-top: 4px; }
+    article.prose h3.q { margin: 24px 0 6px; font-size: 1.02rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em; }
+    article.prose .nope { border-left: 3px solid var(--accent-2); padding: 2px 0 2px 16px; margin: 16px 0; }
+    article.prose .toc { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin: 28px 0 8px; }
+    article.prose .toc ul { margin: 6px 0 0; padding-left: 20px; }
+    article.prose .toc li { font-size: 0.98rem; margin: 3px 0; }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="/"><span class="mark">NM</span> Impact Lab</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+      <div class="nav-links">
+        <a href="/investigations/">Investigations</a>
+        <a href="/articles/">Articles</a>
+        <a href="/education/">Education</a>
+        <a href="/data/">Data</a>
+        <a href="/methodology.html">Methodology</a>
+        <a href="/sources.html">Sources</a>
+        <a href="/about.html">About</a>
+        <a href="/support.html">Support</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <article class="prose">
+      <h1>Sources &amp; gaps</h1>
+      <p class="byline">What each dataset is, where it came from, and what is missing from the record it was built out of.</p>
+
+      <p class="lede">Every dataset on this site has holes in it, and the holes are not accidents of our making. New Mexico keeps its public records in systems that get replaced without migration, that tag some years and not others, that publish two school years out of fifteen, and that in two cases post a rule forbidding anyone from collecting in bulk what they have put on the open web. Those are findings. A reader who knows where a dataset stops knows something about the state, so this page documents the stops as carefully as the contents.</p>
+
+      <p>For each dataset below: the source and how it was obtained, the period it actually covers, what is missing and why, what had to be reconciled before anything could be counted, and what the data will not support. The general principles are on <a href="/methodology.html">methodology &amp; sourcing</a>.</p>
+
+      <div class="toc">
+        <strong>On this page</strong>
+        <ul>
+          <li><a href="#bills">Bills, votes &amp; the legislative record</a></li>
+          <li><a href="#lobbying">Lobbyists &amp; employers</a></li>
+          <li><a href="#campaign-finance">Campaign finance</a></li>
+          <li><a href="#school-network">The public-education lobbying network</a></li>
+          <li><a href="#crosswalk">Organizations across records, and the connection maps</a></li>
+          <li><a href="#licensure">Teacher licensure</a></li>
+          <li><a href="#unusable">Records we could not collect, and why</a></li>
+          <li><a href="#figures">Figures on this page</a></li>
+        </ul>
+      </div>
+
+      <!-- ============================= BILLS ============================= -->
+      <h2 id="bills" class="ds">Bills, votes &amp; the legislative record</h2>
+      <p><a href="/bills/">Search the bills</a> &middot; 48,533 bills &middot; 56 sessions &middot; 1996 to 2026</p>
+
+      <h3 class="q">Source and how it was obtained</h3>
+      <p>The Legislature's own public bill records at nmlegis.gov: bill number, session, chamber and bill type, official title, status as the Legislature records it, the committees a bill was referred to and reported out of, listed sponsors in filed order, and roll-call vote events. Pages were retrieved programmatically at a polite rate. The site's robots file disallows only its <code>.axd</code> endpoints, which were not touched; bill pages are not restricted. That file was checked on 9 July 2026.</p>
+
+      <h3 class="q">What it actually covers</h3>
+      <table class="src">
+        <thead><tr><th>Field</th><th>Coverage</th></tr></thead>
+        <tbody>
+          <tr><td>Bills</td><td>48,533, every one with a session, year, chamber, title and status</td></tr>
+          <tr><td>Sponsors</td><td>48,437 bills (99.8%) carry at least one listed sponsor; 96 carry none</td></tr>
+          <tr><td>Committee path and actions</td><td>43,521 bills (89.7%); 5,012 bills have no action rows at all</td></tr>
+          <tr><td>Roll-call votes</td><td>8,187 bills (16.9%), across 11,427 vote events</td></tr>
+          <tr><td>Official vote sheets</td><td>all 11,427 vote events link to the Legislature's own PDF</td></tr>
+          <tr><td>Full-text link</td><td>47,417 bills (97.7%)</td></tr>
+          <tr><td>Topic tags</td><td>32,786 bills (67.6%), from 41 topics</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="q">What is missing, and why</h3>
+      <ul>
+        <li><strong>1,116 bills have no link to their own text.</strong> They are the bills of special and extraordinary sessions, and nmlegis.gov addresses those by a different URL scheme than the regular sessions. The bill, its sponsors and its actions are all here; only the deep link out is not.</li>
+        <li><strong>Four bills in five carry no roll-call vote.</strong> Most never reached a vote: 29,701 bills in this set (61.2%) are recorded as having died. But the published record also carries a vote sheet for some votes and not others, so a bill with no vote event here is not proof that no vote was taken.</li>
+        <li><strong>A third of bills carry no topic tag.</strong> Topics are matched against the bill's title, and a title like &ldquo;Relating to public finance&rdquo; gives a keyword matcher nothing to work with. The Legislature does not publish a subject classification, so there is nothing authoritative to fall back on.</li>
+        <li><strong>Committee votes are thinner than floor votes</strong>, because committee votes are published less consistently.</li>
+      </ul>
+
+      <h3 class="q">What had to be reconciled</h3>
+      <ul>
+        <li>Roll-call PDF links arrive with trailing characters and repeated host fragments; any link that does not resolve to an <code>nmlegis.gov</code> address is dropped rather than repaired, so a link that is present is a link that works.</li>
+        <li>The status field holds the Legislature's own value, and there are 56 distinct ones. Some name an outcome (died, chaptered, signed, vetoed, pocket veto). Others name the committee where the bill stopped. Grouping by status means deciding which kind you have.</li>
+        <li>Topic tags are ours, not the Legislature's. They are a finding aid for grouping bills, and a bill can hold several.</li>
+      </ul>
+
+      <div class="nope">
+        <h3 class="q" style="margin-top:0">What not to conclude</h3>
+        <p>That a bill with no recorded vote was never voted on. That a bill with no topic tag is about nothing. That the count of bills in a session measures legislative output: a session's bills include memorials and resolutions alongside bills that would change the law, and the chamber field is what tells them apart.</p>
+      </div>
+
+      <!-- ============================= LOBBYING ============================= -->
+      <h2 id="lobbying" class="ds">Lobbyists &amp; employers</h2>
+      <p><a href="/lobbying/">Search the registrations</a> &middot; 6,244 relationships &middot; 2,701 lobbyists &middot; 2,442 employers &middot; 2013 to 2026</p>
+
+      <h3 class="q">Source and how it was obtained</h3>
+      <p>Two state exports, because there are two systems. New Mexico's former lobbyist registration index covers 2013 to 2020. The Secretary of State's current registration export covers 2021 to 2026. The state replaced the system in between and did not carry identifiers across: the current export gives every lobbyist an ID, the former one has no ID at all, and the two spell names differently (one has separate first and last name columns, the other a single &ldquo;Last, First&rdquo; field). A lobbyist who worked both sides of 2020 therefore had to be matched by name, not by key. 738 of the 6,244 relationships here span that break.</p>
+
+      <h3 class="q">What it actually covers</h3>
+      <p>One row per lobbyist-employer pair, with the years that pair was registered, the employer's city and state, and the employer's industry sector where the state assigned one. Registrations per year, as the pairs span them:</p>
+      <table class="src">
+        <thead><tr><th>Year</th><th>Relationships</th><th>Year</th><th>Relationships</th></tr></thead>
+        <tbody>
+          <tr><td>2013</td><td>1,455</td><td>2020</td><td>1,500</td></tr>
+          <tr><td>2014</td><td>2,062</td><td>2021</td><td>849</td></tr>
+          <tr><td>2015</td><td>1,532</td><td>2022</td><td>1,032</td></tr>
+          <tr><td>2016</td><td>1,350</td><td>2023</td><td>2,025</td></tr>
+          <tr><td>2017</td><td>1,448</td><td>2024</td><td>1,873</td></tr>
+          <tr><td>2018</td><td>1,419</td><td>2025</td><td>1,802</td></tr>
+          <tr><td>2019</td><td>1,664</td><td>2026</td><td>1,660</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="q">What is missing, and why</h3>
+      <ul>
+        <li><strong>Industry sector covers 3,780 of 6,244 relationships (60.5%), and the gap is almost entirely on one side of 2020.</strong> The sector comes from the state's separate employer business-interest export, and that export only reaches back a few years. Relationships that begin in 2021 or later have a sector 97.2% of the time (1,833 of 1,886). Relationships that begin in 2020 or earlier have one 44.7% of the time (1,947 of 4,358). An employer with no sector is an employer the state's recent export does not list. It is not an employer with no industry.</li>
+        <li><strong>Nothing before 2013.</strong> That is where the state's exports start.</li>
+        <li><strong>No money.</strong> A New Mexico lobbyist registration names the lobbyist, the employer and the year. It does not carry what the employer paid, what was lobbied, or whether anything was lobbied at all. Expenditure reports are filed separately and are not in this dataset.</li>
+        <li><strong>No per-record filing link.</strong> The state's exports do not include one, so neither does this.</li>
+        <li><strong>57 relationships have no employer city or state</strong>, because the address field they are parsed from was blank or unparseable in the filing.</li>
+        <li><strong>Personal contact details are removed by us, deliberately.</strong> The state's registration export carries lobbyist email addresses, phone numbers and permanent home addresses. None of it is published here, and none of it is in the published file. What is published is the registration fact: name, employer, employer city and state, years.</li>
+      </ul>
+
+      <h3 class="q">What had to be reconciled</h3>
+      <p>The same organization is spelled several ways across the two systems and often within one of them, so employers are compared on a normalized key: upper-cased, punctuation removed, <code>NM</code> expanded to <code>NEW MEXICO</code>, corporate suffixes and filler words dropped. Two decisions inside that are worth stating, because they change counts:</p>
+      <ul>
+        <li><strong>A national body and its New Mexico chapter are counted as one employer.</strong> The key strips &ldquo;New Mexico&rdquo; entirely, on the reasoning that in a New Mexico registry the two are the same registrant. If you need the chapter separate from the parent, this dataset will not give it to you.</li>
+        <li><strong>Numbers inside a name are kept, so numbered locals stay distinct.</strong> A union local registered as &ldquo;IAFF 244&rdquo; does not merge into &ldquo;IAFF&rdquo;, and &ldquo;District 16&rdquo; does not merge into &ldquo;District&rdquo;. An earlier, more aggressive rule dropped digits and did merge them, which collapsed genuinely separate bargaining units into one employer and inflated that employer's lobbyist count. The current rule was checked against the full employer set: it produces 77 groups of names that collapse together, and all 77 were reviewed as the same entity.</li>
+        <li><strong>Lobbyists are matched on first and last name, with middle names dropped.</strong> Two different lobbyists with the same first and last name would be counted as one person. Where a lobbyist's surname changed, the link is asserted by hand and recorded in an internal file with the specific records that establish it, rather than guessed by the matcher.</li>
+      </ul>
+
+      <div class="nope">
+        <h3 class="q" style="margin-top:0">What not to conclude</h3>
+        <p>That the year-to-year numbers above measure lobbying activity. The 2020 to 2021 step is where one state system ends and another begins, and a drop across that line says more about the migration than about the Legislature. That an employer's sector being blank means anything. That a registration means a lobbyist was paid, or appeared, or was effective: it means they registered.</p>
+      </div>
+
+      <!-- ============================= CAMPAIGN FINANCE ============================= -->
+      <h2 id="campaign-finance" class="ds">Campaign finance</h2>
+      <p><a href="/campaign-finance/">Explore the money</a> &middot; $248.9M raised &middot; $212.8M spent &middot; 2,709 recipients &middot; 2020 to 2026</p>
+
+      <h3 class="q">Source and how it was obtained</h3>
+      <p>The Secretary of State's campaign-finance disclosure system, downloaded as its annual contribution and expenditure exports for 2020 through 2026 (the <code>CON_</code> and <code>EXP_</code> files). 1,062,570 contribution rows and 390,559 expenditure rows.</p>
+
+      <h3 class="q">What it actually covers</h3>
+      <table class="src">
+        <thead><tr><th>Year</th><th>Raised</th><th>Spent</th><th>Contributions</th><th>Expenditures</th></tr></thead>
+        <tbody>
+          <tr><td>2020</td><td>$23.8M</td><td>$26.2M</td><td>85,844</td><td>42,283</td></tr>
+          <tr><td>2021</td><td>$21.0M</td><td>$10.4M</td><td>82,542</td><td>27,636</td></tr>
+          <tr><td>2022</td><td>$93.6M</td><td>$84.7M</td><td>213,647</td><td>83,560</td></tr>
+          <tr><td>2023</td><td>$17.0M</td><td>$8.8M</td><td>64,339</td><td>19,518</td></tr>
+          <tr><td>2024</td><td>$39.8M</td><td>$37.4M</td><td>104,822</td><td>46,488</td></tr>
+          <tr><td>2025</td><td>$27.5M</td><td>$20.3M</td><td>340,000</td><td>153,908</td></tr>
+          <tr><td>2026</td><td>$26.2M</td><td>$25.1M</td><td>171,376</td><td>17,166</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="q">What is missing, and why</h3>
+      <ul>
+        <li><strong>Individual donors have no names here, by design.</strong> Every contribution from an individual is attributed to an opaque ID instead. Names, street addresses and occupations are never written to the published files. Organizational donors (PACs, businesses, unions, candidate committees) and recipients are named, because they are public actors rather than private people. The rule behind this is patterns, not individuals.</li>
+        <li><strong>2026 is a partial year.</strong> The cycle was still running when this snapshot was built, and committees were still filing.</li>
+        <li><strong>No per-record link to a filing.</strong> The state's exports identify the recipient committee but do not carry a reference to the report a row came from. To read the filing itself, look the recipient up in the state's system.</li>
+        <li><strong>Amended reports are not reconciled.</strong> Every row in the state's export is counted once, as filed. Where a committee later amended a report, both the figure as filed and the amendment are in the state's data and this dataset does not attempt to tell them apart.</li>
+        <li><strong>Employer is often not an employer.</strong> The state's export carries, in the contributor employer field, entries like &ldquo;best efforts&rdquo;, &ldquo;information requested&rdquo;, &ldquo;not provided&rdquo; and &ldquo;unknown&rdquo;. These are a filer's account of having tried, not a place of work, and they are dropped from the employer rankings rather than ranked as employers.</li>
+        <li><strong>Some contributions carry no usable contributor type.</strong> The type comes from the filing, and the data as filed includes an &ldquo;unknown&rdquo; category holding $501,489, plus a handful of rows with a stray numeric code.</li>
+      </ul>
+
+      <h3 class="q">What had to be reconciled</h3>
+      <ul>
+        <li><strong>The individual-donor ID is built from name, city and state.</strong> That has two consequences worth knowing before you count donors. Two different people with the same name in the same city become one ID. One person who moves between cities becomes two. So 256,560 is a count of donor identities in the filings, not a count of New Mexicans who gave.</li>
+        <li><strong>Organizational donor names are kept as filed, apart from case.</strong> Unlike the lobbying employers, they are not normalized, so a committee that files under two spellings appears twice in the donor rankings. That is deliberate: the name in a filing is itself a fact about the filing, and merging donor names would silently move money between entities.</li>
+        <li><strong>Employers are bucketed where the field is a status rather than a name:</strong> retired, self-employed, not employed and homemaker are each collapsed to one bucket, and a short list of acronyms the filings use interchangeably (UNM, NMSU, PNM, State of NM) is expanded.</li>
+        <li><strong>Candidate-type donors are keyed on the full name</strong>, so two politicians who share a surname do not merge.</li>
+      </ul>
+
+      <div class="nope">
+        <h3 class="q" style="margin-top:0">What not to conclude</h3>
+        <p>That $248.9M is the amount of money in New Mexico politics. It is the sum of what was reported, and it counts the same dollar more than once when it moves between committees: contributions from political committees ($32.4M), from candidates and officeholders ($14.8M) and from lobbying organizations ($5.0M) are all in that total, and a transfer from one committee to another is a contribution to the second. Totals across committees are therefore not additive in the way a single committee's total is. Also not to be concluded: that a donor ID is a person, or that the employer rankings measure which employers' staff give, since the employer is whatever the donor wrote down.</p>
+      </div>
+
+      <!-- ============================= SCHOOL NETWORK ============================= -->
+      <h2 id="school-network" class="ds">The public-education lobbying network</h2>
+      <p><a href="/investigations/school-lobbying-network.html">Open the map</a> &middot; 205 education employers &middot; 417 lobbyists &middot; 648 relationships</p>
+
+      <h3 class="q">Source and how it was built</h3>
+      <p>Derived entirely from the lobbying registrations above, so every gap in that section applies here too. Education employers are picked out by the state's own &ldquo;Education&rdquo; business-interest tag where it exists, and by name matching where it does not.</p>
+
+      <h3 class="q">What is missing, and why</h3>
+      <ul>
+        <li><strong>Before 2021, an education employer is in the map only if its name says so.</strong> The state's sector tagging is thin for the older years (see above), so the fallback is a name match on words like school, educat, teacher, charter, academy, NEA, superintendent, principal, preparatory and montessori. An older education employer whose name contains none of those is not on the map.</li>
+        <li><strong>Higher education is excluded on purpose.</strong> Universities and colleges are filtered out by name, as are child care and early-childhood groups, driving schools, beauty and cosmetology schools, real estate schools, and ophthalmology (which matches &ldquo;ophthal&rdquo; rather than anything educational). This is a K-12 and education-advocacy map.</li>
+        <li><strong>The categories in the legend are name-pattern guesses, not the state's classification.</strong> District (17), Charter or school (54), Association or union (23), State school (5), Education nonprofit (106). &ldquo;Education nonprofit&rdquo; is the fallback bucket, which is why it is the largest: it holds every education employer whose name did not match a more specific pattern.</li>
+      </ul>
+
+      <div class="nope">
+        <h3 class="q" style="margin-top:0">What not to conclude</h3>
+        <p>That a node's position means anything. The layout is a force-directed arrangement from a fixed starting seed, so it is reproducible but carries no information beyond which entities connect to which. That the map is the whole of education lobbying in New Mexico: it is the registrations the state tagged or whose names matched.</p>
+      </div>
+
+      <!-- ============================= CROSSWALK ============================= -->
+      <h2 id="crosswalk" class="ds">Organizations across records, and the connection maps</h2>
+      <p><a href="/organizations/">Organizations</a> &middot; <a href="/connections/">Connection search</a> &middot; <a href="/investigations/influence-network.html">Influence network</a> &middot; 900 organizations in two or more sources &middot; 9,121 entities, 15,471 links</p>
+
+      <h3 class="q">Source and how it was built</h3>
+      <p>Four record sets crossed against each other: the IRS Exempt Organizations Business Master File, New Mexico extract; the lobbyist registrations; the campaign-finance contributions and expenditures; and the education network above. An organization appears in the crosswalk when it is found in two or more of them.</p>
+
+      <h3 class="q">What had to be reconciled, and the rule that governs it</h3>
+      <p>This is the one place on the site where we assert that two records are the same organization, so the evidence rule was set by measurement rather than assumption. A shared address proves affiliation, not identity. In these records, 35 different lobbyists share a single address, 21 share a single email address, and one nonprofit street address hosts 17 unrelated organizations, because registered agents, accountants and attorneys sit at the other end of those fields. Therefore:</p>
+      <ul>
+        <li>An identity match is proposed by name only.</li>
+        <li>A shared address may corroborate a name match. It can never create one.</li>
+        <li>Any address with four or more distinct organizations on it is treated as a shared-service address and is barred from corroborating identity, though it is still reported as an affiliation.</li>
+        <li>The address, email and phone values themselves are never published, and no individual officers are named. The public file carries organization names, which record sets each appears in, a confidence tier, and a plain-language account of how the match was established.</li>
+      </ul>
+
+      <div class="nope">
+        <h3 class="q" style="margin-top:0">What not to conclude</h3>
+        <p>That an affiliation link means a relationship between two organizations. It means they share a registered contact point, which very often means they share an accountant, an attorney or a registered agent. The network is also extremely sparse: most of the 9,121 entities have exactly one connection, so a dense-looking cluster is a property of the few hubs, not of the whole.</p>
+      </div>
+
+      <!-- ============================= LICENSURE ============================= -->
+      <h2 id="licensure" class="ds">Teacher licensure</h2>
+      <p>The licensure datasets have their own, longer provenance page, because the privacy handling there is more involved: <a href="/education/methods.html">teacher licensure data, methods &amp; sourcing</a>. It names each of the five Public Education Department extracts, the IPRA request behind the ten-year assignment panel, how &ldquo;employed&rdquo; is defined and what it costs, the small-cell suppression rules, and the limits.</p>
+      <p>One gap from that page belongs here as well, because it is a fact about the state rather than about the dataset: New Mexico has published teacher salary data through its Sunshine Portal for two school years, 2011-12 and 2018-19. There is no continuous series to analyze because the state has not published one.</p>
+
+      <!-- ============================= UNUSABLE ============================= -->
+      <h2 id="unusable" class="ds">Records we could not collect, and why</h2>
+      <p>Two New Mexico sources hold public-proceeding records on the open web and post a rule against collecting them automatically. A person may read every page. No automated agent may read any. Both robots files were retrieved and read on 9 July 2026.</p>
+      <ul>
+        <li><strong>The Legislature's recordings portal.</strong> Floor sessions and committee hearings are streamed and archived on a third-party video host, and that host's robots file is a blanket <code>Disallow: /</code> for every user agent, across the whole site. The consequence is that there is no searchable index of New Mexico legislative hearings on this site, and no transcripts. The facts of what is said in a public hearing are public and not copyrightable; the obstacle is the collection method the host permits. We link to the official video pages instead. A hearing index would have to be built from the record obtained through a channel that allows it, such as the Legislative Council Service.</li>
+        <li><strong>Board-packet portals.</strong> Several New Mexico public bodies publish their board agendas, minutes and attached financial documents through a hosted board-meeting portal product rather than on their own website. The portal's robots file is the most restrictive of any source examined for this site: a blanket disallow for the catch-all agent, a named blocklist of common collection tools, and only six search engines permitted at all, each of which is separately barred from the document-storage path where the PDFs actually sit, with a two-minute crawl delay. No user agent is permitted to collect the documents. Board packets are public records under the Open Meetings Act; they are simply not obtainable in bulk from where the body chose to put them. The clean route is the records custodian: the body's own website, or a records request to the body.</li>
+      </ul>
+      <p>Both cases are the same shape, and it is worth naming: a New Mexico public body satisfies its publication duty by putting a record on a host that forbids anyone from gathering it. The record is public and unusable at the same time.</p>
+
+      <!-- ============================= FIGURES ============================= -->
+      <h2 id="figures" class="ds">Figures on this page</h2>
+      <p>Every count and percentage above was taken from the published data files that this site serves, as of 5 November 2026, and every percentage states its denominator. Counts change when a dataset is refreshed. Where a figure here disagrees with a figure in an article, the article was written against an earlier build and this page is the later one.</p>
+      <p>Corrections are welcome and wanted: <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a>.</p>
+
+      <div class="callout">
+        Verify before you rely: the figures and records here are compiled from public records as a research and finding aid. The original official record always governs. Before using any figure, record or finding in an official, legal, journalistic or financial capacity, confirm it against the source document. This site is not an official record.
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <h4>New Mexico Impact Lab</h4>
+          <p style="max-width:340px;margin:0 0 8px;">Public-interest data and accountability for New Mexico.</p>
+          <p style="margin:0;"><a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a></p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="/investigations/">Investigations</a></li>
+            <li><a href="/articles/">Articles</a></li>
+            <li><a href="/data/">Data</a></li>
+            <li><a href="/methodology.html">Methodology &amp; sourcing</a></li>
+            <li><a href="/sources.html">Sources &amp; gaps</a></li>
+            <li><a href="/about.html">About</a></li>
+            <li><a href="/resources.html">Resources</a></li>
+            <li><a href="/support.html">Support</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="disclaimer"><span class="dh">Verify before you rely</span>The data and analysis here are compiled from public records using the New Mexico Impact Lab's own custom-built data tools, and are provided as-is, as a research and finding aid. The original official record always governs: before using any figure, record, or finding in an official, legal, journalistic, or financial capacity, <strong>confirm it against the source document.</strong> This site is not an official record.</div>
+      <div class="footer-bottom">&copy; <span id="year">2026</span> New Mexico Impact Lab. Built on public records.</div>
+    </div>
+  </footer>
+  <script>
+    (function(){var b=document.querySelector('.nav-toggle'),l=document.querySelector('.nav-links');if(b&&l){b.addEventListener('click',function(){var o=l.classList.toggle('open');b.setAttribute('aria-expanded',o?'true':'false');});}var y=document.getElementById('year');if(y){y.textContent=new Date().getFullYear();}})();
+  </script>
+</body>
+</html>
