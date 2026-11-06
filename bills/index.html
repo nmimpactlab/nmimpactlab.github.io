@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Search New Mexico Bills — New Mexico Impact Lab</title>
+  <title>Search New Mexico Bills | New Mexico Impact Lab</title>
   <meta name="description" content="Search 48,000+ New Mexico legislative bills (1996–2026) by keyword, sponsor, year, and chamber. Built from public nmlegis.gov records.">
   <link rel="canonical" href="https://nmimpactlab.org/bills/">
   <link rel="stylesheet" href="/assets/css/style.css">
@@ -85,7 +85,7 @@
     <div class="tool">
       <p><a href="/investigations/legislation.html">&larr; Bills, Votes &amp; the Record</a></p>
       <h1>Search New Mexico bills</h1>
-      <p class="sub">Every bill in the New Mexico Legislature's public record, 1996&ndash;2026 &mdash; searchable by keyword, sponsor, year, and chamber.</p>
+      <p class="sub">Every bill in the New Mexico Legislature's public record, 1996&ndash;2026: searchable by keyword, sponsor, year, and chamber.</p>
 
       <div class="controls">
         <div class="field">
@@ -147,7 +147,7 @@
         <button id="next" disabled>Next &rarr;</button>
       </div>
 
-      <p class="srcnote">Source: New Mexico Legislature public bill records (nmlegis.gov). These are facts compiled from the public record with the Lab's custom-built data tools and provided as a research aid; the official record governs &mdash; verify against the source before relying on any entry, and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+      <p class="srcnote">Source: New Mexico Legislature public bill records (nmlegis.gov). These are facts compiled from the public record with the Lab's custom-built data tools and provided as a research aid; the official record governs; verify against the source before relying on any entry, and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
     </div>
   </main>
 
@@ -343,7 +343,7 @@
       return lines;
     }
     function saveCSV(filename, headerCols, dataRows, sourceDesc, dict) {
-      if (!dataRows.length) { alert('No rows to download — adjust your search first.'); return; }
+      if (!dataRows.length) { alert('No rows to download; adjust your search first.'); return; }
       var lines = provenance(sourceDesc, dict);
       lines.push(headerCols.map(csvCell).join(','));
       for (var i = 0; i < dataRows.length; i++) lines.push(dataRows[i].map(csvCell).join(','));

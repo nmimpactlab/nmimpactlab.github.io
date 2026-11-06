@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>New Mexico influence network — New Mexico Impact Lab</title>
+  <title>New Mexico influence network | New Mexico Impact Lab</title>
   <meta name="description" content="A statewide map of how New Mexico's lobbyists, the industries they represent, campaign donors, candidate and PAC committees, and nonprofits connect. Search an entity, follow its connections, and export what you find.">
   <link rel="canonical" href="https://nmimpactlab.org/investigations/influence-network.html">
   <link rel="stylesheet" href="/assets/css/style.css">
@@ -84,8 +84,8 @@
     <div class="maptool">
       <p><a href="/data/">&larr; Data</a></p>
       <h1>New Mexico's influence network</h1>
-      <p class="sub">How New Mexico's lobbyists, the industries they represent, campaign donors, candidate and PAC committees, and nonprofits connect &mdash; through shared lobbyists, shared donations, and shared registered contacts. <strong>Search an entity to isolate it and its direct connections</strong>, then click any connection to open up <em>its</em> connections, one step at a time. Export whatever you trace.</p>
-      <p class="coverage"><strong>Showing the connected core &mdash; entities with 2 or more links (~3,700 of ~9,100).</strong> Single-link entities and any pair of entities can be traced in the <a href="/connections/">connection search</a>. A shared lobbyist, donor, or registered contact shows a relationship, not coordination or wrongdoing. Use the legend to filter by type; use the year sliders (lobbying links only).</p>
+      <p class="sub">How New Mexico's lobbyists, the industries they represent, campaign donors, candidate and PAC committees, and nonprofits connect: through shared lobbyists, shared donations, and shared registered contacts. <strong>Search an entity to isolate it and its direct connections</strong>, then click any connection to open up <em>its</em> connections, one step at a time. Export whatever you trace.</p>
+      <p class="coverage"><strong>Showing the connected core: entities with 2 or more links (~3,700 of ~9,100).</strong> Single-link entities and any pair of entities can be traced in the <a href="/connections/">connection search</a>. A shared lobbyist, donor, or registered contact shows a relationship, not coordination or wrongdoing. Use the legend to filter by type; use the year sliders (lobbying links only).</p>
 
       <div class="mapcontrols">
         <div class="searchwrap">
@@ -124,7 +124,7 @@
         <div class="panel" id="panel"></div>
       </div>
 
-      <p class="srcnote">Sources: New Mexico lobbyist registrations (2013&ndash;2026), New Mexico campaign finance (organizational donors only; individual donors are not included), and the IRS Exempt Organizations Business Master File (New Mexico) &mdash; all public records, compiled with the Lab's custom-built data tools and provided as a research aid. Links mean a shared lobbyist, a shared donation, or a shared registered contact point; a shared contact often just means a shared accountant, attorney, or registered agent. The official record governs &mdash; verify against the source before relying on any entry, and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+      <p class="srcnote">Sources: New Mexico lobbyist registrations (2013&ndash;2026), New Mexico campaign finance (organizational donors only; individual donors are not included), and the IRS Exempt Organizations Business Master File (New Mexico):  all public records, compiled with the Lab's custom-built data tools and provided as a research aid. Links mean a shared lobbyist, a shared donation, or a shared registered contact point; a shared contact often just means a shared accountant, attorney, or registered agent. The official record governs; verify against the source before relying on any entry, and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
     </div>
   </main>
 
@@ -514,10 +514,10 @@
         var A=NODES[e[0]],B=NODES[e[1]];
         rows.push([A.label,A.cat,B.label,B.cat,(ETYPE[e[3]]||e[3]||''),e[2]||'']);
       });
-      if(!rows.length){alert('Nothing traced yet — search an entity first.');return;}
+      if(!rows.length){alert('Nothing traced yet; search an entity first.');return;}
       function c(v){v=(v==null?'':String(v));return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
       var prov=['# New Mexico Impact Lab | https://nmimpactlab.org',
-        '# NM influence network — traced connections',
+        '# NM influence network: traced connections',
         '# Traced from: '+(trail.length?trail.map(function(i){return NODES[i].label;}).join(' > '):'(whole map)'),
         '# Sources: NM lobbyist registrations, NM campaign finance, IRS nonprofit registry (all public)',
         '# A shared lobbyist, donor, or registered contact shows a relationship, not coordination or wrongdoing.',

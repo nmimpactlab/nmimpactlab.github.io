@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>New Mexico Campaign Finance — New Mexico Impact Lab</title>
-  <meta name="description" content="Explore $248M in New Mexico campaign contributions and spending, 2020–2026 — top donors, sectors, and recipient profiles. Individuals anonymized; organizations named.">
+  <title>New Mexico Campaign Finance | New Mexico Impact Lab</title>
+  <meta name="description" content="Explore $248M in New Mexico campaign contributions and spending, 2020–2026, top donors, sectors, and recipient profiles. Individuals anonymized; organizations named.">
   <link rel="canonical" href="https://nmimpactlab.org/campaign-finance/">
   <link rel="stylesheet" href="/assets/css/style.css">
   <style>
@@ -73,7 +73,7 @@
       <p><a href="/investigations/campaign-finance.html">&larr; Campaign Finance</a></p>
       <h1>New Mexico campaign finance</h1>
       <p class="sub" id="sub">Loading&hellip;</p>
-      <div class="privacy"><strong>How to read this:</strong> individual donors are <strong>anonymized</strong> (no names or addresses) &mdash; we surface *patterns*, not people. Organizations (PACs, businesses, unions, candidate committees) and recipients are named, because they are public actors. Coverage: <strong>2020&ndash;2026</strong>.</p>
+      <div class="privacy"><strong>How to read this:</strong> individual donors are <strong>anonymized</strong> (no names or addresses): we surface *patterns*, not people. Organizations (PACs, businesses, unions, candidate committees) and recipients are named, because they are public actors. Coverage: <strong>2020&ndash;2026</strong>.</p>
 
       <div class="tabs">
         <button data-tab="overview" class="on">Overview</button>
@@ -91,7 +91,7 @@
       </section>
 
       <section class="tab" id="recipients">
-        <h2>Recipients &mdash; candidates &amp; committees</h2>
+        <h2>Recipients: candidates &amp; committees</h2>
         <input class="cfsearch" id="recSearch" type="search" placeholder="Search a candidate or committee&hellip;" autocomplete="off">
         <div class="dlrow"><button id="recDl">&#8681; Download recipient totals (CSV)</button></div>
         <div class="profile" id="recProfile"></div>
@@ -114,7 +114,7 @@
         <div class="tablewrap"><table class="cft"><thead><tr><th>Employer</th><th class="num">Total</th><th class="num">Gifts</th></tr></thead><tbody id="secBody"></tbody></table></div>
       </section>
 
-      <p class="srcnote">Source: New Mexico Secretary of State campaign-finance disclosures, 2020&ndash;2026, compiled with the Lab's custom-built data tools and provided as a research aid. Individual donors are pseudonymized and personal identifiers removed. The official record governs &mdash; verify against the source before relying on any figure, and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+      <p class="srcnote">Source: New Mexico Secretary of State campaign-finance disclosures, 2020&ndash;2026, compiled with the Lab's custom-built data tools and provided as a research aid. Individual donors are pseudonymized and personal identifiers removed. The official record governs; verify against the source before relying on any figure, and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
     </div>
   </main>
 
@@ -158,7 +158,7 @@
         kpi(t.indDonors.toLocaleString(),'Individual donors (anonymized)')+
         kpi(t.orgDonors.toLocaleString(),'Organizations')+kpi(t.recipients.toLocaleString(),'Recipients');
       var yrs=SUM.years, maxY=0; yrs.forEach(function(y){maxY=Math.max(maxY,SUM.byYear[y].raised);});
-      $('byYear').innerHTML = yrs.map(function(y){var d=SUM.byYear[y];return barRow(y+' — raised', d.raised, maxY, money(d.raised)+' <span class="muted">/ '+money(d.spent)+' spent</span>');}).join('');
+      $('byYear').innerHTML = yrs.map(function(y){var d=SUM.byYear[y];return barRow(y+': raised', d.raised, maxY, money(d.raised)+' <span class="muted">/ '+money(d.spent)+' spent</span>');}).join('');
       var dt=SUM.donorTypeAmt, maxD=0; Object.keys(dt).forEach(function(k){maxD=Math.max(maxD,dt[k]);});
       $('donorType').innerHTML = Object.keys(dt).map(function(k){return barRow(k, dt[k], maxD, money(dt[k]));}).join('');
     }
@@ -175,9 +175,9 @@
     function recProfile(oid){
       var r=RECIPS.filter(function(x){return x.orgid===oid;})[0]; if(!r) return;
       var mix=Object.keys(r.typeMix||{}).map(function(k){return '<li>'+esc(k)+': '+full(r.typeMix[k])+'</li>';}).join('');
-      var od=(r.topOrgDonors||[]).map(function(d){return '<li>'+esc(d[0])+' — '+full(d[1])+'</li>';}).join('')||'<li class="muted">none</li>';
-      var em=(r.topEmployers||[]).map(function(d){return '<li>'+esc(d[0])+' — '+full(d[1])+'</li>';}).join('')||'<li class="muted">none</li>';
-      var pm=(r.topPayees||[]).map(function(d){return '<li>'+esc(d[0])+' — '+full(d[1])+'</li>';}).join('')||'<li class="muted">none</li>';
+      var od=(r.topOrgDonors||[]).map(function(d){return '<li>'+esc(d[0])+': '+full(d[1])+'</li>';}).join('')||'<li class="muted">none</li>';
+      var em=(r.topEmployers||[]).map(function(d){return '<li>'+esc(d[0])+': '+full(d[1])+'</li>';}).join('')||'<li class="muted">none</li>';
+      var pm=(r.topPayees||[]).map(function(d){return '<li>'+esc(d[0])+': '+full(d[1])+'</li>';}).join('')||'<li class="muted">none</li>';
       var yy=Object.keys(r.byYear||{}).map(function(y){return '<li>'+y+': '+full(r.byYear[y])+'</li>';}).join('');
       $('recProfile').innerHTML='<h3>'+esc(r.name)+'</h3><div class="pt">'+esc(r.type)+' &middot; '+full(r.raised)+' raised &middot; '+full(r.spent)+' spent &middot; '+r.nIndDonors.toLocaleString()+' individual donors</div>'
         +'<div class="pgrid"><div><h4>Raised by year</h4><ul>'+yy+'</ul></div><div><h4>By donor type</h4><ul>'+mix+'</ul></div>'
@@ -193,7 +193,7 @@
       q=q.toLowerCase();
       var rows=ORGS.filter(function(o){return !q||o.name.toLowerCase().indexOf(q)>=0;}).slice(0,150);
       $('orgBody').innerHTML=rows.map(function(o){
-        var subs=(o.topRecipients||[]).map(function(t){return '<li>'+esc(t[0])+' — '+full(t[1])+'</li>';}).join('');
+        var subs=(o.topRecipients||[]).map(function(t){return '<li>'+esc(t[0])+': '+full(t[1])+'</li>';}).join('');
         return '<tr class="click"><td>'+esc(o.name)+'</td><td class="num">'+full(o.total)+'</td><td class="num">'+o.n+'</td></tr>'
           +'<tr class="subrows" style="display:none"><td colspan="3"><strong>Top recipients:</strong><ul>'+(subs||'<li class="muted">n/a</li>')+'</ul></td></tr>';
       }).join('')||'<tr><td colspan="3" class="muted" style="padding:20px">No matches.</td></tr>';

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Where New Mexico's educators work — New Mexico Impact Lab</title>
+  <title>Where New Mexico's educators work | New Mexico Impact Lab</title>
   <link rel="stylesheet" href="/assets/css/style.css">
   <style>
     .wrap3 { max-width: 1120px; margin: 0 auto; padding: 26px 20px 64px; }
@@ -42,7 +42,7 @@
       <p class="sub" style="background:var(--bg-soft);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;max-width:none">
         <strong>Where New Mexico&rsquo;s educators work.</strong> Each educator is placed in the county of their employing district; counties with more than one district show each district delineated. Charters, state special schools, and statewide programs are statewide and shown separately below the map, not inside a county.
       </p>
-      <p class="wip-band"><strong>Work in progress &mdash; updated as new data arrives.</strong> This is a living dataset and data story, built from several separate IPRA public-records productions. Gaps across those datasets &mdash; missing years, blank assignment fields, and roles the records don&rsquo;t capture &mdash; have produced some erroneous or incomplete entries. We are reconciling these and will keep updating as additional data comes in.</p>
+      <p class="wip-band"><strong>Work in progress:  updated as new data arrives.</strong> This is a living dataset and data story, built from several separate IPRA public-records productions. Gaps across those datasets (missing years, blank assignment fields, and roles the records don&rsquo;t capture) have produced some erroneous or incomplete entries. We are reconciling these and will keep updating as additional data comes in.</p>
       <div class="legend" id="legend"></div>
       <div class="maprow">
         <div>
@@ -117,7 +117,7 @@
       ['Charter schools', m.charter, 'statewide-authorized'],
       ['State special schools', m.state_special_schools, 'Deaf / Blind / Arts'],
       ['Statewide programs', m.statewide_programs, 'corrections / juvenile justice'],
-      ['No employer named', m.no_employer_named, 'directory-only — to geocode']
+      ['No employer named', m.no_employer_named, 'directory-only: to geocode']
     ].map(function(x){return '<div class="card2"><div class="v">'+nf(x[1])+'</div><div class="l">'+x[0]+'<br><span style="opacity:.75">'+x[2]+'</span></div></div>';}).join('');
     document.getElementById('footnote').innerHTML='Source: NM PED 2024–25 employment records; district→county crosswalk (draft, under review). Per-district counts under 5 are suppressed. Counties shaded by employed-educator headcount.';
   </script>

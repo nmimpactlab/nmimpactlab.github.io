@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Connection search — how New Mexico entities link up — New Mexico Impact Lab</title>
-  <meta name="description" content="Search across New Mexico public records for the connections between two or more people or organizations — shared lobbyists, shared campaign donors and recipients, and shared registered contacts.">
+  <title>Connection search: how New Mexico entities link up | New Mexico Impact Lab</title>
+  <meta name="description" content="Search across New Mexico public records for the connections between two or more people or organizations, shared lobbyists, shared campaign donors and recipients, and shared registered contacts.">
   <link rel="canonical" href="https://nmimpactlab.org/connections/">
   <link rel="stylesheet" href="/assets/css/style.css">
   <style>
@@ -95,10 +95,10 @@
     <div class="tool">
       <p><a href="/data/">&larr; Data</a></p>
       <h1>Connection search</h1>
-      <p class="sub">Pick two or more New Mexico people or organizations and see how they connect across the public record &mdash; a shared lobbyist, a shared campaign donor or recipient committee, or a shared registered contact point.</p>
+      <p class="sub">Pick two or more New Mexico people or organizations and see how they connect across the public record: a shared lobbyist, a shared campaign donor or recipient committee, or a shared registered contact point.</p>
 
       <div class="privacy">
-        <strong>What a connection means.</strong> Links here come only from public disclosures: a registered lobbyist and the organizations they represent, an organizational campaign donor and the committees it funds, and organizations that share a registered contact point. Individuals other than registered lobbyists are not included. <strong>A shared lobbyist, donor, or registered agent shows a relationship &mdash; not coordination or wrongdoing.</strong> Verify against the source before drawing any conclusion.
+        <strong>What a connection means.</strong> Links here come only from public disclosures: a registered lobbyist and the organizations they represent, an organizational campaign donor and the committees it funds, and organizations that share a registered contact point. Individuals other than registered lobbyists are not included. <strong>A shared lobbyist, donor, or registered agent shows a relationship, not coordination or wrongdoing.</strong> Verify against the source before drawing any conclusion.
       </div>
 
       <div class="searchwrap">
@@ -110,7 +110,7 @@
       <p class="hint" id="hint">Add at least two entities to trace the connections between them.</p>
 
       <div class="searchwrap xwrap">
-        <input type="search" id="qx" placeholder="Optional: exclude a red-herring hub &mdash; e.g. a big PAC many entities all fund &mdash; so paths route around it&hellip;" autocomplete="off" aria-label="Exclude an entity from connection paths">
+        <input type="search" id="qx" placeholder="Optional: exclude a red-herring hub,  e.g. a big PAC many entities all fund, so paths route around it&hellip;" autocomplete="off" aria-label="Exclude an entity from connection paths">
         <div class="sugg" id="suggx"></div>
       </div>
       <div class="chips xchips" id="xchips"></div>
@@ -143,7 +143,7 @@
         </div>
       </div>
 
-      <p class="srcnote">Sources: New Mexico lobbyist registration disclosures, New Mexico campaign finance reports, and the IRS Exempt Organizations Business Master File (New Mexico) &mdash; all public records, compiled with the Lab's custom-built data tools and provided as a research aid. Campaign-finance links use organizational donors only; individual donors are not included. The official record governs &mdash; verify against the source and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+      <p class="srcnote">Sources: New Mexico lobbyist registration disclosures, New Mexico campaign finance reports, and the IRS Exempt Organizations Business Master File (New Mexico):  all public records, compiled with the Lab's custom-built data tools and provided as a research aid. Campaign-finance links use organizational donors only; individual donors are not included. The official record governs; verify against the source and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
     </div>
   </main>
 
@@ -418,7 +418,7 @@
             ph += '<span class="n">' + esc(n.label) + '</span>';
             if (k < p.path.length - 1){
               var t = edgeType(p.path[k], p.path[k+1]);
-              ph += '<span class="arr">&mdash;</span><span class="rel">' + esc(relPhrase(t)) + '</span><span class="arr">&rarr;</span>';
+              ph += '<span class="arr">: </span><span class="rel">' + esc(relPhrase(t)) + '</span><span class="arr">&rarr;</span>';
             }
           }
           ph += '</div>';

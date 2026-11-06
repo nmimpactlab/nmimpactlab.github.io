@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Organizations across New Mexico public records — New Mexico Impact Lab</title>
+  <title>Organizations across New Mexico public records | New Mexico Impact Lab</title>
   <meta name="description" content="Search New Mexico organizations that appear in more than one independent public-record system: the IRS nonprofit registry, lobbyist registrations and campaign finance.">
   <link rel="canonical" href="https://nmimpactlab.org/organizations/">
   <link rel="stylesheet" href="/assets/css/style.css">
@@ -83,10 +83,10 @@
     <div class="tool">
       <p><a href="/data/">&larr; Data</a></p>
       <h1>Organizations across New Mexico public records</h1>
-      <p class="sub">New Mexico organizations that appear in more than one <strong>independent</strong> public-record system &mdash; the IRS nonprofit registry, state lobbyist registrations, and state campaign finance. Click any row for how the match was established.</p>
+      <p class="sub">New Mexico organizations that appear in more than one <strong>independent</strong> public-record system: the IRS nonprofit registry, state lobbyist registrations, and state campaign finance. Click any row for how the match was established.</p>
 
       <div class="privacy">
-        <strong>How matches are made, and what we do not publish.</strong> Confirming that two records describe the same organization requires identifying details in the underlying filings &mdash; registered addresses, contact points, and the names of officers. <strong>Those details are used only to check the match and are never published here.</strong> What you see is the conclusion and the reason for it. Only organizations appear in this tool; individuals do not.
+        <strong>How matches are made, and what we do not publish.</strong> Confirming that two records describe the same organization requires identifying details in the underlying filings: registered addresses, contact points, and the names of officers. <strong>Those details are used only to check the match and are never published here.</strong> What you see is the conclusion and the reason for it. Only organizations appear in this tool; individuals do not.
       </div>
 
       <div class="controls">
@@ -154,8 +154,8 @@
         <button id="next" disabled>Next &rarr;</button>
       </div>
 
-      <p class="srcnote">Sources: the IRS Exempt Organizations Business Master File (New Mexico extract), New Mexico lobbyist registration disclosures, and New Mexico campaign finance reports &mdash; all public records, compiled with the Lab's custom-built data tools and provided as a research aid.
-      <strong>Reported revenue</strong> is the figure in the organization's most recent IRS record; most small nonprofits file a form that carries no financial figures at all, so a blank or zero does not mean an organization is inactive. <strong>Linked organizations</strong> share a registered contact point, which frequently means nothing more than a shared accountant, attorney or registered agent &mdash; it is not evidence of common control. The official record governs; verify against the source and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+      <p class="srcnote">Sources: the IRS Exempt Organizations Business Master File (New Mexico extract), New Mexico lobbyist registration disclosures, and New Mexico campaign finance reports: all public records, compiled with the Lab's custom-built data tools and provided as a research aid.
+      <strong>Reported revenue</strong> is the figure in the organization's most recent IRS record; most small nonprofits file a form that carries no financial figures at all, so a blank or zero does not mean an organization is inactive. <strong>Linked organizations</strong> share a registered contact point, which frequently means nothing more than a shared accountant, attorney or registered agent: it is not evidence of common control. The official record governs; verify against the source and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
     </div>
   </main>
 
@@ -246,7 +246,7 @@
             if (r.ein) h += '<dt>IRS EIN</dt><dd>' + esc(r.ein) + '</dd>';
             if (r.subsection && SUB[r.subsection]) h += '<dt>Tax status</dt><dd>' + esc(SUB[r.subsection]) + '</dd>';
             if (r.ntee) h += '<dt>IRS sector</dt><dd>' + esc(NTEE[r.ntee.charAt(0)] || 'Unclassified') + ' <span class="pill">' + esc(r.ntee) + '</span></dd>';
-            h += '<dt>Reported revenue</dt><dd>' + money(r.revenue) + (r.revenue ? '' : ' <span style="color:var(--text-soft)">&mdash; no figure in the IRS record; small nonprofits file a form that reports none</span>') + '</dd>';
+            h += '<dt>Reported revenue</dt><dd>' + money(r.revenue) + (r.revenue ? '': ' <span style="color:var(--text-soft)">, no figure in the IRS record; small nonprofits file a form that reports none</span>') + '</dd>';
             if (r.affiliations && r.affiliations.length) {
               h += '<dt>Shares a registered contact point with</dt><dd><div class="afflist">'
                 + r.affiliations.map(function (a) { return '<span>' + esc(a) + '</span>'; }).join('')

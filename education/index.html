@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>New Mexico Teacher Licensure — New Mexico Impact Lab</title>
-  <meta name="description" content="Statewide figures on New Mexico's teaching workforce: licensure levels, turnover, endorsements, and pay, 2011–2023. Built from public NM PED records. Aggregate only — no individual teacher is named.">
+  <title>New Mexico Teacher Licensure | New Mexico Impact Lab</title>
+  <meta name="description" content="Statewide figures on New Mexico's teaching workforce: licensure levels, turnover, endorsements, and pay, 2011–2023. Built from public NM PED records. Aggregate only, no individual teacher is named.">
   <link rel="canonical" href="https://nmimpactlab.org/education/">
   <link rel="stylesheet" href="/assets/css/style.css">
   <style>
@@ -78,21 +78,21 @@
   <main id="main">
     <div class="tool">
       <h1>New Mexico's Teaching Workforce</h1>
-      <p class="sub">Statewide figures on teacher licensure, turnover, endorsements, and pay — built from public New Mexico Public Education Department records, school years 2011–2023.</p>
+      <p class="sub">Statewide figures on teacher licensure, turnover, endorsements, and pay: built from public New Mexico Public Education Department records, school years 2011–2023.</p>
       <div class="privacy-band">
         <span>&#128274;</span>
-        <div><b>Aggregate figures only — no individual teacher is named or published.</b> Counts resting on fewer than 5 people are withheld; district and employer breakdowns are limited to units with enough staff to protect identities.</div>
+        <div><b>Aggregate figures only: no individual teacher is named or published.</b> Counts resting on fewer than 5 people are withheld; district and employer breakdowns are limited to units with enough staff to protect identities.</div>
       </div>
 
-      <p class="wip-band"><strong>Work in progress &mdash; updated as new data arrives.</strong> This is a living dataset and data story, built from several separate IPRA public-records productions. Gaps across those datasets &mdash; missing years, blank assignment fields, and roles the records don&rsquo;t capture &mdash; have produced some erroneous or incomplete entries. We are reconciling these and will keep updating as additional data comes in.</p>
+      <p class="wip-band"><strong>Work in progress:  updated as new data arrives.</strong> This is a living dataset and data story, built from several separate IPRA public-records productions. Gaps across those datasets (missing years, blank assignment fields, and roles the records don&rsquo;t capture) have produced some erroneous or incomplete entries. We are reconciling these and will keep updating as additional data comes in.</p>
 
       <section class="block">
         <h2>Explore the workforce</h2>
-        <p class="note">The workforce data three ways &mdash; compare licensed vs. employed, see where they work, or dig into the full breakdown. The dashboard below is the at-a-glance summary.</p>
+        <p class="note">The workforce data three ways: compare licensed vs. employed, see where they work, or dig into the full breakdown. The dashboard below is the at-a-glance summary.</p>
         <div class="hubgrid">
-          <a class="hubcard" href="/education/compare.html"><b>Licensed vs. employed</b><span>The main comparison &mdash; all 82,266 licensed next to the 40,148 employed, by type, level, and specialty.</span></a>
+          <a class="hubcard" href="/education/compare.html"><b>Licensed vs. employed</b><span>The main comparison: all 82,266 licensed next to the 40,148 employed, by type, level, and specialty.</span></a>
           <a class="hubcard" href="/education/geography.html"><b>Where they work</b><span>An interactive county map, districts delineated inside each county.</span></a>
-          <a class="hubcard" href="/education/breakdown.html"><b>Full breakdown</b><span>Every detail of all current licenses &mdash; endorsements, combinations, all-rounders, and more.</span></a>
+          <a class="hubcard" href="/education/breakdown.html"><b>Full breakdown</b><span>Every detail of all current licenses: endorsements, combinations, all-rounders, and more.</span></a>
           <a class="hubcard" href="/education/methods.html"><b>Methods &amp; sourcing</b><span>Datasets, cleaning, and the privacy model.</span></a>
         </div>
       </section>
@@ -125,7 +125,7 @@
     function getCS(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim() || '#0b4f6c'; }
     function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
     function nf(n){ return (n==null||n==='')?'':Number(n).toLocaleString('en-US'); }
-    function pct(v){ return (v===''||v==null)?'<span class="suppressed">&mdash;</span>':(v+'%'); }
+    function pct(v){ return (v===''||v==null)?'<span class="suppressed">: </span>':(v+'%'); }
     function num(v){ return (v===''||v==null||v==='<5')?v:parseFloat(v); }
 
     fetch('/assets/data/teacher-licensure.json').then(function(r){ return r.json(); }).then(render)
@@ -168,7 +168,7 @@
           'Annual exit rate by highest license held, pooled 2016&ndash;2022.',
           '<div class="card">' + levelExitChart(cl) + '</div>') +
         block('Teacher pay compressed from the bottom',
-          'Salary distribution for teachers, 2011&ndash;12 vs 2018&ndash;19. The 25th percentile rose far faster than the median or 75th &mdash; minimum-salary increases lifting entry pay.',
+          'Salary distribution for teachers, 2011&ndash;12 vs 2018&ndash;19. The 25th percentile rose far faster than the median or 75th: minimum-salary increases lifting entry pay.',
           '<div class="card">' + salaryChart(sal) + legend([[C_SOFT,'2011&ndash;12'],[C_ACCENT,'2018&ndash;19']]) + '</div>');
 
       // 4. District table
@@ -189,7 +189,7 @@
 
       // 7. pool
       html += block('Licensed, but not working in NM public schools',
-        'Of roughly ' + nf(poolTotal) + ' endorsed people not currently employed here, most are not strangers &mdash; many taught in New Mexico and left, and thousands more are newly licensed and not yet hired.',
+        'Of roughly ' + nf(poolTotal) + ' endorsed people not currently employed here, most are not strangers: many taught in New Mexico and left, and thousands more are newly licensed and not yet hired.',
         poolTable(pool));
 
       app.innerHTML = html;

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>New Mexico public-education lobbying network — New Mexico Impact Lab</title>
+  <title>New Mexico public-education lobbying network | New Mexico Impact Lab</title>
   <meta name="description" content="Trace who lobbies for New Mexico's public schools, charters, and education groups. Search an entity, follow its connections one step at a time, and export what you find.">
   <link rel="canonical" href="https://nmimpactlab.org/investigations/school-lobbying-network.html">
   <link rel="stylesheet" href="/assets/css/style.css">
@@ -84,8 +84,8 @@
     <div class="maptool">
       <p><a href="/investigations/lobbying.html">&larr; Lobbying &amp; Employers</a></p>
       <h1>New Mexico's public-education lobbying network</h1>
-      <p class="sub">Who lobbies for New Mexico's school districts, charter schools, and education groups &mdash; and the lobbyists who connect them. <strong>Search an entity to isolate it and its direct connections</strong>, then click any connection to open up <em>its</em> connections, one step at a time. Export whatever you trace.</p>
-      <p class="coverage"><strong>Coverage: registrations 2013&ndash;2026.</strong> Combining New Mexico's former and current lobbyist-disclosure systems. Entities are those the state itself tags with an <em>Education</em> business interest, plus school-name matches for older records the state left untagged &mdash; so the map includes some education-adjacent advocacy groups alongside districts and charters. Use the legend to filter by type. <a href="/sources.html#school-network">How this map was built, and what it leaves out</a>.</p>
+      <p class="sub">Who lobbies for New Mexico's school districts, charter schools, and education groups, and the lobbyists who connect them. <strong>Search an entity to isolate it and its direct connections</strong>, then click any connection to open up <em>its</em> connections, one step at a time. Export whatever you trace.</p>
+      <p class="coverage"><strong>Coverage: registrations 2013&ndash;2026.</strong> Combining New Mexico's former and current lobbyist-disclosure systems. Entities are those the state itself tags with an <em>Education</em> business interest, plus school-name matches for older records the state left untagged, so the map includes some education-adjacent advocacy groups alongside districts and charters. Use the legend to filter by type. <a href="/sources.html#school-network">How this map was built, and what it leaves out</a>.</p>
 
       <div class="mapcontrols">
         <div class="searchwrap">
@@ -124,7 +124,7 @@
         <div class="panel" id="panel"></div>
       </div>
 
-      <p class="srcnote">Source: New Mexico lobbyist-registration disclosures (public record), 2013&ndash;2026, compiled with the Lab's custom-built data tools and provided as a research aid. Entity names are normalized across the state's former and current systems; the official record governs &mdash; verify against the source before relying on any entry, and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+      <p class="srcnote">Source: New Mexico lobbyist-registration disclosures (public record), 2013&ndash;2026, compiled with the Lab's custom-built data tools and provided as a research aid. Entity names are normalized across the state's former and current systems; the official record governs; verify against the source before relying on any entry, and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
     </div>
   </main>
 
@@ -514,10 +514,10 @@
         var emp=A.kind==='employer'?A:B, lob=A.kind==='employer'?B:A;
         rows.push([emp.label,emp.cat,lob.label,e[2]||'']);
       });
-      if(!rows.length){alert('Nothing traced yet — search an entity first.');return;}
+      if(!rows.length){alert('Nothing traced yet; search an entity first.');return;}
       function c(v){v=(v==null?'':String(v));return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
       var prov=['# New Mexico Impact Lab | https://nmimpactlab.org',
-        '# NM public-education lobbying network — traced connections',
+        '# NM public-education lobbying network: traced connections',
         '# Traced from: '+(trail.length?trail.map(function(i){return NODES[i].label;}).join(' > '):'(whole map)'),
         '# Source: NM lobbyist-registration disclosures (public), 2013-2026',
         '# Downloaded: '+new Date().toISOString(),

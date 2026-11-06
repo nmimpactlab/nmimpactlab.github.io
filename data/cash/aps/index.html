@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>APS Cash Disbursements — New Mexico Impact Lab</title>
+  <title>APS Cash Disbursements | New Mexico Impact Lab</title>
   <meta name="description" content="Searchable register of Albuquerque Public Schools cash disbursements, July 2010 – June 2026, compiled from the district's published board documents.">
   <meta name="robots" content="noindex, nofollow">
   <link rel="stylesheet" href="/assets/css/style.css">
@@ -72,11 +72,11 @@
   <main id="main">
     <div class="tool">
       <h1>APS cash disbursements, 2010&ndash;2026</h1>
-      <p class="sub">Every cash disbursement Albuquerque Public Schools published in its board documents &mdash; <strong>July 2010 through June 2026</strong> &mdash; compiled into one searchable register. Search a vendor, then click the row to see each individual payment with a pointer to the source document.</p>
+      <p class="sub">Every cash disbursement Albuquerque Public Schools published in its board documents,  <strong>July 2010 through June 2026</strong>, compiled into one searchable register. Search a vendor, then click the row to see each individual payment with a pointer to the source document.</p>
 
       <div class="stats" id="stats"></div>
 
-      <div class="privacy">This register shows payment facts as the district published them: payee, date, amount, check/voucher number, and (from July&nbsp;2025) the district's own expense coding. Remit city and address details are intentionally omitted. 185 of 192 months are present; the district never published registers for 7 months (May&ndash;Jul&nbsp;2019, Mar &amp; Jul&nbsp;2020, Apr &amp; Jul&nbsp;2021) &mdash; those are obtainable only by records request.</div>
+      <div class="privacy">This register shows payment facts as the district published them: payee, date, amount, check/voucher number, and (from July&nbsp;2025) the district's own expense coding. Remit city and address details are intentionally omitted. 185 of 192 months are present; the district never published registers for 7 months (May&ndash;Jul&nbsp;2019, Mar &amp; Jul&nbsp;2020, Apr &amp; Jul&nbsp;2021): those are obtainable only by records request.</div>
 
       <div class="controls">
         <div class="field">
@@ -132,7 +132,7 @@
         <button id="next" disabled>Next &rarr;</button>
       </div>
 
-      <p class="srcnote">Source: Albuquerque Public Schools published board records (public record) &mdash; Lawson AP265 quarterly cash-payment registers from the district's finance quarterly-reports pages (2010&ndash;2018), monthly check registers in Finance Committee and Board of Education agenda packets (2018&ndash;2025), and monthly Detail Listing of Vouchers reports (July&nbsp;2025 onward). Compiled with the Lab's custom-built data tools and provided as a research aid; every payment row carries its source document and page. The official record governs &mdash; verify against the source and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+      <p class="srcnote">Source: Albuquerque Public Schools published board records (public record):  Lawson AP265 quarterly cash-payment registers from the district's finance quarterly-reports pages (2010&ndash;2018), monthly check registers in Finance Committee and Board of Education agenda packets (2018&ndash;2025), and monthly Detail Listing of Vouchers reports (July&nbsp;2025 onward). Compiled with the Lab's custom-built data tools and provided as a research aid; every payment row carries its source document and page. The official record governs; verify against the source and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
     </div>
   </main>
 
@@ -208,7 +208,7 @@
       else view.sort(function (a, b) { return b[V.total] - a[V.total]; });
       page = 0;
       var tot = 0; for (var i = 0; i < view.length; i++) tot += view[i][V.total];
-      $('count').textContent = view.length.toLocaleString() + ' of ' + DATA.length.toLocaleString() + ' vendors — $' + money(tot);
+      $('count').textContent = view.length.toLocaleString() + ' of ' + DATA.length.toLocaleString() + ' vendors: $' + money(tot);
       render();
     }
     var debounce;
@@ -251,7 +251,7 @@
       getShard(r[V.shard]).then(function (sh) {
         if (openVendor !== r[V.name]) return;
         var txns = sh[r[V.name]] || [];
-        var bar = '<div class="dbar"><span><strong>' + esc(r[V.name]) + '</strong> — ' + txns.length.toLocaleString()
+        var bar = '<div class="dbar"><span><strong>' + esc(r[V.name]) + '</strong>: ' + txns.length.toLocaleString()
           + ' payments, $' + money(r[V.total]) + ' (' + esc(r[V.y0]) + '–' + esc(r[V.y1]) + '), newest first</span>'
           + '<button type="button" class="dlvendor">&#8681; Download this vendor’s payments (CSV)</button></div>';
         var truncated = txns.length > DETAIL_FIRST;
@@ -314,7 +314,7 @@
       return lines;
     }
     function saveCSV(filename, headerCols, dataRows, dict) {
-      if (!dataRows.length) { alert('No rows to download — adjust your search first.'); return; }
+      if (!dataRows.length) { alert('No rows to download; adjust your search first.'); return; }
       var lines = provenance(dict);
       lines.push(headerCols.map(csvCell).join(','));
       for (var i = 0; i < dataRows.length; i++) lines.push(dataRows[i].map(csvCell).join(','));
@@ -353,7 +353,7 @@
           done++;
           btn.textContent = 'Preparing… ' + Math.round(100 * done / N) + '%';
           step(i + 1);
-        }).catch(function () { btn.textContent = orig; btn.disabled = false; alert('Download failed partway — please retry.'); });
+        }).catch(function () { btn.textContent = orig; btn.disabled = false; alert('Download failed partway; please retry.'); });
       }
       step(0);
     });

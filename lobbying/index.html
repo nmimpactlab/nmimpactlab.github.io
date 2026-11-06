@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Search NM Lobbyists &amp; Employers — New Mexico Impact Lab</title>
+  <title>Search NM Lobbyists &amp; Employers | New Mexico Impact Lab</title>
   <meta name="description" content="Search New Mexico lobbyist registrations by lobbyist or employer. Public disclosure data; personal contact details omitted.">
   <link rel="canonical" href="https://nmimpactlab.org/lobbying/">
   <link rel="stylesheet" href="/assets/css/style.css">
@@ -60,7 +60,7 @@
     <div class="tool">
       <p><a href="/investigations/lobbying.html">&larr; Lobbying &amp; Employers</a></p>
       <h1>Search lobbyists &amp; employers</h1>
-      <p class="sub">Who lobbies the New Mexico Legislature, and who pays them &mdash; search by either side of the relationship. <strong>Registrations 2013&ndash;2026</strong> (combining the state's former and current disclosure systems).</p>
+      <p class="sub">Who lobbies the New Mexico Legislature, and who pays them; search by either side of the relationship. <strong>Registrations 2013&ndash;2026</strong> (combining the state's former and current disclosure systems).</p>
 
       <div class="privacy">This index shows public registration facts only: lobbyist name, employer, the employer's city/state, and the years registered. Personal contact details (email, phone, home address) are intentionally omitted.</div>
 
@@ -113,7 +113,7 @@
         <button id="next" disabled>Next &rarr;</button>
       </div>
 
-      <p class="srcnote">Source: New Mexico lobbyist registration disclosures (public record), compiled with the Lab's custom-built data tools and provided as a research aid; the official record governs &mdash; verify against the source and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
+      <p class="srcnote">Source: New Mexico lobbyist registration disclosures (public record), compiled with the Lab's custom-built data tools and provided as a research aid; the official record governs; verify against the source and email <a href="mailto:research@nmimpactlab.org">research@nmimpactlab.org</a> with corrections. See our <a href="/methodology.html">methodology</a>.</p>
     </div>
   </main>
 
@@ -231,7 +231,7 @@
       return lines;
     }
     function saveCSV(filename, headerCols, dataRows, sourceDesc, dict) {
-      if (!dataRows.length) { alert('No rows to download — adjust your search first.'); return; }
+      if (!dataRows.length) { alert('No rows to download; adjust your search first.'); return; }
       var lines = provenance(sourceDesc, dict);
       lines.push(headerCols.map(csvCell).join(','));
       for (var i = 0; i < dataRows.length; i++) lines.push(dataRows[i].map(csvCell).join(','));
